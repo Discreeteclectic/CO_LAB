@@ -18,6 +18,8 @@ let allCalculations = [];
 let allClientHistory = [];
 let allContractHistory = [];
 let allSerialNumbers = [];
+let allWriteOffCategories = [];
+let allCostCategories = [];
 
 // Функция сохранения данных в файл
 function saveData() {
@@ -31,7 +33,9 @@ function saveData() {
     calculations: allCalculations,
     clientHistory: allClientHistory,
     contractHistory: allContractHistory,
-    serialNumbers: allSerialNumbers
+    serialNumbers: allSerialNumbers,
+    writeOffCategories: allWriteOffCategories,
+    costCategories: allCostCategories
   };
   try {
     fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
@@ -56,6 +60,8 @@ function loadData() {
       if (data.clientHistory) allClientHistory.splice(0, allClientHistory.length, ...data.clientHistory);
       if (data.contractHistory) allContractHistory.splice(0, allContractHistory.length, ...data.contractHistory);
       if (data.serialNumbers) allSerialNumbers.splice(0, allSerialNumbers.length, ...data.serialNumbers);
+      if (data.writeOffCategories) allWriteOffCategories.splice(0, allWriteOffCategories.length, ...data.writeOffCategories);
+      if (data.costCategories) allCostCategories.splice(0, allCostCategories.length, ...data.costCategories);
       console.log('Data loaded from file');
     }
   } catch (error) {
@@ -968,6 +974,7 @@ const server = http.createServer((req, res) => {
           oldQuantity: oldQuantity,
           newQuantity: newQuantity,
           reason: transactionData.reason || '',
+          writeOffCategory: transactionData.writeOffCategory || '', // Категория списания
           clientId: transactionData.clientId || null,
           createdAt: new Date().toISOString(),
           createdBy: transactionData.createdBy || 'Пользователь'
@@ -2443,6 +2450,40 @@ const server = http.createServer((req, res) => {
     res.writeHead(200, { 'Content-Type': contentType });
     res.end(content);
   });
+
+  // API endpoints for reference data (справочники)
+  if (req.url === '/api/writeoff-categories' && req.method === 'GET') {
+    const user = verifyToken(req);
+    if (!user) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Unauthorized' }));
+      return;
+    }
+
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ 
+      writeOffCategories: allWriteOffCategories,
+      message: 'Write-off categories retrieved successfully' 
+    }));
+    return;
+  }
+
+  if (req.url === '/api/cost-categories' && req.method === 'GET') {
+    const user = verifyToken(req);
+    if (!user) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Unauthorized' }));
+      return;
+    }
+
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ 
+      costCategories: allCostCategories,
+      message: 'Cost categories retrieved successfully' 
+    }));
+    return;
+  }
+
 });
 
 // Данные уже загружены в начале файла

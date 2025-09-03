@@ -1942,8 +1942,22 @@
                     </div>
                     
                     <div class="form-group">
+                        <label for="writeOffCategory">Категория списания:</label>
+                        <select id="writeOffCategory" onchange="updateInventoryReason()">
+                            <option value="">Выберите категорию...</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
                         <label for="inventoryReason">Причина изменения остатка:</label>
-                        <textarea id="inventoryReason" rows="3" placeholder="Укажите причину изменения остатка (например: повреждение баллонов, потеря, ошибка учета)"></textarea>
+                        <textarea id="inventoryReason" rows="3" placeholder="Укажите детальную причину изменения остатка"></textarea>
+                    </div>
+                    
+                    <div id="costImpactInfo" class="form-group" style="display: none; padding: 10px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px;">
+                        <small style="color: #856404;">
+                            <strong>Влияние на себестоимость:</strong> 
+                            <span id="costImpactText"></span>
+                        </small>
                     </div>
                 </div>
             </div>
@@ -2516,7 +2530,7 @@
                                 <td>${transaction.quantity} шт</td>
                                 <td>${transaction.orderNumber ? `Заявка ${transaction.orderNumber}` : '-'}</td>
                                 <td>
-                                    ${transaction.reason || '-'}${transaction.cylinderNumbers && transaction.cylinderNumbers.length > 0 ? ` (${transaction.cylinderNumbers.map(num => typeof num === 'object' ? num.cylinderNumber : num).join(', ')})` : ''}
+                                    ${transaction.writeOffCategory ? `[${getCategoryName(transaction.writeOffCategory)}] ` : ''}${transaction.reason || '-'}${transaction.cylinderNumbers && transaction.cylinderNumbers.length > 0 ? ` (${transaction.cylinderNumbers.map(num => typeof num === 'object' ? num.cylinderNumber : num).join(', ')})` : ''}
                                 </td>
                                 <td>${transaction.createdBy || '-'}</td>
                             </tr>
@@ -3323,6 +3337,7 @@
                             
                             ${transaction.reason ? `
                                 <div style="margin-top: 5px;">
+                                    ${transaction.writeOffCategory ? `<strong>Категория:</strong> <span style="color: #dc3545;">${getCategoryName(transaction.writeOffCategory)}</span><br>` : ''}
                                     <strong>Основание:</strong> ${transaction.reason}
                                 </div>
                             ` : ''}
@@ -4559,6 +4574,11 @@
                 document.getElementById('currentInventoryStock').textContent = `${currentStock} ${unit}`;
                 document.getElementById('inventoryModalErrorMessage').style.display = 'none';
                 document.getElementById('inventoryReason').value = '';
+                document.getElementById('writeOffCategory').value = '';
+                document.getElementById('costImpactInfo').style.display = 'none';
+                
+                // Загружаем категории списания
+                await loadWriteOffCategories();
                 
                 // Загружаем номера баллонов с сервера
                 const serialNumbers = await API.getSerialNumbers(productId);
@@ -4651,9 +4671,16 @@
                     return;
                 }
                 
+                const writeOffCategory = document.getElementById('writeOffCategory').value;
                 const reason = document.getElementById('inventoryReason').value.trim();
+                
                 if (!reason) {
                     showInventoryError('Укажите причину изменения остатка');
+                    return;
+                }
+                
+                if (difference < 0 && !writeOffCategory) {
+                    showInventoryError('При уменьшении остатка необходимо выбрать категорию списания');
                     return;
                 }
                 
@@ -4681,6 +4708,7 @@
                     type: 'INVENTORY',
                     quantity: finalCount, // Итоговое количество после инвентаризации
                     reason: detailedReason,
+                    writeOffCategory: writeOffCategory, // Категория списания
                     cylinderNumbers: presentCylinders, // Баллоны, которые остались
                     missingCylinderNumbers: missingCylinders // Баллоны, которые списаны
                 });
@@ -4781,6 +4809,92 @@
             const saveBtn = document.getElementById('saveInventoryBtn');
             saveBtn.innerHTML = '💾 Провести инвентаризацию';
             saveBtn.disabled = false;
+        }
+
+        // Загрузка категорий списания
+        async function loadWriteOffCategories() {
+            try {
+                const response = await API.get('/api/writeoff-categories');
+                const select = document.getElementById('writeOffCategory');
+                
+                // Очищаем текущие опции (кроме первой)
+                select.innerHTML = '<option value="">Выберите категорию...</option>';
+                
+                // Добавляем категории
+                response.writeOffCategories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.code;
+                    option.textContent = category.name;
+                    option.dataset.description = category.description;
+                    option.dataset.affectsCost = category.affectsCost;
+                    option.dataset.costPercent = category.defaultCostPercent;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading write-off categories:', error);
+                showToast('Ошибка загрузки категорий списания', true);
+            }
+        }
+
+        // Получение названия категории по коду
+        function getCategoryName(categoryCode) {
+            const select = document.getElementById('writeOffCategory');
+            if (select) {
+                for (let option of select.options) {
+                    if (option.value === categoryCode) {
+                        return option.textContent;
+                    }
+                }
+            }
+            
+            // Fallback - возвращаем код если название не найдено
+            const categoryNames = {
+                'DEFECT': 'Дефект товара',
+                'QUALITY': 'Низкое качество газа', 
+                'LEAKAGE': 'Утечка газа',
+                'THEFT': 'Пропажа/кража',
+                'EXPIRED': 'Истек срок переосвидетельствования',
+                'RETURN': 'Возврат от клиента',
+                'RECOUNT': 'Пересортица при инвентаризации'
+            };
+            
+            return categoryNames[categoryCode] || categoryCode;
+        }
+
+        // Обновление информации при выборе категории
+        function updateInventoryReason() {
+            const select = document.getElementById('writeOffCategory');
+            const costImpactInfo = document.getElementById('costImpactInfo');
+            const costImpactText = document.getElementById('costImpactText');
+            const reasonTextarea = document.getElementById('inventoryReason');
+            
+            if (select.value) {
+                const selectedOption = select.options[select.selectedIndex];
+                const affectsCost = selectedOption.dataset.affectsCost === 'true';
+                const costPercent = selectedOption.dataset.costPercent;
+                const description = selectedOption.dataset.description;
+                
+                // Показываем информацию о влиянии на себестоимость
+                if (affectsCost) {
+                    costImpactText.textContent = `Списание повлияет на себестоимость товара (${costPercent}% от закупочной стоимости)`;
+                    costImpactInfo.style.background = '#f8d7da';
+                    costImpactInfo.style.borderColor = '#f5c6cb';
+                    costImpactText.style.color = '#721c24';
+                } else {
+                    costImpactText.textContent = 'Списание не влияет на себестоимость товара';
+                    costImpactInfo.style.background = '#d1ecf1';
+                    costImpactInfo.style.borderColor = '#bee5eb';
+                    costImpactText.style.color = '#0c5460';
+                }
+                
+                costImpactInfo.style.display = 'block';
+                
+                // Устанавливаем placeholder с описанием категории
+                reasonTextarea.placeholder = `${description}. Укажите дополнительные детали...`;
+            } else {
+                costImpactInfo.style.display = 'none';
+                reasonTextarea.placeholder = 'Укажите детальную причину изменения остатка';
+            }
         }
 
         // Экспорт функций для использования в HTML

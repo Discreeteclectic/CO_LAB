@@ -1304,5 +1304,114 @@
       "createdAt": "2025-09-03T15:36:07.572Z",
       "createdBy": "System"
     }
+  ],
+  "writeOffCategories": [
+    {
+      "id": "writeoff-001",
+      "code": "DEFECT",
+      "name": "Дефект товара",
+      "description": "Физические повреждения, трещины, коррозия",
+      "affectsCost": true,
+      "requiresJustification": true,
+      "defaultCostPercent": 100
+    },
+    {
+      "id": "writeoff-002", 
+      "code": "QUALITY",
+      "name": "Низкое качество газа",
+      "description": "Не соответствует стандартам качества",
+      "affectsCost": true,
+      "requiresJustification": true,
+      "defaultCostPercent": 80
+    },
+    {
+      "id": "writeoff-003",
+      "code": "LEAKAGE", 
+      "name": "Утечка газа",
+      "description": "Газ улетучился, неисправность клапана",
+      "affectsCost": true,
+      "requiresJustification": true,
+      "defaultCostPercent": 100
+    },
+    {
+      "id": "writeoff-004",
+      "code": "THEFT",
+      "name": "Пропажа/кража",
+      "description": "Баллон отсутствует, возможная кража",
+      "affectsCost": true,
+      "requiresJustification": true,
+      "defaultCostPercent": 100
+    },
+    {
+      "id": "writeoff-005",
+      "code": "EXPIRED",
+      "name": "Истек срок переосвидетельствования",
+      "description": "Требуется переосвидетельствование",
+      "affectsCost": false,
+      "requiresJustification": false,
+      "defaultCostPercent": 0
+    },
+    {
+      "id": "writeoff-006",
+      "code": "RETURN",
+      "name": "Возврат от клиента",
+      "description": "Товар возвращен клиентом",
+      "affectsCost": false,
+      "requiresJustification": true,
+      "defaultCostPercent": 0
+    },
+    {
+      "id": "writeoff-007",
+      "code": "RECOUNT",
+      "name": "Пересортица при инвентаризации",
+      "description": "Корректировка остатков при инвентаризации",
+      "affectsCost": false,
+      "requiresJustification": true,
+      "defaultCostPercent": 0
+    }
+  ],
+  "costCategories": [
+    {
+      "id": "cost-001",
+      "code": "PURCHASE",
+      "name": "Закупочная стоимость",
+      "description": "Стоимость покупки товара у поставщика",
+      "isOperational": false
+    },
+    {
+      "id": "cost-002",
+      "code": "TRANSPORT",
+      "name": "Транспортные расходы",
+      "description": "Доставка, логистика, грузчики",
+      "isOperational": true
+    },
+    {
+      "id": "cost-003", 
+      "code": "STORAGE",
+      "name": "Складские расходы",
+      "description": "Аренда склада, коммунальные услуги",
+      "isOperational": true
+    },
+    {
+      "id": "cost-004",
+      "code": "CERTIFICATION",
+      "name": "Переосвидетельствование",
+      "description": "Сертификация, проверка качества",
+      "isOperational": true
+    },
+    {
+      "id": "cost-005",
+      "code": "PREPARATION",
+      "name": "Подготовка товара",
+      "description": "Комплектующие, покраска, упаковка",
+      "isOperational": true
+    },
+    {
+      "id": "cost-006",
+      "code": "ADMINISTRATIVE",
+      "name": "Административные расходы", 
+      "description": "Документооборот, управленческие расходы",
+      "isOperational": true
+    }
   ]
 }
