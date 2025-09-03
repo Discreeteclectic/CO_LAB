@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест страницы заказов</title>
+</head>
+<body>
+    <h1>Тестовая страница заказов</h1>
+    <p>Если вы видите эту страницу, перенаправление работает!</p>
+    
+    <div style="margin: 20px; padding: 20px; border: 1px solid #ccc;">
+        <h2>Информация о пользователе:</h2>
+        <pre id="userInfo"></pre>
+    </div>
+    
+    <div style="margin: 20px;">
+        <a href="simple-login.html">Вернуться к логину</a> |
+        <a href="orders.html">Перейти на реальную страницу заказов</a> |
+        <a href="warehouse.html">Перейти на склад</a>
+    </div>
+
+    <script>
+        // Показываем данные пользователя
+        const user = localStorage.getItem('user');
+        const token = localStorage.getItem('token');
+        
+        document.getElementById('userInfo').textContent = 
+            'User: ' + (user || 'Не авторизован') + '\n\n' +
+            'Token: ' + (token ? token.substring(0, 20) + '...' : 'Нет токена');
+            
+        if (!token) {
+            document.getElementById('userInfo').innerHTML += 
+                '<br><br><strong style="color: red;">⚠️ Пользователь не авторизован!</strong>';
+        }
+    </script>
+</body>
+</html>

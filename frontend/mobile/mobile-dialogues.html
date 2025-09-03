@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="CO-LAB CRM">
+    <title>Диалоги - CO-LAB CRM</title>
+    <link rel="stylesheet" href="./mobile-styles.css">
+    <link rel="manifest" href="./manifest.json">
+    <style>
+        .dialogue-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        .dialogue-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+        
+        .dialogue-card.unread {
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .dialogue-card.priority {
+            border-left: 4px solid #ef4444;
+        }
+        
+        .dialogue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        
+        .client-info {
+            flex: 1;
+        }
+        
+        .client-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0 0 2px 0;
+        }
+        
+        .client-company {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .dialogue-meta {
+            text-align: right;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+        
+        .last-message-time {
+            margin-bottom: 2px;
+        }
+        
+        .unread-badge {
+            background: var(--primary-color);
+            color: white;
+            border-radius: 10px;
+            padding: 2px 6px;
+            font-size: 10px;
+            font-weight: 600;
+            min-width: 18px;
+            text-align: center;
+        }
+        
+        .last-message {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .dialogue-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #f3f4f6;
+        }
+        
+        .dialogue-status {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+        
+        .status-dot.active { background: #10b981; }
+        .status-dot.pending { background: #f59e0b; }
+        .status-dot.closed { background: #6b7280; }
+        
+        .message-count {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .filters-container {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+        
+        .filter-chip {
+            white-space: nowrap;
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            background: white;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .filter-chip.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .search-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 12px 16px 12px 44px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+            transition: border-color 0.2s;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 18px;
+        }
+        
+        .quick-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .quick-stat {
+            background: white;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+        
+        .quick-stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+        
+        .quick-stat-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        
+        .priority-indicator {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ef4444;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+        
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-container">
+        <!-- Header -->
+        <div class="mobile-header">
+            <div class="mobile-nav">
+                <button class="menu-toggle">☰</button>
+                <h1>💬 Диалоги</h1>
+                <button class="mobile-nav-btn" onclick="window.history.back()">Назад</button>
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="mobile-sidebar">
+            <div class="mobile-sidebar-header">
+                <h3>CO-LAB CRM</h3>
+                <button class="mobile-sidebar-close">✕</button>
+            </div>
+            <ul class="mobile-menu">
+                <li><a href="./mobile-dashboard.html">🏠 Дашборд</a></li>
+                <li><a href="./mobile-clients.html">👥 Клиенты</a></li>
+                <li><a href="./mobile-orders.html">📋 Заказы</a></li>
+                <li><a href="./mobile-warehouse.html">📦 Склад</a></li>
+                <li><a href="./mobile-analytics.html">📊 Аналитика</a></li>
+                <li><a href="./mobile-dialogues.html" class="active">💬 Диалоги</a></li>
+                <li><a href="./mobile-notifications.html">🔔 Уведомления</a></li>
+            </ul>
+        </div>
+        
+        <!-- Overlay -->
+        <div class="mobile-overlay"></div>
+        
+        <!-- Content -->
+        <div class="mobile-content" id="main-content">
+            <!-- Quick Stats -->
+            <div class="quick-stats">
+                <div class="quick-stat">
+                    <div class="quick-stat-value" id="total-dialogues">—</div>
+                    <div class="quick-stat-label">Всего</div>
+                </div>
+                <div class="quick-stat">
+                    <div class="quick-stat-value" id="unread-count">—</div>
+                    <div class="quick-stat-label">Непрочитано</div>
+                </div>
+                <div class="quick-stat">
+                    <div class="quick-stat-value" id="active-count">—</div>
+                    <div class="quick-stat-label">Активные</div>
+                </div>
+            </div>
+            
+            <!-- Search -->
+            <div class="search-container">
+                <div class="search-icon">🔍</div>
+                <input type="text" class="search-input" placeholder="Поиск диалогов..." id="search-input">
+            </div>
+            
+            <!-- Filters -->
+            <div class="filters-container">
+                <button class="filter-chip active" data-filter="all">Все</button>
+                <button class="filter-chip" data-filter="unread">Непрочитанные</button>
+                <button class="filter-chip" data-filter="active">Активные</button>
+                <button class="filter-chip" data-filter="pending">Ожидающие</button>
+                <button class="filter-chip" data-filter="closed">Закрытые</button>
+            </div>
+            
+            <!-- Dialogues List -->
+            <div id="dialogues-list">
+                <div class="mobile-loading">
+                    <div class="mobile-spinner"></div>
+                    <p>Загрузка диалогов...</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- FAB -->
+        <button class="fab" onclick="startNewDialogue()" title="Новый диалог">+</button>
+        
+        <!-- Bottom Navigation -->
+        <div class="mobile-bottom-nav">
+            <a href="./mobile-dashboard.html" class="mobile-bottom-nav-item">
+                <div class="mobile-bottom-nav-icon">🏠</div>
+                <span>Дашборд</span>
+            </a>
+            <a href="./mobile-clients.html" class="mobile-bottom-nav-item">
+                <div class="mobile-bottom-nav-icon">👥</div>
+                <span>Клиенты</span>
+            </a>
+            <a href="./mobile-orders.html" class="mobile-bottom-nav-item">
+                <div class="mobile-bottom-nav-icon">📋</div>
+                <span>Заказы</span>
+            </a>
+            <a href="./mobile-dialogues.html" class="mobile-bottom-nav-item active">
+                <div class="mobile-bottom-nav-icon">💬</div>
+                <span>Диалоги</span>
+            </a>
+        </div>
+    </div>
+
+    <script src="./mobile-app.js"></script>
+    <script>
+        class MobileDialoguesManager {
+            constructor() {
+                this.dialogues = [];
+                this.filteredDialogues = [];
+                this.currentFilter = 'all';
+                this.searchQuery = '';
+                this.init();
+            }
+            
+            async init() {
+                this.setupEventListeners();
+                await this.loadDialogues();
+                this.renderDialogues();
+                this.updateStats();
+            }
+            
+            setupEventListeners() {
+                // Search input
+                document.getElementById('search-input').addEventListener('input', (e) => {
+                    this.searchQuery = e.target.value.toLowerCase();
+                    this.filterAndRenderDialogues();
+                });
+                
+                // Filter chips
+                document.querySelectorAll('.filter-chip').forEach(chip => {
+                    chip.addEventListener('click', (e) => {
+                        document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                        e.target.classList.add('active');
+                        this.currentFilter = e.target.dataset.filter;
+                        this.filterAndRenderDialogues();
+                    });
+                });
+            }
+            
+            async loadDialogues() {
+                try {
+                    // Mock dialogues data
+                    this.dialogues = [
+                        {
+                            id: 1,
+                            clientName: 'Иван Петров',
+                            clientCompany: 'ООО "Газпром"',
+                            status: 'active',
+                            priority: 'high',
+                            unreadCount: 3,
+                            totalMessages: 15,
+                            lastMessage: 'Когда ожидать поставку баллонов? Очень срочно нужно для производства.',
+                            lastMessageTime: '2024-01-20 14:30',
+                            lastActivity: new Date('2024-01-20 14:30')
+                        },
+                        {
+                            id: 2,
+                            clientName: 'Мария Смирнова',
+                            clientCompany: 'АО "Роснефть"',
+                            status: 'pending',
+                            priority: 'medium',
+                            unreadCount: 1,
+                            totalMessages: 8,
+                            lastMessage: 'Спасибо за предложение, обсудим с руководством.',
+                            lastMessageTime: '2024-01-20 11:15',
+                            lastActivity: new Date('2024-01-20 11:15')
+                        },
+                        {
+                            id: 3,
+                            clientName: 'Алексей Кузнецов',
+                            clientCompany: 'ЗАО "Лукойл-газ"',
+                            status: 'active',
+                            priority: 'medium',
+                            unreadCount: 0,
+                            totalMessages: 23,
+                            lastMessage: 'Договор готов, можете забирать.',
+                            lastMessageTime: '2024-01-19 16:45',
+                            lastActivity: new Date('2024-01-19 16:45')
+                        },
+                        {
+                            id: 4,
+                            clientName: 'Елена Волкова',
+                            clientCompany: 'ООО "Северсталь"',
+                            status: 'active',
+                            priority: 'low',
+                            unreadCount: 2,
+                            totalMessages: 12,
+                            lastMessage: 'Нужна консультация по выбору редукторов.',
+                            lastMessageTime: '2024-01-19 10:20',
+                            lastActivity: new Date('2024-01-19 10:20')
+                        },
+                        {
+                            id: 5,
+                            clientName: 'Сергей Морозов',
+                            clientCompany: 'АО "Металлургия"',
+                            status: 'closed',
+                            priority: 'low',
+                            unreadCount: 0,
+                            totalMessages: 7,
+                            lastMessage: 'Заказ получен, спасибо за работу.',
+                            lastMessageTime: '2024-01-18 14:00',
+                            lastActivity: new Date('2024-01-18 14:00')
+                        }
+                    ];
+                } catch (error) {
+                    console.error('Error loading dialogues:', error);
+                    mobileApp.showNotification('Ошибка загрузки диалогов', 'danger');
+                }
+            }
+            
+            filterAndRenderDialogues() {
+                this.filteredDialogues = this.dialogues.filter(dialogue => {
+                    // Apply search filter
+                    const matchesSearch = !this.searchQuery || 
+                        dialogue.clientName.toLowerCase().includes(this.searchQuery) ||
+                        dialogue.clientCompany.toLowerCase().includes(this.searchQuery) ||
+                        dialogue.lastMessage.toLowerCase().includes(this.searchQuery);
+                    
+                    // Apply status filter
+                    let matchesFilter = true;
+                    switch (this.currentFilter) {
+                        case 'unread':
+                            matchesFilter = dialogue.unreadCount > 0;
+                            break;
+                        case 'active':
+                            matchesFilter = dialogue.status === 'active';
+                            break;
+                        case 'pending':
+                            matchesFilter = dialogue.status === 'pending';
+                            break;
+                        case 'closed':
+                            matchesFilter = dialogue.status === 'closed';
+                            break;
+                        default:
+                            matchesFilter = true;
+                    }
+                    
+                    return matchesSearch && matchesFilter;
+                });
+                
+                // Sort by last activity (most recent first)
+                this.filteredDialogues.sort((a, b) => b.lastActivity - a.lastActivity);
+                
+                this.renderDialogues();
+            }
+            
+            renderDialogues() {
+                const container = document.getElementById('dialogues-list');
+                
+                if (this.filteredDialogues.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">💬</div>
+                            <div class="empty-state-text">Диалоги не найдены</div>
+                            <div class="empty-state-subtext">
+                                ${this.searchQuery ? 'Попробуйте изменить поисковый запрос' : 'Нет диалогов в выбранной категории'}
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = this.filteredDialogues.map(dialogue => `
+                    <div class="dialogue-card ${dialogue.unreadCount > 0 ? 'unread' : ''} ${dialogue.priority === 'high' ? 'priority' : ''}" 
+                         onclick="openDialogue(${dialogue.id})">
+                        
+                        ${dialogue.priority === 'high' ? '<div class="priority-indicator"></div>' : ''}
+                        
+                        <div class="dialogue-header">
+                            <div class="client-info">
+                                <h3 class="client-name">${dialogue.clientName}</h3>
+                                <div class="client-company">${dialogue.clientCompany}</div>
+                            </div>
+                            <div class="dialogue-meta">
+                                <div class="last-message-time">
+                                    ${this.formatTime(dialogue.lastMessageTime)}
+                                </div>
+                                ${dialogue.unreadCount > 0 ? 
+                                    `<div class="unread-badge">${dialogue.unreadCount}</div>` : 
+                                    ''
+                                }
+                            </div>
+                        </div>
+                        
+                        <div class="last-message">${dialogue.lastMessage}</div>
+                        
+                        <div class="dialogue-stats">
+                            <div class="dialogue-status">
+                                <div class="status-dot ${dialogue.status}"></div>
+                                ${this.getStatusLabel(dialogue.status)}
+                            </div>
+                            <div class="message-count">
+                                💬 ${dialogue.totalMessages}
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            formatTime(timeString) {
+                const date = new Date(timeString);
+                const now = new Date();
+                const diff = now - date;
+                
+                if (diff < 60000) return 'Сейчас';
+                if (diff < 3600000) return `${Math.floor(diff / 60000)}м назад`;
+                if (diff < 86400000) return `${Math.floor(diff / 3600000)}ч назад`;
+                
+                return date.toLocaleDateString('ru-RU', { 
+                    day: 'numeric', 
+                    month: 'short' 
+                });
+            }
+            
+            getStatusLabel(status) {
+                const labels = {
+                    'active': 'Активный',
+                    'pending': 'Ожидание',
+                    'closed': 'Закрыт'
+                };
+                return labels[status] || status;
+            }
+            
+            updateStats() {
+                const totalDialogues = this.dialogues.length;
+                const unreadCount = this.dialogues.filter(d => d.unreadCount > 0).length;
+                const activeCount = this.dialogues.filter(d => d.status === 'active').length;
+                
+                document.getElementById('total-dialogues').textContent = totalDialogues;
+                document.getElementById('unread-count').textContent = unreadCount;
+                document.getElementById('active-count').textContent = activeCount;
+            }
+        }
+        
+        // Global functions
+        function openDialogue(dialogueId) {
+            mobileApp.showNotification(`Открытие диалога ${dialogueId}`, 'info');
+            // Here you would navigate to the dialogue chat page
+        }
+        
+        function startNewDialogue() {
+            mobileApp.showNotification('Создание нового диалога', 'info');
+            // Here you would show client selection or create new dialogue form
+        }
+        
+        // Initialize
+        let dialoguesManager;
+        document.addEventListener('DOMContentLoaded', () => {
+            if (mobileApp.user) {
+                dialoguesManager = new MobileDialoguesManager();
+            } else {
+                window.location.href = './mobile-login.html';
+            }
+        });
+    </script>
+</body>
+</html>

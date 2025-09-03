@@ -1,0 +1,2195 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Диалоги - CO_LAB CRM</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .dialogues-container {
+            width: 100%;
+            height: 100vh;
+            background: white;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Top Navigation Bar */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: white;
+            border-bottom: 1px solid #e1e5e9;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .back-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: #5a6fd8;
+        }
+
+        .nav-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .nav-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Main Layout */
+        .main-layout {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            padding-top: 60px;
+        }
+
+        /* Left Sidebar */
+        .sidebar {
+            width: 350px;
+            min-width: 350px;
+            background: #f8f9fa;
+            border-right: 1px solid #e1e5e9;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 60px);
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #e1e5e9;
+            background: white;
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 40px 10px 15px;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: #667eea;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 16px;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .filter-btn {
+            padding: 6px 12px;
+            border: 1px solid #e1e5e9;
+            background: white;
+            border-radius: 15px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .create-dialogue-btn {
+            width: 100%;
+            padding: 10px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+
+        .create-dialogue-btn:hover {
+            background: #218838;
+        }
+
+        .dialogues-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0;
+        }
+
+        .dialogue-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e1e5e9;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            position: relative;
+        }
+
+        .dialogue-item:hover {
+            background: #f0f0f0;
+        }
+
+        .dialogue-item.active {
+            background: #e3f2fd;
+            border-left: 4px solid #667eea;
+        }
+
+        .dialogue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .client-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .client-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .client-name {
+            font-weight: 500;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .dialogue-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .timestamp {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .priority-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .priority-urgent { background: #dc3545; }
+        .priority-high { background: #fd7e14; }
+        .priority-normal { background: #007bff; }
+        .priority-low { background: #6c757d; }
+
+        .status-indicator {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .status-active { background: #d4edda; color: #155724; }
+        .status-closed { background: #d1ecf1; color: #0c5460; }
+        .status-archived { background: #f8d7da; color: #721c24; }
+
+        .dialogue-subject {
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 5px;
+            line-height: 1.2;
+        }
+
+        .last-message {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .unread-badge {
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 600;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+        }
+
+        .sidebar-pagination {
+            padding: 15px 20px;
+            border-top: 1px solid #e1e5e9;
+            background: white;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .pagination-btn {
+            padding: 5px 10px;
+            border: 1px solid #e1e5e9;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 60px);
+        }
+
+        .no-dialogue-selected {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 16px;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .dialogue-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        /* Dialogue Header */
+        .dialogue-header-bar {
+            padding: 20px;
+            border-bottom: 1px solid #e1e5e9;
+            background: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dialogue-info {
+            flex: 1;
+        }
+
+        .dialogue-subject-edit {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            border: none;
+            background: transparent;
+            padding: 5px;
+            border-radius: 4px;
+            outline: none;
+            transition: background 0.3s ease;
+        }
+
+        .dialogue-subject-edit:focus {
+            background: #f8f9fa;
+        }
+
+        .client-details {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 8px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .dialogue-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .priority-selector,
+        .status-selector {
+            padding: 6px 12px;
+            border: 1px solid #e1e5e9;
+            border-radius: 6px;
+            font-size: 12px;
+            outline: none;
+            background: white;
+        }
+
+        .actions-dropdown {
+            position: relative;
+        }
+
+        .actions-btn {
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border: 1px solid #e1e5e9;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .actions-btn:hover {
+            background: #e9ecef;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid #e1e5e9;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            min-width: 150px;
+            display: none;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background 0.3s ease;
+        }
+
+        .dropdown-item:hover {
+            background: #f8f9fa;
+        }
+
+        /* Messages Area */
+        .messages-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message-search {
+            position: sticky;
+            top: 0;
+            background: #f8f9fa;
+            padding: 10px 0;
+            margin-bottom: 10px;
+            z-index: 10;
+        }
+
+        .message-search-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #e1e5e9;
+            border-radius: 20px;
+            font-size: 13px;
+            outline: none;
+            background: white;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            max-width: 70%;
+        }
+
+        .message.own {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message.system {
+            align-self: center;
+            max-width: 90%;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        .message-content {
+            flex: 1;
+            max-width: 100%;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+
+        .message-author {
+            font-weight: 500;
+            font-size: 13px;
+            color: #333;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #999;
+        }
+
+        .important-indicator {
+            color: #dc3545;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .message-bubble {
+            padding: 12px 16px;
+            border-radius: 18px;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            word-wrap: break-word;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .message.own .message-bubble {
+            background: #667eea;
+            color: white;
+        }
+
+        .message.note .message-bubble {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+
+        .message.system .message-bubble {
+            background: #e9ecef;
+            color: #495057;
+            text-align: center;
+            font-style: italic;
+            font-size: 13px;
+        }
+
+        .message-attachments {
+            margin-top: 8px;
+        }
+
+        .attachment {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            margin-right: 8px;
+            margin-bottom: 5px;
+            font-size: 12px;
+            text-decoration: none;
+            color: inherit;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: background 0.3s ease;
+        }
+
+        .attachment:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .message.own .attachment {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .message:not(.own) .attachment {
+            background: #f8f9fa;
+            color: #333;
+            border-color: #e1e5e9;
+        }
+
+        .message:not(.own) .attachment:hover {
+            background: #e9ecef;
+        }
+
+        .read-indicator {
+            font-size: 10px;
+            color: #28a745;
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        .message.own .read-indicator {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Message Input Area */
+        .message-input-container {
+            padding: 20px;
+            border-top: 1px solid #e1e5e9;
+            background: white;
+        }
+
+        .message-input-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .message-type-selector {
+            padding: 6px 12px;
+            border: 1px solid #e1e5e9;
+            border-radius: 6px;
+            font-size: 12px;
+            outline: none;
+            background: white;
+        }
+
+        .toolbar-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-btn {
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border: 1px solid #e1e5e9;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .file-btn:hover {
+            background: #e9ecef;
+        }
+
+        .important-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+        }
+
+        .message-input-area {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .message-input {
+            flex: 1;
+            min-height: 40px;
+            max-height: 120px;
+            padding: 10px 15px;
+            border: 1px solid #e1e5e9;
+            border-radius: 20px;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            resize: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .message-input:focus {
+            border-color: #667eea;
+        }
+
+        .send-btn {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .send-btn:hover:not(:disabled) {
+            background: #5a6fd8;
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Selected Files Display */
+        .selected-files {
+            margin-bottom: 10px;
+            display: none;
+        }
+
+        .selected-files.has-files {
+            display: block;
+        }
+
+        .file-preview {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-right: 8px;
+            margin-bottom: 5px;
+            display: inline-flex;
+            font-size: 12px;
+        }
+
+        .file-remove {
+            color: #dc3545;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Modals */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            display: none;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 0;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #e1e5e9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            color: #333;
+        }
+
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e1e5e9;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+        }
+
+        .form-control textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid #e1e5e9;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a6fd8;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        /* Drag & Drop File Upload */
+        .file-drop-zone {
+            border: 2px dashed #e1e5e9;
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #666;
+        }
+
+        .file-drop-zone:hover,
+        .file-drop-zone.dragover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .drop-text {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .drop-subtext {
+            font-size: 12px;
+            color: #999;
+        }
+
+        /* Loading States */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(102, 126, 234, 0.3);
+            border-radius: 50%;
+            border-top-color: #667eea;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 300px;
+                min-width: 300px;
+            }
+
+            .dialogue-controls {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+
+            .message-input-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+
+            .toolbar-controls {
+                justify-content: space-between;
+            }
+
+            .nav-buttons {
+                display: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .sidebar {
+                display: none;
+            }
+
+            .dialogues-container.show-sidebar .sidebar {
+                display: flex;
+                position: fixed;
+                left: 0;
+                top: 60px;
+                z-index: 1500;
+                height: calc(100vh - 60px);
+                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            }
+
+            .main-content {
+                width: 100%;
+            }
+        }
+
+        /* Custom Scrollbar */
+        .dialogues-list::-webkit-scrollbar,
+        .messages-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .dialogues-list::-webkit-scrollbar-track,
+        .messages-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .dialogues-list::-webkit-scrollbar-thumb,
+        .messages-container::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        .dialogues-list::-webkit-scrollbar-thumb:hover,
+        .messages-container::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+
+        /* Notification toast */
+        .toast {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: white;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 3000;
+            display: none;
+            max-width: 300px;
+        }
+
+        .toast.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .toast.success {
+            border-left: 4px solid #28a745;
+        }
+
+        .toast.error {
+            border-left: 4px solid #dc3545;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Empty states */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .empty-state-text {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .empty-state-subtext {
+            font-size: 14px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation -->
+    <div class="top-nav">
+        <div class="nav-left">
+            <button class="back-button" onclick="goToWorkspace()">
+                ← Назад к рабочему месту
+            </button>
+            <div class="nav-title">Диалоги с клиентами</div>
+        </div>
+        <div class="nav-right">
+            <div class="user-info">
+                <span id="currentUser">Загрузка...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="dialogues-container" id="dialoguesContainer">
+        <!-- Main Layout -->
+        <div class="main-layout">
+            <!-- Left Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <!-- Search Box -->
+                    <div class="search-box">
+                        <input type="text" class="search-input" id="searchInput" placeholder="Поиск диалогов...">
+                        <span class="search-icon">🔍</span>
+                    </div>
+
+                    <!-- Filter Buttons -->
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" data-filter="all">Все</button>
+                        <button class="filter-btn" data-filter="active">Активные</button>
+                        <button class="filter-btn" data-filter="high-priority">Важные</button>
+                        <button class="filter-btn" data-filter="unread">Непрочитанные</button>
+                    </div>
+
+                    <!-- Create New Dialogue -->
+                    <button class="create-dialogue-btn" onclick="showCreateDialogueModal()">
+                        + Создать диалог
+                    </button>
+                </div>
+
+                <!-- Dialogues List -->
+                <div class="dialogues-list" id="dialoguesList">
+                    <div class="empty-state">
+                        <div class="loading"></div>
+                        <div class="empty-state-text">Загрузка диалогов...</div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="sidebar-pagination">
+                    <div id="paginationInfo">Загрузка...</div>
+                    <div class="pagination-controls">
+                        <button class="pagination-btn" id="prevPageBtn" onclick="goToPrevPage()">←</button>
+                        <button class="pagination-btn" id="nextPageBtn" onclick="goToNextPage()">→</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="main-content" id="mainContent">
+                <!-- No Dialogue Selected State -->
+                <div class="no-dialogue-selected" id="noDialogueSelected">
+                    <div style="font-size: 48px; opacity: 0.3;">💬</div>
+                    <div>Выберите диалог для просмотра сообщений</div>
+                    <div style="font-size: 14px; color: #999;">
+                        Или создайте новый диалог с клиентом
+                    </div>
+                </div>
+
+                <!-- Active Dialogue Container -->
+                <div class="dialogue-container" id="dialogueContainer" style="display: none;">
+                    <!-- Dialogue Header -->
+                    <div class="dialogue-header-bar">
+                        <div class="dialogue-info">
+                            <input type="text" class="dialogue-subject-edit" id="dialogueSubject" 
+                                   placeholder="Тема диалога..." readonly>
+                            <div class="client-details">
+                                <span id="clientName">Клиент</span>
+                                <span id="clientEmail">email@example.com</span>
+                                <span id="dialogueStatus">Активный</span>
+                            </div>
+                        </div>
+                        <div class="dialogue-controls">
+                            <select class="priority-selector" id="prioritySelector">
+                                <option value="LOW">Низкий</option>
+                                <option value="NORMAL">Обычный</option>
+                                <option value="HIGH">Высокий</option>
+                                <option value="URGENT">Срочный</option>
+                            </select>
+                            <select class="status-selector" id="statusSelector">
+                                <option value="ACTIVE">Активный</option>
+                                <option value="CLOSED">Закрыт</option>
+                                <option value="ARCHIVED">В архиве</option>
+                            </select>
+                            <div class="actions-dropdown">
+                                <button class="actions-btn" onclick="toggleActionsDropdown()">
+                                    Действия ⏷
+                                </button>
+                                <div class="dropdown-menu" id="actionsDropdown">
+                                    <div class="dropdown-item" onclick="exportDialogue()">Экспорт</div>
+                                    <div class="dropdown-item" onclick="archiveDialogue()">В архив</div>
+                                    <div class="dropdown-item" onclick="closeDialogue()">Закрыть</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Messages Container -->
+                    <div class="messages-container" id="messagesContainer">
+                        <!-- Message Search -->
+                        <div class="message-search">
+                            <input type="text" class="message-search-input" id="messageSearchInput" 
+                                   placeholder="Поиск в диалоге...">
+                        </div>
+
+                        <!-- Messages will be loaded here -->
+                    </div>
+
+                    <!-- Message Input Area -->
+                    <div class="message-input-container">
+                        <!-- Selected Files Display -->
+                        <div class="selected-files" id="selectedFiles"></div>
+
+                        <!-- Message Toolbar -->
+                        <div class="message-input-toolbar">
+                            <select class="message-type-selector" id="messageTypeSelector">
+                                <option value="TEXT">Сообщение</option>
+                                <option value="NOTE">Заметка</option>
+                            </select>
+                            <div class="toolbar-controls">
+                                <input type="file" class="file-input" id="fileInput" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif,.txt,.csv">
+                                <label for="fileInput" class="file-btn">
+                                    📎 Файлы
+                                </label>
+                                <label class="important-checkbox">
+                                    <input type="checkbox" id="importantCheckbox">
+                                    Важное
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Message Input -->
+                        <div class="message-input-area">
+                            <textarea class="message-input" id="messageInput" 
+                                      placeholder="Напишите сообщение... (Ctrl+Enter для отправки)"></textarea>
+                            <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                                Отправить →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Dialogue Modal -->
+    <div class="modal" id="createDialogueModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Создать новый диалог</h3>
+                <button class="modal-close" onclick="closeCreateDialogueModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Клиент *</label>
+                    <select class="form-control" id="clientSelector">
+                        <option value="">Выберите клиента...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Тема диалога *</label>
+                    <input type="text" class="form-control" id="newDialogueSubject" placeholder="О чем будет диалог?">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Приоритет</label>
+                    <select class="form-control" id="newDialoguePriority">
+                        <option value="NORMAL">Обычный</option>
+                        <option value="LOW">Низкий</option>
+                        <option value="HIGH">Высокий</option>
+                        <option value="URGENT">Срочный</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeCreateDialogueModal()">Отмена</button>
+                <button class="btn btn-primary" onclick="createDialogue()">Создать диалог</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Upload Modal -->
+    <div class="modal" id="fileUploadModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Загрузить файлы</h3>
+                <button class="modal-close" onclick="closeFileUploadModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="file-drop-zone" id="fileDropZone">
+                    <div class="drop-text">Перетащите файлы сюда</div>
+                    <div class="drop-subtext">или нажмите для выбора файлов</div>
+                    <div class="drop-subtext">Максимум 5 файлов, до 10 МБ каждый</div>
+                </div>
+                <div id="filePreviewList"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeFileUploadModal()">Отмена</button>
+                <button class="btn btn-primary" onclick="uploadFiles()">Загрузить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <div id="toastMessage"></div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/api.js"></script>
+    <script>
+        // Global variables
+        let currentDialogue = null;
+        let currentUser = null;
+        let dialogues = [];
+        let currentPage = 1;
+        let totalPages = 1;
+        let currentFilter = 'all';
+        let searchTerm = '';
+        let selectedFiles = [];
+        let messageRefreshInterval = null;
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePage();
+            setupEventListeners();
+        });
+
+        async function initializePage() {
+            try {
+                // Get current user info
+                const user = APIHelpers.getCurrentUser();
+                if (user) {
+                    currentUser = user;
+                    document.getElementById('currentUser').textContent = user.name;
+                }
+
+                // Load initial data
+                await loadClients();
+                await loadDialogues();
+
+                // Start auto-refresh
+                startMessageRefresh();
+
+            } catch (error) {
+                console.error('Error initializing page:', error);
+                showToast('Ошибка при загрузке страницы: ' + APIHelpers.formatError(error), 'error');
+            }
+        }
+
+        function setupEventListeners() {
+            // Search input
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', APIHelpers.debounce(handleSearch, 300));
+
+            // Filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentFilter = this.getAttribute('data-filter');
+                    currentPage = 1;
+                    loadDialogues();
+                });
+            });
+
+            // Message input
+            const messageInput = document.getElementById('messageInput');
+            messageInput.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.key === 'Enter') {
+                    e.preventDefault();
+                    sendMessage();
+                }
+                // Auto-resize
+                this.style.height = 'auto';
+                this.style.height = this.scrollHeight + 'px';
+            });
+
+            // File input
+            document.getElementById('fileInput').addEventListener('change', handleFileSelect);
+
+            // Priority and status selectors
+            document.getElementById('prioritySelector').addEventListener('change', updateDialoguePriority);
+            document.getElementById('statusSelector').addEventListener('change', updateDialogueStatus);
+
+            // Subject editing
+            const subjectInput = document.getElementById('dialogueSubject');
+            subjectInput.addEventListener('dblclick', function() {
+                this.readOnly = false;
+                this.focus();
+            });
+            subjectInput.addEventListener('blur', updateDialogueSubject);
+            subjectInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    this.blur();
+                }
+            });
+
+            // Message search
+            const messageSearchInput = document.getElementById('messageSearchInput');
+            messageSearchInput.addEventListener('input', APIHelpers.debounce(searchMessages, 300));
+
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.actions-dropdown')) {
+                    document.getElementById('actionsDropdown').classList.remove('show');
+                }
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    // Close modals
+                    closeCreateDialogueModal();
+                    closeFileUploadModal();
+                }
+            });
+        }
+
+        // Navigation functions
+        function goToWorkspace() {
+            window.location.href = 'manager-workspace.html';
+        }
+
+        // Data loading functions
+        async function loadDialogues() {
+            try {
+                showLoading(document.getElementById('dialoguesList'));
+
+                let params = {
+                    page: currentPage,
+                    limit: 20,
+                    sort: 'lastMessageAt',
+                    order: 'DESC'
+                };
+
+                // Add search
+                if (searchTerm) {
+                    params.search = searchTerm;
+                }
+
+                // Add filters
+                switch (currentFilter) {
+                    case 'active':
+                        params.status = 'ACTIVE';
+                        break;
+                    case 'high-priority':
+                        params.priority = 'HIGH,URGENT';
+                        break;
+                    case 'unread':
+                        // Will be handled client-side
+                        break;
+                }
+
+                const response = await API.request('/dialogues', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                dialogues = response.dialogues || [];
+                
+                // Filter unread messages client-side
+                if (currentFilter === 'unread') {
+                    dialogues = dialogues.filter(d => d.unreadCount > 0);
+                }
+
+                totalPages = response.pagination?.pages || 1;
+                
+                renderDialogues(dialogues);
+                updatePagination(response.pagination);
+
+            } catch (error) {
+                console.error('Error loading dialogues:', error);
+                document.getElementById('dialoguesList').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⚠️</div>
+                        <div class="empty-state-text">Ошибка загрузки диалогов</div>
+                        <div class="empty-state-subtext">${APIHelpers.formatError(error)}</div>
+                    </div>
+                `;
+            }
+        }
+
+        async function loadClients() {
+            try {
+                const response = await API.getClients({ limit: 1000 });
+                const clients = response.clients || [];
+                
+                const clientSelector = document.getElementById('clientSelector');
+                clientSelector.innerHTML = '<option value="">Выберите клиента...</option>';
+                
+                clients.forEach(client => {
+                    clientSelector.innerHTML += `
+                        <option value="${client.id}">${client.name} - ${client.email}</option>
+                    `;
+                });
+
+            } catch (error) {
+                console.error('Error loading clients:', error);
+            }
+        }
+
+        async function loadDialogue(dialogueId) {
+            try {
+                showLoadingInMessages();
+
+                const response = await API.request(`/dialogues/${dialogueId}`);
+                currentDialogue = response.dialogue;
+
+                // Update dialogue header
+                document.getElementById('dialogueSubject').value = currentDialogue.subject;
+                document.getElementById('clientName').textContent = currentDialogue.client.name;
+                document.getElementById('clientEmail').textContent = currentDialogue.client.email;
+                document.getElementById('dialogueStatus').textContent = getStatusText(currentDialogue.status);
+                document.getElementById('prioritySelector').value = currentDialogue.priority;
+                document.getElementById('statusSelector').value = currentDialogue.status;
+
+                // Load messages
+                await loadMessages(dialogueId);
+
+                // Show dialogue container
+                document.getElementById('noDialogueSelected').style.display = 'none';
+                document.getElementById('dialogueContainer').style.display = 'flex';
+
+                // Mark dialogue as active in sidebar
+                document.querySelectorAll('.dialogue-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                document.querySelector(`[data-dialogue-id="${dialogueId}"]`)?.classList.add('active');
+
+            } catch (error) {
+                console.error('Error loading dialogue:', error);
+                showToast('Ошибка загрузки диалога: ' + APIHelpers.formatError(error), 'error');
+            }
+        }
+
+        async function loadMessages(dialogueId) {
+            try {
+                const response = await API.request(`/dialogues/${dialogueId}/messages`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const messages = response.messages || [];
+                renderMessages(messages);
+
+            } catch (error) {
+                console.error('Error loading messages:', error);
+                showToast('Ошибка загрузки сообщений: ' + APIHelpers.formatError(error), 'error');
+            }
+        }
+
+        // Rendering functions
+        function renderDialogues(dialoguesList) {
+            const container = document.getElementById('dialoguesList');
+            
+            if (dialoguesList.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">💬</div>
+                        <div class="empty-state-text">Диалоги не найдены</div>
+                        <div class="empty-state-subtext">
+                            ${searchTerm ? 'Попробуйте изменить поисковый запрос' : 'Создайте новый диалог с клиентом'}
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = dialoguesList.map(dialogue => {
+                const clientName = dialogue.client?.name || 'Неизвестный клиент';
+                const lastMessage = dialogue.lastMessage;
+                const lastMessageText = lastMessage ? 
+                    (lastMessage.content.length > 50 ? 
+                        lastMessage.content.substring(0, 50) + '...' : 
+                        lastMessage.content) : 
+                    'Нет сообщений';
+                
+                const timeAgo = dialogue.lastMessageAt ? 
+                    formatTimeAgo(dialogue.lastMessageAt) : 
+                    formatTimeAgo(dialogue.createdAt);
+
+                const priorityClass = `priority-${dialogue.priority.toLowerCase()}`;
+                const statusClass = `status-${dialogue.status.toLowerCase()}`;
+
+                return `
+                    <div class="dialogue-item" data-dialogue-id="${dialogue.id}" onclick="loadDialogue('${dialogue.id}')">
+                        ${dialogue.unreadCount > 0 ? `<div class="unread-badge">${dialogue.unreadCount}</div>` : ''}
+                        <div class="dialogue-header">
+                            <div class="client-info">
+                                <div class="client-avatar">${getInitials(clientName)}</div>
+                                <div class="client-name">${clientName}</div>
+                            </div>
+                            <div class="dialogue-meta">
+                                <div class="timestamp">${timeAgo}</div>
+                                <div class="priority-indicator ${priorityClass}"></div>
+                            </div>
+                        </div>
+                        <div class="dialogue-subject">${dialogue.subject}</div>
+                        <div class="last-message">${lastMessageText}</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+                            <div class="status-indicator ${statusClass}">${getStatusText(dialogue.status)}</div>
+                            <div style="font-size: 11px; color: #999;">${dialogue.messageCount} сообщений</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderMessages(messagesList) {
+            const container = document.getElementById('messagesContainer');
+            const searchBar = container.querySelector('.message-search');
+            
+            // Clear messages but keep search
+            const messagesToRemove = container.querySelectorAll(':not(.message-search)');
+            messagesToRemove.forEach(el => el.remove());
+            
+            if (messagesList.length === 0) {
+                container.appendChild(createEmptyMessagesState());
+                return;
+            }
+
+            messagesList.forEach(message => {
+                const messageEl = createMessageElement(message);
+                container.appendChild(messageEl);
+            });
+
+            // Scroll to bottom
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function createMessageElement(message) {
+            const messageDiv = document.createElement('div');
+            const isOwnMessage = message.author.id === currentUser.id;
+            const messageTypeClass = message.type.toLowerCase();
+            
+            let classes = 'message';
+            if (isOwnMessage) classes += ' own';
+            if (message.type !== 'TEXT') classes += ` ${messageTypeClass}`;
+            
+            messageDiv.className = classes;
+
+            const authorName = message.author.name;
+            const avatar = getInitials(authorName);
+            const timeStr = formatTime(message.createdAt);
+            
+            const attachmentsHtml = message.attachments && message.attachments.length > 0 ?
+                `<div class="message-attachments">
+                    ${message.attachments.map(att => `
+                        <a href="${att.downloadUrl}" class="attachment" target="_blank">
+                            📎 ${att.originalName} (${formatFileSize(att.size)})
+                        </a>
+                    `).join('')}
+                </div>` : '';
+
+            const readIndicator = isOwnMessage && message.readAt ? 
+                '<div class="read-indicator">✓ Прочитано</div>' : '';
+
+            const importantIndicator = message.isImportant ? 
+                '<span class="important-indicator">❗ Важное</span>' : '';
+
+            messageDiv.innerHTML = `
+                ${message.type !== 'SYSTEM' ? `<div class="message-avatar">${avatar}</div>` : ''}
+                <div class="message-content">
+                    ${message.type !== 'SYSTEM' ? `
+                        <div class="message-header">
+                            <span class="message-author">${authorName}</span>
+                            <span class="message-time">${timeStr}</span>
+                            ${importantIndicator}
+                        </div>
+                    ` : ''}
+                    <div class="message-bubble">
+                        ${message.content}
+                        ${attachmentsHtml}
+                    </div>
+                    ${readIndicator}
+                </div>
+            `;
+
+            return messageDiv;
+        }
+
+        function createEmptyMessagesState() {
+            const div = document.createElement('div');
+            div.className = 'empty-state';
+            div.innerHTML = `
+                <div class="empty-state-icon">💭</div>
+                <div class="empty-state-text">Сообщений пока нет</div>
+                <div class="empty-state-subtext">Начните диалог с клиентом</div>
+            `;
+            return div;
+        }
+
+        // Message functions
+        async function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const sendBtn = document.getElementById('sendBtn');
+            const content = messageInput.value.trim();
+
+            if (!content && selectedFiles.length === 0) {
+                showToast('Введите сообщение или выберите файл', 'error');
+                return;
+            }
+
+            if (!currentDialogue) {
+                showToast('Выберите диалог', 'error');
+                return;
+            }
+
+            try {
+                sendBtn.disabled = true;
+                sendBtn.innerHTML = '<div class="loading"></div> Отправка...';
+
+                const formData = new FormData();
+                formData.append('content', content || 'Файлы');
+                formData.append('type', document.getElementById('messageTypeSelector').value);
+                formData.append('isImportant', document.getElementById('importantCheckbox').checked);
+
+                // Add files
+                selectedFiles.forEach(file => {
+                    formData.append('attachments', file);
+                });
+
+                const response = await API.request(`/dialogues/${currentDialogue.id}/messages`, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {} // Let browser set Content-Type for FormData
+                });
+
+                // Clear input
+                messageInput.value = '';
+                messageInput.style.height = 'auto';
+                document.getElementById('importantCheckbox').checked = false;
+                clearSelectedFiles();
+
+                // Reload messages
+                await loadMessages(currentDialogue.id);
+                
+                // Refresh dialogues list to update last message
+                loadDialogues();
+
+                showToast('Сообщение отправлено', 'success');
+
+            } catch (error) {
+                console.error('Error sending message:', error);
+                showToast('Ошибка отправки сообщения: ' + APIHelpers.formatError(error), 'error');
+            } finally {
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = 'Отправить →';
+            }
+        }
+
+        // File handling
+        function handleFileSelect(e) {
+            const files = Array.from(e.target.files);
+            addFilesToSelection(files);
+        }
+
+        function addFilesToSelection(files) {
+            const maxFiles = 5;
+            const maxSize = 10 * 1024 * 1024; // 10MB
+
+            files.forEach(file => {
+                if (selectedFiles.length >= maxFiles) {
+                    showToast(`Максимум ${maxFiles} файлов`, 'error');
+                    return;
+                }
+
+                if (file.size > maxSize) {
+                    showToast(`Файл ${file.name} слишком большой (максимум 10 МБ)`, 'error');
+                    return;
+                }
+
+                selectedFiles.push(file);
+            });
+
+            updateFilePreview();
+        }
+
+        function updateFilePreview() {
+            const container = document.getElementById('selectedFiles');
+            
+            if (selectedFiles.length === 0) {
+                container.style.display = 'none';
+                container.innerHTML = '';
+                return;
+            }
+
+            container.style.display = 'block';
+            container.innerHTML = selectedFiles.map((file, index) => `
+                <div class="file-preview">
+                    📎 ${file.name} (${formatFileSize(file.size)})
+                    <span class="file-remove" onclick="removeFile(${index})">&times;</span>
+                </div>
+            `).join('');
+        }
+
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            updateFilePreview();
+        }
+
+        function clearSelectedFiles() {
+            selectedFiles = [];
+            updateFilePreview();
+            document.getElementById('fileInput').value = '';
+        }
+
+        // Dialogue management
+        async function createDialogue() {
+            const clientId = document.getElementById('clientSelector').value;
+            const subject = document.getElementById('newDialogueSubject').value.trim();
+            const priority = document.getElementById('newDialoguePriority').value;
+
+            if (!clientId || !subject) {
+                showToast('Заполните все обязательные поля', 'error');
+                return;
+            }
+
+            try {
+                const response = await API.request('/dialogues', {
+                    method: 'POST',
+                    body: {
+                        clientId,
+                        subject,
+                        priority
+                    }
+                });
+
+                closeCreateDialogueModal();
+                await loadDialogues();
+                
+                // Select the new dialogue
+                if (response.dialogue) {
+                    await loadDialogue(response.dialogue.id);
+                }
+
+                showToast('Диалог создан успешно', 'success');
+
+            } catch (error) {
+                console.error('Error creating dialogue:', error);
+                showToast('Ошибка создания диалога: ' + APIHelpers.formatError(error), 'error');
+            }
+        }
+
+        async function updateDialoguePriority() {
+            if (!currentDialogue) return;
+
+            const priority = document.getElementById('prioritySelector').value;
+
+            try {
+                await API.request(`/dialogues/${currentDialogue.id}`, {
+                    method: 'PUT',
+                    body: { priority }
+                });
+
+                currentDialogue.priority = priority;
+                loadDialogues(); // Refresh list
+                showToast('Приоритет обновлен', 'success');
+
+            } catch (error) {
+                console.error('Error updating priority:', error);
+                showToast('Ошибка обновления приоритета: ' + APIHelpers.formatError(error), 'error');
+            }
+        }
+
+        async function updateDialogueStatus() {
+            if (!currentDialogue) return;
+
+            const status = document.getElementById('statusSelector').value;
+
+            try {
+                await API.request(`/dialogues/${currentDialogue.id}`, {
+                    method: 'PUT',
+                    body: { status }
+                });
+
+                currentDialogue.status = status;
+                document.getElementById('dialogueStatus').textContent = getStatusText(status);
+                loadDialogues(); // Refresh list
+                showToast('Статус обновлен', 'success');
+
+            } catch (error) {
+                console.error('Error updating status:', error);
+                showToast('Ошибка обновления статуса: ' + APIHelpers.formatError(error), 'error');
+            }
+        }
+
+        async function updateDialogueSubject() {
+            if (!currentDialogue) return;
+
+            const subjectInput = document.getElementById('dialogueSubject');
+            const newSubject = subjectInput.value.trim();
+
+            if (newSubject === currentDialogue.subject) {
+                subjectInput.readOnly = true;
+                return;
+            }
+
+            if (!newSubject) {
+                subjectInput.value = currentDialogue.subject;
+                subjectInput.readOnly = true;
+                return;
+            }
+
+            try {
+                await API.request(`/dialogues/${currentDialogue.id}`, {
+                    method: 'PUT',
+                    body: { subject: newSubject }
+                });
+
+                currentDialogue.subject = newSubject;
+                subjectInput.readOnly = true;
+                loadDialogues(); // Refresh list
+                showToast('Тема обновлена', 'success');
+
+            } catch (error) {
+                console.error('Error updating subject:', error);
+                subjectInput.value = currentDialogue.subject;
+                subjectInput.readOnly = true;
+                showToast('Ошибка обновления темы: ' + APIHelpers.formatError(error), 'error');
+            }
+        }
+
+        // Search functions
+        function handleSearch() {
+            searchTerm = document.getElementById('searchInput').value.trim();
+            currentPage = 1;
+            loadDialogues();
+        }
+
+        function searchMessages() {
+            const searchTerm = document.getElementById('messageSearchInput').value.trim();
+            
+            if (!searchTerm) {
+                // Show all messages
+                document.querySelectorAll('.message').forEach(msg => {
+                    msg.style.display = 'flex';
+                });
+                return;
+            }
+
+            // Filter messages by search term
+            document.querySelectorAll('.message').forEach(msg => {
+                const content = msg.querySelector('.message-bubble')?.textContent?.toLowerCase() || '';
+                if (content.includes(searchTerm.toLowerCase())) {
+                    msg.style.display = 'flex';
+                } else {
+                    msg.style.display = 'none';
+                }
+            });
+        }
+
+        // Pagination
+        function updatePagination(pagination) {
+            if (!pagination) return;
+
+            const info = APIHelpers.getPaginationInfo(pagination);
+            document.getElementById('paginationInfo').textContent = info.text;
+
+            const prevBtn = document.getElementById('prevPageBtn');
+            const nextBtn = document.getElementById('nextPageBtn');
+
+            prevBtn.disabled = !pagination.hasPrev;
+            nextBtn.disabled = !pagination.hasNext;
+
+            currentPage = pagination.page;
+            totalPages = pagination.pages;
+        }
+
+        function goToPrevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                loadDialogues();
+            }
+        }
+
+        function goToNextPage() {
+            if (currentPage < totalPages) {
+                currentPage++;
+                loadDialogues();
+            }
+        }
+
+        // Modal functions
+        function showCreateDialogueModal() {
+            document.getElementById('createDialogueModal').classList.add('show');
+            // Clear form
+            document.getElementById('clientSelector').value = '';
+            document.getElementById('newDialogueSubject').value = '';
+            document.getElementById('newDialoguePriority').value = 'NORMAL';
+        }
+
+        function closeCreateDialogueModal() {
+            document.getElementById('createDialogueModal').classList.remove('show');
+        }
+
+        function showFileUploadModal() {
+            document.getElementById('fileUploadModal').classList.add('show');
+        }
+
+        function closeFileUploadModal() {
+            document.getElementById('fileUploadModal').classList.remove('show');
+        }
+
+        // Actions dropdown
+        function toggleActionsDropdown() {
+            document.getElementById('actionsDropdown').classList.toggle('show');
+        }
+
+        function exportDialogue() {
+            if (!currentDialogue) return;
+            
+            // TODO: Implement export functionality
+            showToast('Экспорт будет реализован в следующей версии', 'info');
+            document.getElementById('actionsDropdown').classList.remove('show');
+        }
+
+        function archiveDialogue() {
+            if (!currentDialogue) return;
+            
+            if (confirm('Архивировать диалог? Он будет скрыт из основного списка.')) {
+                document.getElementById('statusSelector').value = 'ARCHIVED';
+                updateDialogueStatus();
+            }
+            
+            document.getElementById('actionsDropdown').classList.remove('show');
+        }
+
+        function closeDialogue() {
+            if (!currentDialogue) return;
+            
+            if (confirm('Закрыть диалог? Новые сообщения будут недоступны.')) {
+                document.getElementById('statusSelector').value = 'CLOSED';
+                updateDialogueStatus();
+            }
+            
+            document.getElementById('actionsDropdown').classList.remove('show');
+        }
+
+        // Real-time updates
+        function startMessageRefresh() {
+            if (messageRefreshInterval) {
+                clearInterval(messageRefreshInterval);
+            }
+
+            messageRefreshInterval = setInterval(async () => {
+                if (currentDialogue) {
+                    try {
+                        // Refresh messages silently
+                        const response = await API.request(`/dialogues/${currentDialogue.id}/messages`);
+                        const currentMessageCount = document.querySelectorAll('.message').length;
+                        
+                        if (response.messages && response.messages.length > currentMessageCount) {
+                            // New messages available, reload
+                            renderMessages(response.messages);
+                        }
+                    } catch (error) {
+                        console.error('Error refreshing messages:', error);
+                    }
+                }
+                
+                // Refresh dialogues list (to update unread counts)
+                loadDialogues();
+            }, 10000); // Every 10 seconds
+        }
+
+        // Utility functions
+        function getInitials(name) {
+            return name
+                .split(' ')
+                .map(word => word[0])
+                .join('')
+                .toUpperCase()
+                .substring(0, 2);
+        }
+
+        function formatTime(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diff = now - date;
+            
+            if (diff < 60000) { // Less than 1 minute
+                return 'Сейчас';
+            } else if (diff < 3600000) { // Less than 1 hour
+                return Math.floor(diff / 60000) + ' мин назад';
+            } else if (date.toDateString() === now.toDateString()) { // Today
+                return date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+            } else {
+                return date.toLocaleDateString('ru-RU') + ' ' + 
+                       date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+            }
+        }
+
+        function formatTimeAgo(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diff = now - date;
+            
+            if (diff < 60000) {
+                return 'Сейчас';
+            } else if (diff < 3600000) {
+                return Math.floor(diff / 60000) + 'м';
+            } else if (diff < 86400000) {
+                return Math.floor(diff / 3600000) + 'ч';
+            } else if (diff < 604800000) {
+                return Math.floor(diff / 86400000) + 'д';
+            } else {
+                return date.toLocaleDateString('ru-RU');
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Б';
+            const k = 1024;
+            const sizes = ['Б', 'КБ', 'МБ', 'ГБ'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        function getStatusText(status) {
+            const statusTexts = {
+                'ACTIVE': 'Активный',
+                'CLOSED': 'Закрыт',
+                'ARCHIVED': 'В архиве'
+            };
+            return statusTexts[status] || status;
+        }
+
+        function showLoading(element) {
+            if (element) {
+                element.innerHTML = `
+                    <div class="empty-state">
+                        <div class="loading"></div>
+                        <div class="empty-state-text">Загрузка...</div>
+                    </div>
+                `;
+            }
+        }
+
+        function showLoadingInMessages() {
+            const container = document.getElementById('messagesContainer');
+            const searchBar = container.querySelector('.message-search');
+            
+            // Remove all messages but keep search
+            const messagesToRemove = container.querySelectorAll(':not(.message-search)');
+            messagesToRemove.forEach(el => el.remove());
+            
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'empty-state';
+            loadingDiv.innerHTML = `
+                <div class="loading"></div>
+                <div class="empty-state-text">Загрузка сообщений...</div>
+            `;
+            container.appendChild(loadingDiv);
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            toastMessage.textContent = message;
+            toast.className = `toast ${type} show`;
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Clean up on page unload
+        window.addEventListener('beforeunload', function() {
+            if (messageRefreshInterval) {
+                clearInterval(messageRefreshInterval);
+            }
+        });
+    </script>
+</body>
+</html>

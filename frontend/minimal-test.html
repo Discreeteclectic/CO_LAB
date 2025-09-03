@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Minimal Test</title>
+</head>
+<body>
+    <h1>Minimal CORS Test</h1>
+    <button onclick="test()">Test API</button>
+    <div id="result"></div>
+    
+    <script>
+        function test() {
+            // Using XMLHttpRequest instead of fetch
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'http://localhost:5001/api/auth/login', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            
+            xhr.onload = function() {
+                document.getElementById('result').innerHTML = 
+                    '<h2>Success!</h2><pre>' + this.responseText + '</pre>';
+            };
+            
+            xhr.onerror = function() {
+                document.getElementById('result').innerHTML = 
+                    '<h2>Error: ' + this.status + '</h2>';
+            };
+            
+            xhr.send(JSON.stringify({
+                email: 'test@test.com',
+                password: 'password123'
+            }));
+        }
+    </script>
+</body>
+</html>

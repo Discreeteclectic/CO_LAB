@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="CO-LAB CRM">
+    <title>Аналитика - CO-LAB CRM</title>
+    <link rel="stylesheet" href="./mobile-styles.css">
+    <link rel="manifest" href="./manifest.json">
+    <style>
+        .analytics-tabs {
+            display: flex;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+        
+        .analytics-tab {
+            flex: 1;
+            padding: 12px 8px;
+            text-align: center;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+        
+        .analytics-tab.active {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .metric-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary-color);
+        }
+        
+        .metric-card.revenue::before { background: var(--success-color); }
+        .metric-card.orders::before { background: var(--primary-color); }
+        .metric-card.clients::before { background: var(--warning-color); }
+        .metric-card.conversion::before { background: #8b5cf6; }
+        
+        .metric-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            font-size: 16px;
+            color: white;
+        }
+        
+        .metric-icon.revenue { background: var(--success-color); }
+        .metric-icon.orders { background: var(--primary-color); }
+        .metric-icon.clients { background: var(--warning-color); }
+        .metric-icon.conversion { background: #8b5cf6; }
+        
+        .metric-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        
+        .metric-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .metric-change {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+        
+        .metric-change.positive {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+        
+        .metric-change.negative {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .chart-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+        
+        .chart-selector {
+            font-size: 12px;
+            color: var(--text-secondary);
+            background: var(--light-gray);
+            border: 1px solid var(--border-color);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        
+        .chart-body {
+            padding: 20px;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+            position: relative;
+        }
+        
+        .chart-placeholder {
+            text-align: center;
+            color: var(--text-secondary);
+        }
+        
+        .chart-placeholder-icon {
+            font-size: 48px;
+            opacity: 0.3;
+            margin-bottom: 12px;
+        }
+        
+        .top-items {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .top-items-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--light-gray);
+        }
+        
+        .top-items-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+        
+        .top-item {
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .top-item:last-child {
+            border-bottom: none;
+        }
+        
+        .top-item-rank {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 12px;
+        }
+        
+        .top-item-info {
+            flex: 1;
+        }
+        
+        .top-item-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin: 0 0 2px;
+        }
+        
+        .top-item-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .top-item-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .manager-analytics {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .manager-card {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .manager-card:last-child {
+            border-bottom: none;
+        }
+        
+        .manager-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .manager-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+        
+        .manager-rating {
+            background: var(--success-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .manager-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            font-size: 12px;
+        }
+        
+        .manager-stat {
+            text-align: center;
+        }
+        
+        .manager-stat-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .manager-stat-label {
+            color: var(--text-secondary);
+            font-size: 10px;
+        }
+        
+        .refresh-btn {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            font-size: 20px;
+            box-shadow: var(--shadow-lg);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        
+        .refresh-btn:hover {
+            background: var(--primary-dark);
+            transform: scale(1.1);
+        }
+        
+        .refresh-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-container">
+        <!-- Header -->
+        <div class="mobile-header">
+            <div class="mobile-nav">
+                <button class="menu-toggle">☰</button>
+                <h1>📊 Аналитика</h1>
+                <button class="mobile-nav-btn" onclick="window.history.back()">Назад</button>
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="mobile-sidebar">
+            <div class="mobile-sidebar-header">
+                <h3>CO-LAB CRM</h3>
+                <button class="mobile-sidebar-close">✕</button>
+            </div>
+            <ul class="mobile-menu">
+                <li><a href="./mobile-dashboard.html">🏠 Дашборд</a></li>
+                <li><a href="./mobile-clients.html">👥 Клиенты</a></li>
+                <li><a href="./mobile-orders.html">📋 Заказы</a></li>
+                <li><a href="./mobile-warehouse.html">📦 Склад</a></li>
+                <li><a href="./mobile-analytics.html" class="active">📊 Аналитика</a></li>
+                <li><a href="./mobile-dialogues.html">💬 Диалоги</a></li>
+                <li><a href="./mobile-notifications.html">🔔 Уведомления</a></li>
+            </ul>
+        </div>
+        
+        <!-- Overlay -->
+        <div class="mobile-overlay"></div>
+        
+        <!-- Content -->
+        <div class="mobile-content" id="main-content">
+            
+            <!-- Analytics Tabs -->
+            <div class="analytics-tabs">
+                <button class="analytics-tab active" data-tab="overview">Обзор</button>
+                <button class="analytics-tab" data-tab="sales">Продажи</button>
+                <button class="analytics-tab" data-tab="clients">Клиенты</button>
+                <button class="analytics-tab" data-tab="managers">Менеджеры</button>
+            </div>
+            
+            <!-- Tab Content: Overview -->
+            <div id="tab-overview" class="tab-content">
+                <!-- Key Metrics -->
+                <div class="metrics-grid">
+                    <div class="metric-card revenue">
+                        <div class="metric-icon revenue">💰</div>
+                        <div class="metric-value" id="total-revenue">—</div>
+                        <div class="metric-label">Общий доход</div>
+                        <div class="metric-change positive" id="revenue-change">+12.5%</div>
+                    </div>
+                    
+                    <div class="metric-card orders">
+                        <div class="metric-icon orders">📋</div>
+                        <div class="metric-value" id="total-orders">—</div>
+                        <div class="metric-label">Заказы</div>
+                        <div class="metric-change positive" id="orders-change">+8.3%</div>
+                    </div>
+                    
+                    <div class="metric-card clients">
+                        <div class="metric-icon clients">👥</div>
+                        <div class="metric-value" id="total-clients">—</div>
+                        <div class="metric-label">Клиенты</div>
+                        <div class="metric-change positive" id="clients-change">+15.2%</div>
+                    </div>
+                    
+                    <div class="metric-card conversion">
+                        <div class="metric-icon conversion">📈</div>
+                        <div class="metric-value" id="conversion-rate">—</div>
+                        <div class="metric-label">Конверсия</div>
+                        <div class="metric-change negative" id="conversion-change">-2.1%</div>
+                    </div>
+                </div>
+                
+                <!-- Revenue Chart -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Динамика доходов</h3>
+                        <select class="chart-selector" id="period-selector">
+                            <option value="30">30 дней</option>
+                            <option value="90">3 месяца</option>
+                            <option value="365">Год</option>
+                        </select>
+                    </div>
+                    <div class="chart-body" id="revenue-chart">
+                        <div class="chart-placeholder">
+                            <div class="chart-placeholder-icon">📈</div>
+                            <div>График доходов будет загружен</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab Content: Sales -->
+            <div id="tab-sales" class="tab-content mobile-hidden">
+                <!-- Top Products -->
+                <div class="top-items">
+                    <div class="top-items-header">
+                        <h3 class="top-items-title">🏆 Топ товаров</h3>
+                    </div>
+                    <div id="top-products">
+                        <!-- Products will be loaded here -->
+                        <div class="mobile-loading">
+                            <div class="mobile-spinner"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sales Funnel -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Воронка продаж</h3>
+                    </div>
+                    <div class="chart-body">
+                        <div class="chart-placeholder">
+                            <div class="chart-placeholder-icon">🔽</div>
+                            <div>Воронка продаж</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab Content: Clients -->
+            <div id="tab-clients" class="tab-content mobile-hidden">
+                <!-- Client Segments -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value" id="vip-clients">—</div>
+                        <div class="metric-label">VIP клиенты</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="active-clients">—</div>
+                        <div class="metric-label">Активные</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="new-clients">—</div>
+                        <div class="metric-label">Новые</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="retention-rate">—</div>
+                        <div class="metric-label">Удержание</div>
+                    </div>
+                </div>
+                
+                <!-- Top Clients -->
+                <div class="top-items">
+                    <div class="top-items-header">
+                        <h3 class="top-items-title">💎 Лучшие клиенты</h3>
+                    </div>
+                    <div id="top-clients">
+                        <div class="mobile-loading">
+                            <div class="mobile-spinner"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab Content: Managers -->
+            <div id="tab-managers" class="tab-content mobile-hidden">
+                <div class="manager-analytics">
+                    <div class="top-items-header">
+                        <h3 class="top-items-title">👨‍💼 Производительность менеджеров</h3>
+                    </div>
+                    <div id="manager-performance">
+                        <div class="mobile-loading">
+                            <div class="mobile-spinner"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Refresh Button -->
+        <button class="refresh-btn" onclick="refreshAnalytics()" title="Обновить данные">🔄</button>
+        
+        <!-- Bottom Navigation -->
+        <div class="mobile-bottom-nav">
+            <a href="./mobile-dashboard.html" class="mobile-bottom-nav-item">
+                <div class="mobile-bottom-nav-icon">🏠</div>
+                <span>Дашборд</span>
+            </a>
+            <a href="./mobile-clients.html" class="mobile-bottom-nav-item">
+                <div class="mobile-bottom-nav-icon">👥</div>
+                <span>Клиенты</span>
+            </a>
+            <a href="./mobile-orders.html" class="mobile-bottom-nav-item">
+                <div class="mobile-bottom-nav-icon">📋</div>
+                <span>Заказы</span>
+            </a>
+            <a href="./mobile-analytics.html" class="mobile-bottom-nav-item active">
+                <div class="mobile-bottom-nav-icon">📊</div>
+                <span>Аналитика</span>
+            </a>
+        </div>
+    </div>
+
+    <script src="./mobile-app.js"></script>
+    <script>
+        class MobileAnalytics {
+            constructor() {
+                this.currentTab = 'overview';
+                this.dateFrom = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+                this.dateTo = new Date().toISOString().split('T')[0];
+                this.init();
+            }
+            
+            async init() {
+                this.setupEventListeners();
+                await this.loadAnalyticsData();
+                this.setupAutoRefresh();
+            }
+            
+            setupEventListeners() {
+                // Tab switching
+                document.querySelectorAll('.analytics-tab').forEach(tab => {
+                    tab.addEventListener('click', (e) => {
+                        this.switchTab(e.target.dataset.tab);
+                    });
+                });
+                
+                // Period selector
+                const periodSelector = document.getElementById('period-selector');
+                if (periodSelector) {
+                    periodSelector.addEventListener('change', (e) => {
+                        this.updateDateRange(e.target.value);
+                        this.loadAnalyticsData();
+                    });
+                }
+            }
+            
+            switchTab(tabName) {
+                // Update tab buttons
+                document.querySelectorAll('.analytics-tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+                
+                // Show/hide tab content
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.add('mobile-hidden');
+                });
+                document.getElementById(`tab-${tabName}`).classList.remove('mobile-hidden');
+                
+                this.currentTab = tabName;
+                
+                // Load tab-specific data
+                switch (tabName) {
+                    case 'sales':
+                        this.loadSalesData();
+                        break;
+                    case 'clients':
+                        this.loadClientData();
+                        break;
+                    case 'managers':
+                        this.loadManagerData();
+                        break;
+                }
+            }
+            
+            updateDateRange(days) {
+                this.dateFrom = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+                this.dateTo = new Date().toISOString().split('T')[0];
+            }
+            
+            async loadAnalyticsData() {
+                await this.loadOverviewData();
+            }
+            
+            async loadOverviewData() {
+                try {
+                    // Mock data for overview metrics
+                    const overviewData = {
+                        totalRevenue: 2847650,
+                        totalOrders: 342,
+                        totalClients: 87,
+                        conversionRate: 23.8
+                    };
+                    
+                    // Update overview metrics
+                    document.getElementById('total-revenue').textContent = 
+                        mobileApp.formatCurrency(overviewData.totalRevenue);
+                    document.getElementById('total-orders').textContent = overviewData.totalOrders;
+                    document.getElementById('total-clients').textContent = overviewData.totalClients;
+                    document.getElementById('conversion-rate').textContent = `${overviewData.conversionRate}%`;
+                    
+                } catch (error) {
+                    console.error('Error loading overview data:', error);
+                    mobileApp.showNotification('Ошибка загрузки данных обзора', 'warning');
+                }
+            }
+            
+            async loadSalesData() {
+                try {
+                    const topProductsContainer = document.getElementById('top-products');
+                    
+                    // Mock top products data
+                    const topProducts = [
+                        { name: 'Баллон пропановый 50л', revenue: 485000, orders: 47 },
+                        { name: 'Баллон кислородный 40л', revenue: 367000, orders: 38 },
+                        { name: 'Баллон аргон 40л', revenue: 298000, orders: 31 },
+                        { name: 'Редуктор кислородный', revenue: 234000, orders: 28 },
+                        { name: 'Рукав газовый 9мм', revenue: 187000, orders: 23 }
+                    ];
+                    
+                    topProductsContainer.innerHTML = topProducts.map((product, index) => `
+                        <div class="top-item">
+                            <div class="top-item-rank">${index + 1}</div>
+                            <div class="top-item-info">
+                                <div class="top-item-name">${product.name}</div>
+                                <div class="top-item-desc">${product.orders} заказов</div>
+                            </div>
+                            <div class="top-item-value">${mobileApp.formatCurrency(product.revenue)}</div>
+                        </div>
+                    `).join('');
+                    
+                } catch (error) {
+                    console.error('Error loading sales data:', error);
+                    document.getElementById('top-products').innerHTML = `
+                        <div class="mobile-alert mobile-alert-warning">
+                            Ошибка загрузки данных продаж
+                        </div>
+                    `;
+                }
+            }
+            
+            async loadClientData() {
+                try {
+                    // Update client metrics
+                    document.getElementById('vip-clients').textContent = '12';
+                    document.getElementById('active-clients').textContent = '74';
+                    document.getElementById('new-clients').textContent = '18';
+                    document.getElementById('retention-rate').textContent = '85%';
+                    
+                    const topClientsContainer = document.getElementById('top-clients');
+                    
+                    // Mock top clients data
+                    const topClients = [
+                        { name: 'ООО "Газпром"', revenue: 847000, orders: 23 },
+                        { name: 'АО "Роснефть"', revenue: 654000, orders: 18 },
+                        { name: 'ЗАО "Лукойл-газ"', revenue: 532000, orders: 15 },
+                        { name: 'ООО "Северсталь"', revenue: 398000, orders: 12 },
+                        { name: 'АО "Металлургия"', revenue: 287000, orders: 9 }
+                    ];
+                    
+                    topClientsContainer.innerHTML = topClients.map((client, index) => `
+                        <div class="top-item">
+                            <div class="top-item-rank">${index + 1}</div>
+                            <div class="top-item-info">
+                                <div class="top-item-name">${client.name}</div>
+                                <div class="top-item-desc">${client.orders} заказов</div>
+                            </div>
+                            <div class="top-item-value">${mobileApp.formatCurrency(client.revenue)}</div>
+                        </div>
+                    `).join('');
+                    
+                } catch (error) {
+                    console.error('Error loading client data:', error);
+                }
+            }
+            
+            async loadManagerData() {
+                try {
+                    const managersContainer = document.getElementById('manager-performance');
+                    
+                    // Try to load real manager analytics if available
+                    let managersData;
+                    try {
+                        const response = await mobileApp.apiRequest(`/analytics/managers?dateFrom=${this.dateFrom}&dateTo=${this.dateTo}`);
+                        if (response.success && response.data.managers) {
+                            managersData = response.data.managers.slice(0, 5);
+                        }
+                    } catch (error) {
+                        console.log('Using mock manager data');
+                    }
+                    
+                    // Use mock data if API not available
+                    if (!managersData) {
+                        managersData = [
+                            { 
+                                name: 'Иванов А.С.', 
+                                rating: 'EXCELLENT',
+                                performance: { 
+                                    totalRevenue: 487000, 
+                                    orders: { total: 28, completionRate: 92 },
+                                    conversionRate: 26.4
+                                }
+                            },
+                            {
+                                name: 'Петрова М.В.',
+                                rating: 'HIGH', 
+                                performance: {
+                                    totalRevenue: 398000,
+                                    orders: { total: 24, completionRate: 87 },
+                                    conversionRate: 22.1
+                                }
+                            },
+                            {
+                                name: 'Сидоров П.И.',
+                                rating: 'HIGH',
+                                performance: {
+                                    totalRevenue: 321000,
+                                    orders: { total: 19, completionRate: 84 },
+                                    conversionRate: 19.8
+                                }
+                            }
+                        ];
+                    }
+                    
+                    managersContainer.innerHTML = managersData.map(manager => {
+                        const ratingColors = {
+                            'EXCELLENT': '#10b981',
+                            'HIGH': '#3b82f6',
+                            'MEDIUM': '#f59e0b',
+                            'LOW': '#ef4444'
+                        };
+                        
+                        const ratingLabels = {
+                            'EXCELLENT': 'Отлично',
+                            'HIGH': 'Высоко',
+                            'MEDIUM': 'Средне',
+                            'LOW': 'Низко'
+                        };
+                        
+                        const rating = manager.overallRating?.rating || manager.rating || 'MEDIUM';
+                        
+                        return `
+                            <div class="manager-card">
+                                <div class="manager-header">
+                                    <h4 class="manager-name">${manager.manager?.name || manager.name}</h4>
+                                    <div class="manager-rating" style="background: ${ratingColors[rating]}">
+                                        ${ratingLabels[rating]}
+                                    </div>
+                                </div>
+                                <div class="manager-stats">
+                                    <div class="manager-stat">
+                                        <div class="manager-stat-value">${mobileApp.formatCurrency(manager.performance.totalRevenue || 0).replace(/\s₽/, 'к')}</div>
+                                        <div class="manager-stat-label">Доход</div>
+                                    </div>
+                                    <div class="manager-stat">
+                                        <div class="manager-stat-value">${manager.performance.orders?.total || 0}</div>
+                                        <div class="manager-stat-label">Заказы</div>
+                                    </div>
+                                    <div class="manager-stat">
+                                        <div class="manager-stat-value">${manager.performance.conversionRate || 0}%</div>
+                                        <div class="manager-stat-label">Конверсия</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                    
+                } catch (error) {
+                    console.error('Error loading manager data:', error);
+                    document.getElementById('manager-performance').innerHTML = `
+                        <div class="mobile-alert mobile-alert-warning">
+                            Ошибка загрузки данных менеджеров
+                        </div>
+                    `;
+                }
+            }
+            
+            setupAutoRefresh() {
+                // Auto refresh every 5 minutes
+                setInterval(() => {
+                    if (!document.hidden) {
+                        this.loadAnalyticsData();
+                    }
+                }, 5 * 60 * 1000);
+            }
+        }
+        
+        // Global refresh function
+        async function refreshAnalytics() {
+            const refreshBtn = document.querySelector('.refresh-btn');
+            refreshBtn.style.animation = 'spin 1s linear infinite';
+            
+            mobileApp.showNotification('Обновление данных...', 'info', 1000);
+            
+            try {
+                await analytics.loadAnalyticsData();
+                mobileApp.showNotification('Данные обновлены', 'success', 2000);
+            } catch (error) {
+                mobileApp.showNotification('Ошибка обновления', 'danger', 3000);
+            }
+            
+            refreshBtn.style.animation = '';
+        }
+        
+        // Initialize analytics
+        let analytics;
+        document.addEventListener('DOMContentLoaded', () => {
+            if (mobileApp.user) {
+                analytics = new MobileAnalytics();
+            } else {
+                window.location.href = './mobile-login.html';
+            }
+        });
+        
+        // Handle app visibility change
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && analytics) {
+                analytics.loadAnalyticsData();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,524 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      String   @default("USER") // USER, MANAGER, ADMIN
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  calculations     Calculation[]
+  transactions     Transaction[]
+  orders           Order[]
+  shipments        Shipment[]
+  manager          Manager?
+  notifications    Notification[]
+  authoredMessages Message[]
+  reminders        Reminder[]
+  createdContracts Contract[]
+
+  @@map("users")
+}
+
+model Client {
+  id            String   @id @default(cuid())
+  name          String   @unique
+  code          String?  @unique
+  inn           String?  @unique
+  contactPerson String?
+  position      String?
+  phone         String?
+  email         String?
+  telegram      String?
+  address       String?
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  calculations   Calculation[]
+  transactions   Transaction[]
+  orders         Order[]
+  contracts      Contract[]
+  managerClients ManagerClient[]
+  dialogues      Dialogue[]
+
+  // Performance indexes for pagination and search
+  @@index([createdAt])
+  @@index([updatedAt])
+  @@index([name])
+  @@index([email])
+  @@index([phone])
+  @@index([contactPerson])
+  @@map("clients")
+}
+
+model Product {
+  id                    String   @id @default(cuid())
+  name                  String
+  code                  String?  @unique
+  supplier              String?
+  unit                  String   @default("шт")
+  purchasePrice         Float
+  minStock              Float    @default(0)
+  location              String?
+  description           String?
+  manufactureDate       String? // Дата изготовления (MM/YYYY)
+  certificationDate     String? // Дата переосвидетельствования (MM/YYYY)
+  nextCertificationDate String? // Следующая дата переосвидетельствования (MM/YYYY)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  warehouseItems   WarehouseItem[]
+  transactions     Transaction[]
+  calculationItems CalculationItem[]
+  serialNumbers    SerialNumber[]
+  orderItems       OrderItem[]
+  shipmentItems    ShipmentItem[]
+
+  // Performance indexes for pagination and search
+  @@index([createdAt])
+  @@index([updatedAt])
+  @@index([name])
+  @@index([supplier])
+  @@index([purchasePrice])
+  @@index([minStock])
+  @@index([location])
+  @@index([code])
+  @@map("products")
+}
+
+model WarehouseItem {
+  id        String   @id @default(cuid())
+  productId String
+  quantity  Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  product       Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  serialNumbers SerialNumber[]
+
+  @@unique([productId])
+  @@map("warehouse_items")
+}
+
+model SerialNumber {
+  id                    String    @id @default(cuid())
+  productId             String
+  warehouseItemId       String
+  serialNumber          String // Номер баллона
+  status                String    @default("IN_STOCK") // IN_STOCK, OUT_OF_STOCK
+  manufactureDate       DateTime? // Дата изготовления
+  certificationDate     DateTime? // Дата переосвидетельствования
+  nextCertificationDate DateTime? // Следующая дата переосвидетельствования
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  product       Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  warehouseItem WarehouseItem @relation(fields: [warehouseItemId], references: [id], onDelete: Cascade)
+  transactions  Transaction[]
+
+  @@unique([productId, serialNumber])
+  @@map("serial_numbers")
+}
+
+model Calculation {
+  id                String   @id @default(cuid())
+  userId            String
+  clientId          String?
+  orderId           String?  // Связь с заявкой (опциональная)
+  name              String
+  
+  // Legacy fields for backward compatibility
+  brokerPercent     Float    @default(0)
+  transportCost     Float    @default(0)
+  certificationCost Float    @default(0)
+  customsCost       Float    @default(0)
+  vatPercent        Float    @default(12)
+  quattroMargin     Float    @default(30)
+  totalCost         Float?
+  
+  // New detailed cost breakdown (Себестоимость)
+  gasCost           Float?   // газ - cost of gas product
+  cylinderCost      Float?   // баллон - cost of cylinder
+  preparationCost   Float?   // подготовка товара - комплектующие, покраска и т.д.
+  logisticsCost     Float?   // логистика - transportation costs
+  workersCost       Float?   // грузчики - loading/unloading workers
+  kickbacksCost     Float?   // откаты по сделке - deal kickbacks
+  
+  // Sales price calculation fields
+  productName       String?  // наименование товара
+  pricePerUnit      Float?   // цена за штуку
+  quantity          Float?   // количество штук
+  totalSaleAmount   Float?   // сумма сделки = pricePerUnit * quantity
+  
+  // Company and organization information
+  sellingCompany    String?  // продажная компания: Нова, СО-ЛАБ и т.д.
+  organizationINN   String?  // ИНН организации
+  organizationName  String?  // наименование организации
+  responsibleManager String? // ответственный менеджер
+  
+  // Calculated profitability fields
+  totalCostBreakdown Float?  // gas + cylinder + preparation + logistics + workers + kickbacks
+  grossProfit       Float?   // totalSaleAmount - totalCostBreakdown (валовая прибыль)
+  vatAmount         Float?   // НДС сумма
+  incomeTaxAmount   Float?   // подоходный налог сумма
+  netProfit         Float?   // grossProfit - VAT - incomeTax (чистая прибыль)
+  profitabilityPercent Float? // (netProfit / totalCostBreakdown) * 100
+  
+  // Reminder system fields
+  sentDate          DateTime? // Дата отправки КП
+  reminderActive    Boolean   @default(false) // Активна ли система напоминаний
+  nextReminderDate  DateTime? // Дата следующего напоминания
+  status            String    @default("DRAFT") // DRAFT, КП_ОТПРАВЛЕНО, ACCEPTED, REJECTED
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user      User              @relation(fields: [userId], references: [id])
+  client    Client?           @relation(fields: [clientId], references: [id])
+  order     Order?            @relation("CalculationOrder", fields: [orderId], references: [id])
+  items     CalculationItem[]
+  files     File[]
+  reminders Reminder[]
+  orders    Order[]           @relation("OrderCalculation") // Orders that reference this calculation
+
+  @@map("calculations")
+}
+
+model CalculationItem {
+  id            String  @id @default(cuid())
+  calculationId String
+  productId     String?
+  name          String
+  cost          Float
+  duty          Float   @default(0)
+  quantity      Float   @default(1)
+  finalPrice    Float?
+
+  calculation Calculation @relation(fields: [calculationId], references: [id], onDelete: Cascade)
+  product     Product?    @relation(fields: [productId], references: [id])
+
+  @@map("calculation_items")
+}
+
+model Transaction {
+  id             String   @id @default(cuid())
+  productId      String
+  userId         String
+  clientId       String?
+  serialNumberId String? // Привязка к серийному номеру для списания
+  type           String
+  quantity       Float
+  reason         String?
+  createdAt      DateTime @default(now())
+
+  product      Product       @relation(fields: [productId], references: [id])
+  user         User          @relation(fields: [userId], references: [id])
+  client       Client?       @relation(fields: [clientId], references: [id])
+  serialNumber SerialNumber? @relation(fields: [serialNumberId], references: [id])
+  files        File[]
+
+  @@map("transactions")
+}
+
+model File {
+  id           String   @id @default(cuid())
+  filename     String
+  originalName String
+  path         String
+  size         Int
+  mimetype     String
+  relatedId    String?
+  relatedType  String? // CALCULATION, TRANSACTION, ORDER, CONTRACT
+  createdAt    DateTime @default(now())
+
+  calculation  Calculation?  @relation(fields: [relatedId], references: [id])
+  transaction  Transaction?  @relation(fields: [relatedId], references: [id])
+  order        Order?        @relation(fields: [relatedId], references: [id])
+  contract     Contract?     @relation(fields: [relatedId], references: [id])
+  messageFiles MessageFile[]
+
+  @@map("files")
+}
+
+model Order {
+  id            String   @id @default(cuid())
+  number        String   @unique // Номер заявки (ORD-001)
+  userId        String
+  clientId      String
+  contractId    String?  // Связь с договором (опциональная)
+  calculationId String?  // Связь с расчетом (опциональная)
+  orderDate     DateTime
+  status        String   @default("CREATED") // CREATED, CALCULATION, PROPOSAL_SENT, PROPOSAL_ACCEPTED, PROPOSAL_REJECTED, PAID, FOR_SHIPMENT_UNPAID, PICKING, SHIPPED, CLOSED
+  totalAmount   Float    @default(0)
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user         User           @relation(fields: [userId], references: [id])
+  client       Client         @relation(fields: [clientId], references: [id])
+  contract     Contract?      @relation(fields: [contractId], references: [id])
+  calculation  Calculation?   @relation("OrderCalculation", fields: [calculationId], references: [id])
+  items        OrderItem[]
+  files        File[]
+  shipment     Shipment?
+  calculations Calculation[]  @relation("CalculationOrder") // Calculations created from this order
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String @id @default(cuid())
+  orderId   String
+  productId String
+  quantity  Float
+  price     Float // Цена за единицу в заявке
+  total     Float // quantity * price
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+model Shipment {
+  id        String   @id @default(cuid())
+  orderId   String   @unique // Одна отгрузка на заявку
+  userId    String
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  order Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  user  User           @relation(fields: [userId], references: [id])
+  items ShipmentItem[]
+  files ShipmentFile[]
+
+  @@map("shipments")
+}
+
+model ShipmentItem {
+  id         String   @id @default(cuid())
+  shipmentId String
+  productId  String
+  quantity   Float
+  createdAt  DateTime @default(now())
+
+  shipment      Shipment               @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  product       Product                @relation(fields: [productId], references: [id])
+  serialNumbers ShipmentSerialNumber[]
+
+  @@map("shipment_items")
+}
+
+model ShipmentSerialNumber {
+  id             String @id @default(cuid())
+  shipmentItemId String
+  serialNumber   String
+
+  shipmentItem ShipmentItem @relation(fields: [shipmentItemId], references: [id], onDelete: Cascade)
+
+  @@map("shipment_serial_numbers")
+}
+
+model ShipmentFile {
+  id         String @id @default(cuid())
+  shipmentId String
+  fileId     String
+
+  shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  @@map("shipment_files")
+}
+
+model Manager {
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  name       String
+  department String?
+  settings   String?
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  managerClients ManagerClient[]
+  dialogues      Dialogue[]
+
+  @@map("managers")
+}
+
+model ManagerClient {
+  id         String   @id @default(cuid())
+  managerId  String
+  clientId   String
+  assignedAt DateTime @default(now())
+  isActive   Boolean  @default(true)
+  notes      String?
+
+  manager Manager @relation(fields: [managerId], references: [id], onDelete: Cascade)
+  client  Client  @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@unique([managerId, clientId])
+  @@map("manager_clients")
+}
+
+model Dialogue {
+  id            String    @id @default(cuid())
+  managerId     String
+  clientId      String
+  subject       String
+  status        String    @default("ACTIVE") // ACTIVE, CLOSED, ARCHIVED
+  priority      String    @default("NORMAL") // LOW, NORMAL, HIGH, URGENT
+  lastMessageAt DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  manager  Manager   @relation(fields: [managerId], references: [id], onDelete: Cascade)
+  client   Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  messages Message[]
+
+  @@index([status])
+  @@index([priority])
+  @@index([createdAt])
+  @@index([lastMessageAt])
+  @@map("dialogues")
+}
+
+model Message {
+  id          String    @id @default(cuid())
+  dialogueId  String
+  authorId    String?
+  content     String
+  type        String    @default("TEXT") // TEXT, FILE, SYSTEM, NOTE
+  isImportant Boolean   @default(false)
+  metadata    String?
+  readAt      DateTime?
+  createdAt   DateTime  @default(now())
+
+  dialogue     Dialogue      @relation(fields: [dialogueId], references: [id], onDelete: Cascade)
+  author       User?         @relation(fields: [authorId], references: [id])
+  messageFiles MessageFile[]
+
+  @@index([createdAt])
+  @@index([type])
+  @@index([isImportant])
+  @@map("messages")
+}
+
+model MessageFile {
+  id        String @id @default(cuid())
+  messageId String
+  fileId    String
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  file    File    @relation(fields: [fileId], references: [id], onDelete: Cascade)
+
+  @@map("message_files")
+}
+
+model Notification {
+  id           String    @id @default(cuid())
+  userId       String
+  type         String // MESSAGE, REMINDER, ALERT, SYSTEM
+  title        String
+  content      String?
+  relatedId    String?
+  relatedType  String? // ORDER, CLIENT, DIALOGUE, CALCULATION, etc.
+  isRead       Boolean   @default(false)
+  isUrgent     Boolean   @default(false)
+  metadata     String?
+  expiresAt    DateTime?
+  reminderType String? // FOLLOW_UP, CALL_CLIENT, SEND_PROPOSAL, etc.
+  createdAt    DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([isUrgent])
+  @@index([type])
+  @@index([reminderType])
+  @@index([createdAt])
+  @@index([expiresAt])
+  @@map("notifications")
+}
+
+model Reminder {
+  id            String   @id @default(cuid())
+  userId        String
+  relatedId     String
+  relatedType   String   // CALCULATION, ORDER, CLIENT, etc.
+  title         String
+  description   String?
+  reminderType  String   // FOLLOW_UP, CALL_CLIENT, SEND_PROPOSAL, etc.
+  scheduledDate DateTime
+  status        String   @default("PENDING") // PENDING, SENT, CANCELLED, COMPLETED
+  frequency     Int      @default(3) // Days between reminders
+  maxReminders  Int      @default(10) // Maximum number of reminders to send
+  sentCount     Int      @default(0) // Number of reminders already sent
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  calculation Calculation? @relation(fields: [relatedId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([scheduledDate])
+  @@index([relatedType])
+  @@index([reminderType])
+  @@map("reminders")
+}
+
+model Contract {
+  id                String   @id @default(cuid())
+  orderId           String?  // Связь с заявкой (опциональная)
+  clientId          String
+  contractNumber    String   @unique // Номер договора
+  contractDate      DateTime // Дата заключения договора
+  signedDate        DateTime? // Дата подписания
+  contractType      String   // SUPPLY, SERVICE, LEASE, PURCHASE, etc.
+  exchangeName      String?  // Название биржи (если применимо)
+  exchangeType      String?  // Тип биржи
+  status            String   @default("DRAFT") // DRAFT, SENT, SIGNED, ACTIVE, COMPLETED, CANCELLED
+  totalAmount       Float    @default(0)
+  currency          String   @default("RUB")
+  description       String?
+  terms             String?  // Условия договора
+  conditions        String?  // Дополнительные условия
+  documentIds       String?  // JSON массив ID документов
+  responsibleManager String? // Ответственный менеджер
+  createdBy         String   // Кто создал договор
+  validFrom         DateTime // Действует с
+  validTo           DateTime? // Действует до
+  autoRenewal       Boolean  @default(false)
+  metadata          String?  // Дополнительные данные в JSON
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  client   Client  @relation(fields: [clientId], references: [id])
+  creator  User    @relation(fields: [createdBy], references: [id])
+  orders   Order[]
+  files    File[]
+
+  // Performance indexes
+  @@index([clientId])
+  @@index([status])
+  @@index([contractType])
+  @@index([createdBy])
+  @@index([contractDate])
+  @@index([validFrom])
+  @@index([validTo])
+  @@index([createdAt])
+  @@map("contracts")
+}

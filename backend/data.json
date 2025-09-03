@@ -1,0 +1,1308 @@
+{
+  "users": [
+    {
+      "id": "user-admin-1",
+      "email": "admin@colab.uz",
+      "password": "Admin2024!",
+      "name": "Администратор",
+      "role": "admin",
+      "status": "active",
+      "avatar": null,
+      "createdAt": "2025-08-01T09:00:00.000Z",
+      "permissions": [
+        "all"
+      ]
+    },
+    {
+      "id": "user-manager-1",
+      "email": "vitaliy@colab.uz",
+      "password": "Vitaliy2024",
+      "name": "Виталий",
+      "role": "manager",
+      "status": "active",
+      "avatar": null,
+      "department": "sales",
+      "createdAt": "2025-08-15T10:00:00.000Z",
+      "permissions": [
+        "clients",
+        "orders",
+        "products",
+        "calculations",
+        "warehouse"
+      ]
+    },
+    {
+      "id": "user-manager-2",
+      "email": "orif@colab.uz",
+      "password": "Orif2024",
+      "name": "Ориф",
+      "role": "manager",
+      "status": "active",
+      "avatar": null,
+      "department": "sales",
+      "createdAt": "2025-08-15T10:30:00.000Z",
+      "permissions": [
+        "clients",
+        "orders",
+        "products",
+        "calculations",
+        "warehouse"
+      ]
+    }
+  ],
+  "clients": [
+    {
+      "id": "1756469527709",
+      "name": "Кваттро",
+      "inn": "308221676",
+      "contactPerson": "Иван",
+      "position": "директор",
+      "phone": "901111137",
+      "createdAt": "2025-08-29T12:12:07.709Z",
+      "updatedAt": "2025-09-03T14:19:59.401Z",
+      "email": "ain@colab.ru",
+      "telegram": "@kkk"
+    },
+    {
+      "id": "1756469674927",
+      "name": "Тест",
+      "inn": "3081111111",
+      "contactPerson": "тест",
+      "position": "директор",
+      "createdAt": "2025-08-29T12:14:34.927Z",
+      "updatedAt": "2025-09-01T16:32:41.378Z",
+      "email": "test@company.ru"
+    },
+    {
+      "id": "1756713969805",
+      "name": "Рога и копыта",
+      "inn": "300111111",
+      "contactPerson": "Ориф",
+      "position": "директор",
+      "phone": "901111111",
+      "email": "admin@colab.ru",
+      "telegram": "@kk",
+      "createdAt": "2025-09-01T08:06:09.805Z",
+      "updatedAt": "2025-09-01T16:30:09.791Z"
+    }
+  ],
+  "products": [
+    {
+      "id": "1756469821091",
+      "name": "Азот 5.0",
+      "sku": "SKU1756469821091",
+      "price": 52000000,
+      "purchasePrice": 400000,
+      "quantity": 1,
+      "minQuantity": 1,
+      "supplier": "Кваттро",
+      "category": "Чистые газы",
+      "description": "",
+      "location": "",
+      "status": "active",
+      "unit": "шт",
+      "createdAt": "2025-08-29T12:17:01.091Z",
+      "updatedAt": "2025-09-03T11:40:11.239Z"
+    },
+    {
+      "id": "1756633890813",
+      "name": "Гелий 6.0",
+      "sku": "SKU1756633890813",
+      "price": 78000000,
+      "purchasePrice": 60000000,
+      "quantity": 3,
+      "minQuantity": 0,
+      "supplier": "Кваттро",
+      "category": "Чистые газы",
+      "description": "",
+      "location": "",
+      "status": "active",
+      "unit": "шт",
+      "createdAt": "2025-08-31T09:51:30.813Z",
+      "updatedAt": "2025-09-03T15:44:18.002Z"
+    },
+    {
+      "id": "1756912519407",
+      "name": "Водород 5.0",
+      "sku": "SKU1756912519407",
+      "price": 650000,
+      "purchasePrice": 500000,
+      "quantity": 0,
+      "minQuantity": 10,
+      "supplier": "Кваттро",
+      "category": "Чистые газы",
+      "description": "",
+      "location": "",
+      "status": "active",
+      "unit": "шт",
+      "createdAt": "2025-09-03T15:15:19.407Z",
+      "updatedAt": "2025-09-03T15:32:43.399Z"
+    },
+    {
+      "id": "1756913767568",
+      "name": "Ацетилен",
+      "sku": "SKU1756913767568",
+      "price": 7800000,
+      "purchasePrice": 6000000,
+      "quantity": 3,
+      "minQuantity": 0,
+      "supplier": "Кваттро",
+      "category": "Чистые газы",
+      "description": "",
+      "location": "",
+      "status": "active",
+      "unit": "шт",
+      "createdAt": "2025-09-03T15:36:07.568Z",
+      "updatedAt": "2025-09-03T15:37:58.453Z"
+    }
+  ],
+  "orders": [
+    {
+      "id": "5",
+      "number": "5",
+      "orderNumber": "5",
+      "clientId": "1",
+      "client": {
+        "id": "1",
+        "name": "ООО \"Тестовая компания\"",
+        "phone": "+7 900 123-45-67",
+        "email": "test@company.ru"
+      },
+      "status": "CLOSED",
+      "manager": "Менеджер 1",
+      "totalAmount": 18000,
+      "total": 18000,
+      "items": [],
+      "itemsCount": 2,
+      "createdAt": "2025-08-24T13:10:45.000Z",
+      "updatedAt": "2025-08-26T15:25:00.000Z"
+    },
+    {
+      "id": "6",
+      "number": "6",
+      "orderNumber": "6",
+      "clientId": "2",
+      "client": {
+        "id": "2",
+        "name": "ИП Иванов И.И.",
+        "phone": "+7 900 987-65-43",
+        "email": "ivanov@mail.ru"
+      },
+      "status": "CLOSED",
+      "manager": "Менеджер 2",
+      "totalAmount": 32000,
+      "total": 32000,
+      "items": [],
+      "itemsCount": 1,
+      "createdAt": "2025-08-20T09:15:00.000Z",
+      "updatedAt": "2025-08-23T16:30:00.000Z"
+    },
+    {
+      "id": "7",
+      "number": "7",
+      "orderNumber": "7",
+      "clientId": "3",
+      "client": {
+        "id": "3",
+        "name": "ООО \"Ромашка\"",
+        "phone": "+7 900 555-12-34",
+        "email": "info@romashka.ru"
+      },
+      "status": "CLOSED",
+      "manager": "Менеджер 1",
+      "totalAmount": 45000,
+      "total": 45000,
+      "items": [],
+      "itemsCount": 3,
+      "createdAt": "2025-08-18T14:20:30.000Z",
+      "updatedAt": "2025-08-22T11:45:00.000Z"
+    },
+    {
+      "id": "1756469957581",
+      "number": "8",
+      "orderNumber": "8",
+      "clientId": "1756469527709",
+      "client": {
+        "id": "1756469527709",
+        "name": "Кваттро",
+        "phone": "901111137"
+      },
+      "status": "CLOSED",
+      "manager": "Менеджер 1",
+      "totalAmount": 40000000,
+      "total": 40000000,
+      "items": [
+        {
+          "id": "1756469821091",
+          "quantity": 1,
+          "price": 40000000
+        }
+      ],
+      "itemsCount": 1,
+      "notes": null,
+      "orderDate": "2025-08-29",
+      "createdAt": "2025-08-29T12:19:17.582Z",
+      "updatedAt": "2025-08-31T09:43:22.521Z",
+      "shippedAt": "2025-08-30T07:33:31.107Z",
+      "shipment": {
+        "items": [
+          {
+            "productId": "1756469821091",
+            "quantity": 1,
+            "serialNumbers": [
+              "444"
+            ]
+          }
+        ],
+        "fileIds": [],
+        "notes": null,
+        "cylinderNumbers": [
+          {
+            "cylinderNumber": "444",
+            "productId": "1756469821091"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1756633433460",
+      "number": "9",
+      "orderNumber": "9",
+      "clientId": "1756469527709",
+      "client": {
+        "id": "1756469527709",
+        "name": "Кваттро",
+        "phone": "901111137"
+      },
+      "status": "CLOSED",
+      "manager": "Менеджер 1",
+      "totalAmount": 26000000,
+      "total": 26000000,
+      "items": [
+        {
+          "id": "1756469821091",
+          "quantity": 1,
+          "price": 26000000
+        }
+      ],
+      "itemsCount": 1,
+      "notes": null,
+      "orderDate": "2025-08-31",
+      "createdAt": "2025-08-31T09:43:53.460Z",
+      "updatedAt": "2025-09-01T15:54:29.412Z",
+      "shippedAt": "2025-09-01T15:47:07.042Z",
+      "shipment": {
+        "items": [
+          {
+            "productId": "1756469821091",
+            "quantity": 1,
+            "serialNumbers": [
+              "445"
+            ]
+          }
+        ],
+        "fileIds": [],
+        "notes": null,
+        "cylinderNumbers": [
+          {
+            "cylinderNumber": "445",
+            "productId": "1756469821091"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1756741976369",
+      "number": "10",
+      "orderNumber": "10",
+      "clientId": "1756469527709",
+      "client": {
+        "id": "1756469527709",
+        "name": "Кваттро",
+        "phone": "901111137"
+      },
+      "status": "CLOSED",
+      "manager": "Ориф",
+      "totalAmount": 60000000,
+      "total": 60000000,
+      "items": [
+        {
+          "id": "1756469821091",
+          "quantity": 1,
+          "price": 60000000
+        }
+      ],
+      "itemsCount": 1,
+      "notes": null,
+      "orderDate": "2025-09-01",
+      "createdAt": "2025-09-01T15:52:56.369Z",
+      "updatedAt": "2025-09-03T15:28:08.733Z",
+      "shippedAt": "2025-09-01T16:03:26.268Z",
+      "shipment": {
+        "items": [
+          {
+            "productId": "1756469821091",
+            "quantity": 1,
+            "serialNumbers": [
+              "446"
+            ]
+          }
+        ],
+        "fileIds": [],
+        "notes": null,
+        "cylinderNumbers": [
+          {
+            "cylinderNumber": "446",
+            "productId": "1756469821091"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1756909862543",
+      "number": "11",
+      "orderNumber": "11",
+      "clientId": "1756713969805",
+      "client": {
+        "id": "1756713969805",
+        "name": "Рога и копыта",
+        "phone": "901111111",
+        "email": "admin@colab.ru"
+      },
+      "status": "CLOSED",
+      "manager": "Виталий",
+      "totalAmount": 70000000,
+      "total": 70000000,
+      "items": [
+        {
+          "id": "1756633890813",
+          "quantity": 1,
+          "price": 70000000
+        }
+      ],
+      "itemsCount": 1,
+      "notes": null,
+      "orderDate": "2025-09-03",
+      "createdAt": "2025-09-03T14:31:02.543Z",
+      "updatedAt": "2025-09-03T15:36:37.463Z",
+      "shippedAt": "2025-09-03T14:32:41.948Z",
+      "shipment": {
+        "items": [
+          {
+            "productId": "1756633890813",
+            "quantity": 1,
+            "serialNumbers": [
+              "HE-001"
+            ]
+          }
+        ],
+        "fileIds": [],
+        "notes": null,
+        "cylinderNumbers": [
+          {
+            "cylinderNumber": "HE-001",
+            "productId": "1756633890813"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1756913309688",
+      "number": "12",
+      "orderNumber": "12",
+      "clientId": "1756469527709",
+      "client": {
+        "id": "1756469527709",
+        "name": "Кваттро",
+        "phone": "901111137",
+        "email": "ain@colab.ru"
+      },
+      "status": "CLOSED",
+      "manager": "Виталий",
+      "totalAmount": 5000000,
+      "total": 5000000,
+      "items": [
+        {
+          "id": "1756912519407",
+          "quantity": 1,
+          "price": 5000000
+        }
+      ],
+      "itemsCount": 1,
+      "notes": null,
+      "orderDate": "2025-09-03",
+      "createdAt": "2025-09-03T15:28:29.688Z",
+      "updatedAt": "2025-09-03T15:36:42.033Z",
+      "shippedAt": "2025-09-03T15:32:43.399Z",
+      "shipment": {
+        "items": [
+          {
+            "productId": "1756912519407",
+            "quantity": 1,
+            "serialNumbers": [
+              "346"
+            ]
+          }
+        ],
+        "fileIds": [],
+        "notes": null,
+        "cylinderNumbers": [
+          {
+            "cylinderNumber": "346",
+            "productId": "1756912519407"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1756913817629",
+      "number": "13",
+      "orderNumber": "13",
+      "clientId": "1756713969805",
+      "client": {
+        "id": "1756713969805",
+        "name": "Рога и копыта",
+        "phone": "901111111",
+        "email": "admin@colab.ru"
+      },
+      "status": "SHIPPED",
+      "manager": "Виталий",
+      "totalAmount": 8999999.95,
+      "total": 8999999.95,
+      "items": [
+        {
+          "id": "1756913767568",
+          "quantity": 1,
+          "price": 8999999.95
+        }
+      ],
+      "itemsCount": 1,
+      "notes": null,
+      "orderDate": "2025-09-03",
+      "createdAt": "2025-09-03T15:36:57.629Z",
+      "updatedAt": "2025-09-03T15:37:58.453Z",
+      "shippedAt": "2025-09-03T15:37:58.453Z",
+      "shipment": {
+        "items": [
+          {
+            "productId": "1756913767568",
+            "quantity": 1,
+            "serialNumbers": [
+              "567"
+            ]
+          }
+        ],
+        "fileIds": [],
+        "notes": null,
+        "cylinderNumbers": [
+          {
+            "cylinderNumber": "567",
+            "productId": "1756913767568"
+          }
+        ]
+      }
+    }
+  ],
+  "contracts": [
+    {
+      "id": "1",
+      "contractNumber": "CTR001",
+      "clientId": "1",
+      "client": {
+        "id": "1",
+        "name": "ООО \"Тестовая компания\"",
+        "inn": "1234567890",
+        "phone": "+7 900 123-45-67",
+        "email": "test@company.ru"
+      },
+      "contractType": "SERVICE",
+      "contractDate": "2025-08-01T09:00:00.000Z",
+      "signedDate": "2025-08-03T14:30:00.000Z",
+      "status": "ACTIVE",
+      "totalAmount": 150000,
+      "currency": "RUB",
+      "validFrom": "2025-08-01T00:00:00.000Z",
+      "validTo": "2025-12-31T23:59:59.000Z",
+      "description": "Договор на оказание услуг по техническому обслуживанию",
+      "autoRenewal": true,
+      "createdAt": "2025-08-01T09:00:00.000Z",
+      "updatedAt": "2025-08-28T10:15:00.000Z"
+    },
+    {
+      "id": "2",
+      "contractNumber": "CTR002",
+      "clientId": "2",
+      "client": {
+        "id": "2",
+        "name": "ИП Иванов И.И.",
+        "inn": "987654321098",
+        "phone": "+7 900 987-65-43",
+        "email": "ivanov@mail.ru"
+      },
+      "contractType": "SUPPLY",
+      "contractDate": "2025-08-10T11:15:00.000Z",
+      "signedDate": null,
+      "status": "SENT",
+      "totalAmount": 295000,
+      "currency": "RUB",
+      "validFrom": "2025-08-10T00:00:00.000Z",
+      "validTo": "2025-11-30T23:59:59.000Z",
+      "description": "Договор поставки товаров",
+      "autoRenewal": false,
+      "createdAt": "2025-08-10T11:15:00.000Z",
+      "updatedAt": "2025-08-25T16:20:00.000Z"
+    },
+    {
+      "id": "3",
+      "contractNumber": "CTR003",
+      "clientId": "3",
+      "client": {
+        "id": "3",
+        "name": "ООО \"Ромашка\"",
+        "inn": "1122334455",
+        "phone": "+7 900 555-12-34",
+        "email": "info@romashka.ru"
+      },
+      "contractType": "OTHER",
+      "contractDate": "2025-08-15T16:45:00.000Z",
+      "signedDate": "2025-08-20T10:30:00.000Z",
+      "status": "ACTIVE",
+      "totalAmount": 0,
+      "currency": "RUB",
+      "validFrom": "2025-08-15T00:00:00.000Z",
+      "validTo": "2025-10-15T23:59:59.000Z",
+      "description": "Смешанный договор: услуги + товары",
+      "autoRenewal": false,
+      "createdAt": "2025-08-15T13:30:00.000Z",
+      "updatedAt": "2025-08-26T09:45:00.000Z"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "1756914225352y1ns2",
+      "type": "INVENTORY",
+      "productId": "1756633890813",
+      "productName": "Гелий 6.0",
+      "quantity": -1,
+      "oldQuantity": 4,
+      "newQuantity": 3,
+      "reason": "улетучился. Списаны баллоны: HE-002. Остались на складе: HE-003, HE-004, HE-005.",
+      "clientId": null,
+      "createdAt": "2025-09-03T15:43:45.352Z",
+      "createdBy": "Пользователь",
+      "cylinderNumbers": [
+        "HE-003",
+        "HE-004",
+        "HE-005"
+      ],
+      "missingCylinderNumbers": [
+        "HE-002"
+      ]
+    },
+    {
+      "id": "1756913878453lke6c",
+      "type": "SHIPMENT",
+      "productId": "1756913767568",
+      "productName": "Ацетилен",
+      "quantity": -1,
+      "oldQuantity": 4,
+      "newQuantity": 3,
+      "orderId": "1756913817629",
+      "orderNumber": "13",
+      "cylinderNumbers": [
+        "567"
+      ],
+      "reason": "Отгрузка по заявке 13",
+      "createdAt": "2025-09-03T15:37:58.453Z",
+      "createdBy": "Система"
+    },
+    {
+      "id": "17569135633995wv6z",
+      "type": "SHIPMENT",
+      "productId": "1756912519407",
+      "productName": "Водород 5.0",
+      "quantity": -1,
+      "oldQuantity": 1,
+      "newQuantity": 0,
+      "orderId": "1756913309688",
+      "orderNumber": "12",
+      "cylinderNumbers": [
+        "346"
+      ],
+      "reason": "Отгрузка по заявке 12",
+      "createdAt": "2025-09-03T15:32:43.399Z",
+      "createdBy": "Система"
+    },
+    {
+      "id": "1756913216670r3xuk",
+      "type": "INVENTORY",
+      "productId": "1756912519407",
+      "productName": "Водород 5.0",
+      "quantity": -5,
+      "oldQuantity": 6,
+      "newQuantity": 1,
+      "reason": "газ низкого качества. Списаны баллоны: 347, 348, 349. Остались на складе: 346.",
+      "clientId": null,
+      "createdAt": "2025-09-03T15:26:56.670Z",
+      "createdBy": "Пользователь",
+      "cylinderNumbers": [
+        "346"
+      ],
+      "missingCylinderNumbers": [
+        "347",
+        "348",
+        "349"
+      ]
+    },
+    {
+      "id": "1756912684343xzm5f",
+      "type": "INCOMING",
+      "productId": "1756912519407",
+      "productName": "Водород 5.0",
+      "quantity": 2,
+      "oldQuantity": 4,
+      "newQuantity": 6,
+      "reason": "Поступление баллонов",
+      "clientId": null,
+      "createdAt": "2025-09-03T15:18:04.343Z",
+      "createdBy": "Пользователь"
+    },
+    {
+      "id": "1756912519411mlo1q",
+      "type": "INCOMING",
+      "productId": "1756912519407",
+      "productName": "Водород 5.0",
+      "quantity": 2,
+      "oldQuantity": 2,
+      "newQuantity": 4,
+      "reason": "Начальный остаток при создании товара",
+      "clientId": null,
+      "createdAt": "2025-09-03T15:15:19.411Z",
+      "createdBy": "Пользователь",
+      "cylinderNumbers": [
+        {
+          "serialNumber": "346",
+          "manufactureDate": "01/2000",
+          "certificationDate": "01/2022",
+          "nextCertificationDate": "01/2027"
+        },
+        {
+          "serialNumber": "347",
+          "manufactureDate": "01/2000",
+          "certificationDate": "02/2022",
+          "nextCertificationDate": "02/2027"
+        }
+      ]
+    },
+    {
+      "id": "1756909961948dvzkd",
+      "type": "SHIPMENT",
+      "productId": "1756633890813",
+      "productName": "Гелий 6.0",
+      "quantity": -1,
+      "oldQuantity": 5,
+      "newQuantity": 4,
+      "orderId": "1756909862543",
+      "orderNumber": "11",
+      "cylinderNumbers": [
+        "HE-001"
+      ],
+      "reason": "Отгрузка по заявке 11",
+      "createdAt": "2025-09-03T14:32:41.948Z",
+      "createdBy": "Система"
+    },
+    {
+      "id": "1756901630137i31zs",
+      "type": "INVENTORY",
+      "productId": "1756633890813",
+      "productName": "Гелий 6.0",
+      "quantity": 1,
+      "oldQuantity": 4,
+      "newQuantity": 5,
+      "reason": "газ улетучился. Списаны баллоны: HE-006. Остались на складе: HE-001, HE-002, HE-003, HE-004, HE-005.",
+      "clientId": null,
+      "createdAt": "2025-09-03T12:13:50.138Z",
+      "createdBy": "Пользователь"
+    },
+    {
+      "id": "17569004286544tcv1",
+      "type": "INVENTORY",
+      "productId": "1756633890813",
+      "productName": "Гелий 6.0",
+      "quantity": -2,
+      "oldQuantity": 6,
+      "newQuantity": 4,
+      "reason": "Газ улетучился",
+      "clientId": null,
+      "createdAt": "2025-09-03T11:53:48.654Z",
+      "createdBy": "Пользователь"
+    },
+    {
+      "id": "1756899611239lcr3u",
+      "type": "INVENTORY",
+      "productId": "1756469821091",
+      "productName": "Азот 5.0",
+      "quantity": -1,
+      "oldQuantity": 2,
+      "newQuantity": 1,
+      "reason": "Отсутствует",
+      "clientId": null,
+      "createdAt": "2025-09-03T11:40:11.239Z",
+      "createdBy": "Пользователь"
+    },
+    {
+      "id": "1756899380173ypyjm",
+      "type": "INCOMING",
+      "productId": "1756469821091",
+      "productName": "Азот 5.0",
+      "quantity": 2,
+      "oldQuantity": 0,
+      "newQuantity": 2,
+      "reason": "Поступление баллонов",
+      "clientId": null,
+      "createdAt": "2025-09-03T11:36:20.173Z",
+      "createdBy": "Пользователь"
+    },
+    {
+      "id": "1756742606268maojm",
+      "type": "SHIPMENT",
+      "productId": "1756469821091",
+      "productName": "азот 40",
+      "quantity": -1,
+      "oldQuantity": 1,
+      "newQuantity": 0,
+      "orderId": "1756741976369",
+      "orderNumber": "10",
+      "cylinderNumbers": [
+        "446"
+      ],
+      "reason": "Отгрузка по заявке 10",
+      "createdAt": "2025-09-01T16:03:26.268Z",
+      "createdBy": "Система"
+    },
+    {
+      "id": "1756741627042ks7nb",
+      "type": "SHIPMENT",
+      "productId": "1756469821091",
+      "productName": "азот 40",
+      "quantity": -1,
+      "oldQuantity": 2,
+      "newQuantity": 1,
+      "orderId": "1756633433460",
+      "orderNumber": "9",
+      "cylinderNumbers": [
+        "445"
+      ],
+      "reason": "Отгрузка по заявке 9",
+      "createdAt": "2025-09-01T15:47:07.042Z",
+      "createdBy": "Система"
+    },
+    {
+      "id": "1756741613393l9tcr",
+      "type": "SHIPMENT",
+      "productId": "1756469821091",
+      "productName": "азот 40",
+      "quantity": -1,
+      "oldQuantity": 3,
+      "newQuantity": 2,
+      "orderId": "1756633433460",
+      "orderNumber": "9",
+      "cylinderNumbers": [
+        "445"
+      ],
+      "reason": "Отгрузка по заявке 9",
+      "createdAt": "2025-09-01T15:46:53.393Z",
+      "createdBy": "Система"
+    },
+    {
+      "id": "1756636030348fo437",
+      "type": "INCOMING",
+      "productId": "1756633890813",
+      "productName": "Гелий 6. 0",
+      "quantity": 3,
+      "oldQuantity": 3,
+      "newQuantity": 6,
+      "reason": "Начальный остаток Гелий 6.0",
+      "cylinderNumbers": [
+        "HE-001",
+        "HE-002",
+        "HE-003"
+      ],
+      "clientId": null,
+      "createdAt": "2025-08-31T10:27:10.348Z",
+      "createdBy": "Система"
+    },
+    {
+      "id": "1756540759157y4pqt",
+      "type": "INCOMING",
+      "productId": "1756469821091",
+      "productName": "азот 40",
+      "quantity": 3,
+      "oldQuantity": 0,
+      "newQuantity": 3,
+      "reason": "Тестовый приход",
+      "cylinderNumbers": [
+        "444",
+        "445",
+        "446"
+      ],
+      "clientId": null,
+      "createdAt": "2025-08-30T07:59:19.157Z",
+      "createdBy": "Тест"
+    },
+    {
+      "id": "17564733311070001",
+      "type": "SHIPMENT",
+      "productId": "1756469821091",
+      "productName": "азот 40",
+      "quantity": -1,
+      "oldQuantity": 1,
+      "newQuantity": 0,
+      "orderId": "1756469957581",
+      "orderNumber": "8",
+      "cylinderNumbers": [
+        "444"
+      ],
+      "reason": "Отгрузка по заявке 8",
+      "createdAt": "2025-08-30T07:33:31.107Z",
+      "createdBy": "Система"
+    }
+  ],
+  "calculations": [
+    {
+      "id": "calc-1756717148494",
+      "name": "Аргон - 01.09.2025",
+      "sellingCompany": "nova",
+      "organizationINN": "300111111",
+      "organizationName": "Рога и копыта",
+      "responsibleManager": "user-manager-1",
+      "gasCost": 4000000,
+      "cylinderCost": 2500000,
+      "preparationCost": 1000000,
+      "logisticsCost": 1000000,
+      "workersCost": 200000,
+      "kickbacksCost": 2000000,
+      "productName": "Аргон",
+      "pricePerUnit": 18999999.89,
+      "quantity": 1,
+      "vatPercent": 12,
+      "incomeTaxPercent": 20,
+      "createdBy": "Виталий",
+      "createdByUserId": "user-manager-1",
+      "createdAt": "2025-09-01T08:59:08.494Z",
+      "updatedAt": "2025-09-01T08:59:08.495Z",
+      "totalCost": 10700000,
+      "totalSales": 18999999.89,
+      "grossProfit": 8299999.890000001,
+      "netProfit": 2219999.9252000004,
+      "profitabilityPercent": 11.684210200277008
+    },
+    {
+      "id": "calc-1756801737270",
+      "name": "тест 43 - 02.09.2025",
+      "sellingCompany": "co-lab",
+      "organizationINN": "308221676",
+      "organizationName": "Кваттро",
+      "responsibleManager": "user-manager-1",
+      "gasCost": 5000000,
+      "cylinderCost": 2500000,
+      "preparationCost": 120000,
+      "logisticsCost": 150000,
+      "workersCost": 150000,
+      "kickbacksCost": 2000000,
+      "productName": "тест 43",
+      "pricePerUnit": 18000000,
+      "quantity": 1,
+      "vatPercent": 12,
+      "incomeTaxPercent": 20,
+      "createdBy": "Виталий",
+      "createdByUserId": "user-manager-1",
+      "createdAt": "2025-09-02T08:28:57.270Z",
+      "updatedAt": "2025-09-02T08:28:57.270Z",
+      "totalCost": 9920000,
+      "totalSales": 18000000,
+      "grossProfit": 8080000,
+      "netProfit": 2320000,
+      "profitabilityPercent": 12.88888888888889
+    },
+    {
+      "id": "calc-1756908588130",
+      "name": "Азот 5.0 - 03.09.2025",
+      "sellingCompany": "nova",
+      "organizationINN": "300111111",
+      "organizationName": "Рога и копыта",
+      "responsibleManager": "user-manager-1",
+      "gasCost": 5000000,
+      "cylinderCost": 2500000,
+      "preparationCost": 100000,
+      "logisticsCost": 150000,
+      "workersCost": 150000,
+      "kickbacksCost": 2000000,
+      "productName": "Азот 5.0",
+      "pricePerUnit": 17999999.89,
+      "quantity": 1,
+      "vatPercent": 12,
+      "incomeTaxPercent": 20,
+      "createdBy": "Виталий",
+      "createdByUserId": "user-manager-1",
+      "createdAt": "2025-09-03T14:09:48.130Z",
+      "updatedAt": "2025-09-03T14:09:48.130Z",
+      "totalCost": 9900000,
+      "totalSales": 17999999.89,
+      "grossProfit": 8099999.890000001,
+      "netProfit": 2339999.9252000004,
+      "profitabilityPercent": 12.99999966388889
+    },
+    {
+      "id": "calc-1756908593321",
+      "name": "Азот 5.0 - 03.09.2025",
+      "sellingCompany": "nova",
+      "organizationINN": "300111111",
+      "organizationName": "Рога и копыта",
+      "responsibleManager": "user-manager-1",
+      "gasCost": 5000000,
+      "cylinderCost": 2500000,
+      "preparationCost": 100000,
+      "logisticsCost": 150000,
+      "workersCost": 150000,
+      "kickbacksCost": 2000000,
+      "productName": "Азот 5.0",
+      "pricePerUnit": 17999999.89,
+      "quantity": 1,
+      "vatPercent": 12,
+      "incomeTaxPercent": 20,
+      "createdBy": "Виталий",
+      "createdByUserId": "user-manager-1",
+      "createdAt": "2025-09-03T14:09:53.321Z",
+      "updatedAt": "2025-09-03T14:09:53.321Z",
+      "totalCost": 9900000,
+      "totalSales": 17999999.89,
+      "grossProfit": 8099999.890000001,
+      "netProfit": 2339999.9252000004,
+      "profitabilityPercent": 12.99999966388889
+    },
+    {
+      "id": "calc-1756908835132",
+      "name": "Азот 5.0 - 03.09.2025",
+      "sellingCompany": "nova",
+      "organizationINN": "300111111",
+      "organizationName": "Рога и копыта",
+      "responsibleManager": "user-manager-1",
+      "gasCost": 5000000,
+      "cylinderCost": 2500000,
+      "preparationCost": 100000,
+      "logisticsCost": 150000,
+      "workersCost": 150000,
+      "kickbacksCost": 2000000,
+      "productName": "Азот 5.0",
+      "pricePerUnit": 17999999.89,
+      "quantity": 1,
+      "vatPercent": 12,
+      "incomeTaxPercent": 20,
+      "createdBy": "Виталий",
+      "createdByUserId": "user-manager-1",
+      "createdAt": "2025-09-03T14:13:55.133Z",
+      "updatedAt": "2025-09-03T14:13:55.133Z",
+      "totalCost": 9900000,
+      "totalSales": 17999999.89,
+      "grossProfit": 8099999.890000001,
+      "netProfit": 2339999.9252000004,
+      "profitabilityPercent": 12.99999966388889
+    },
+    {
+      "id": "calc-1756908896374",
+      "name": "Гелий 6. 0 - 03.09.2025",
+      "sellingCompany": "nova",
+      "organizationINN": "300111111",
+      "organizationName": "Рога и копыта",
+      "responsibleManager": "user-manager-1",
+      "gasCost": 4000000,
+      "cylinderCost": 3000000,
+      "preparationCost": 59000,
+      "logisticsCost": 5599944,
+      "workersCost": 400000,
+      "kickbacksCost": 40000000,
+      "productName": "Гелий 6. 0",
+      "pricePerUnit": 70000000,
+      "quantity": 1,
+      "vatPercent": 12,
+      "incomeTaxPercent": 20,
+      "createdBy": "Виталий",
+      "createdByUserId": "user-manager-1",
+      "createdAt": "2025-09-03T14:14:56.374Z",
+      "updatedAt": "2025-09-03T14:14:56.374Z",
+      "totalCost": 53058944,
+      "totalSales": 70000000,
+      "grossProfit": 16941056,
+      "netProfit": -5458944,
+      "profitabilityPercent": -7.798491428571428
+    }
+  ],
+  "clientHistory": [
+    {
+      "id": "17567439225765xzf5",
+      "clientId": "1756469527709",
+      "clientName": "Кваттро",
+      "action": "UPDATE",
+      "changes": [
+        {
+          "field": "Email",
+          "oldValue": "admin@colab.ru",
+          "newValue": "ain@colab.ru"
+        }
+      ],
+      "changedBy": "Виталий",
+      "changedByUserId": "user-manager-1",
+      "createdAt": "2025-09-01T16:25:22.576Z"
+    },
+    {
+      "id": "1756744209791g233n",
+      "clientId": "1756713969805",
+      "clientName": "Рога и копыта",
+      "action": "UPDATE",
+      "changes": [
+        {
+          "field": "Telegram",
+          "oldValue": "@rh",
+          "newValue": "@kk"
+        }
+      ],
+      "changedBy": "Виталий",
+      "changedByUserId": "user-manager-1",
+      "createdAt": "2025-09-01T16:30:09.791Z"
+    },
+    {
+      "id": "175674436137872zbf",
+      "clientId": "1756469674927",
+      "clientName": "Тест",
+      "action": "UPDATE",
+      "changes": [
+        {
+          "field": "Email",
+          "oldValue": "",
+          "newValue": "test@company.ru"
+        }
+      ],
+      "changedBy": "Виталий",
+      "changedByUserId": "user-manager-1",
+      "createdAt": "2025-09-01T16:32:41.379Z"
+    },
+    {
+      "id": "1756801968408o1710",
+      "clientId": "1756469527709",
+      "clientName": "Кваттро",
+      "action": "UPDATE",
+      "changes": [
+        {
+          "field": "Telegram",
+          "oldValue": "",
+          "newValue": "@rh"
+        }
+      ],
+      "changedBy": "Виталий",
+      "changedByUserId": "user-manager-1",
+      "createdAt": "2025-09-02T08:32:48.408Z"
+    },
+    {
+      "id": "17569091994013nekd",
+      "clientId": "1756469527709",
+      "clientName": "Кваттро",
+      "action": "UPDATE",
+      "changes": [
+        {
+          "field": "Telegram",
+          "oldValue": "@rh",
+          "newValue": "@kkk"
+        }
+      ],
+      "changedBy": "Виталий",
+      "changedByUserId": "user-manager-1",
+      "createdAt": "2025-09-03T14:19:59.401Z"
+    }
+  ],
+  "contractHistory": [],
+  "serialNumbers": [
+    {
+      "id": "sn-1756469821091-234",
+      "productId": "1756469821091",
+      "serialNumber": "234",
+      "manufactureDate": "01/2023",
+      "certificationDate": "03/2024",
+      "nextCertificationDate": "03/2029",
+      "status": "active",
+      "createdAt": "2025-09-03T11:36:20.173Z",
+      "createdBy": "System"
+    },
+    {
+      "id": "sn-1756469821091-235",
+      "productId": "1756469821091",
+      "serialNumber": "235",
+      "manufactureDate": "01/2023",
+      "certificationDate": "03/2024",
+      "nextCertificationDate": "03/2029",
+      "status": "active",
+      "createdAt": "2025-09-03T11:36:20.173Z",
+      "createdBy": "System"
+    },
+    {
+      "id": "sn-1756633890813-he001",
+      "productId": "1756633890813",
+      "serialNumber": "HE-001",
+      "manufactureDate": "02/2023",
+      "certificationDate": "04/2024",
+      "nextCertificationDate": "04/2029",
+      "status": "shipped",
+      "createdAt": "2025-08-31T10:27:10.348Z",
+      "createdBy": "System"
+    },
+    {
+      "id": "sn-1756633890813-he002",
+      "productId": "1756633890813",
+      "serialNumber": "HE-002",
+      "manufactureDate": "02/2023",
+      "certificationDate": "04/2024",
+      "nextCertificationDate": "04/2029",
+      "status": "lost",
+      "createdAt": "2025-08-31T10:27:10.348Z",
+      "createdBy": "System",
+      "updatedAt": "2025-09-03T15:43:45.356Z"
+    },
+    {
+      "id": "sn-1756633890813-he003",
+      "productId": "1756633890813",
+      "serialNumber": "HE-003",
+      "manufactureDate": "02/2023",
+      "certificationDate": "04/2024",
+      "nextCertificationDate": "04/2029",
+      "status": "active",
+      "createdAt": "2025-08-31T10:27:10.348Z",
+      "createdBy": "System"
+    },
+    {
+      "id": "sn-1756633890813-he004",
+      "productId": "1756633890813",
+      "serialNumber": "HE-004",
+      "manufactureDate": "03/2023",
+      "certificationDate": "05/2024",
+      "nextCertificationDate": "05/2029",
+      "status": "active",
+      "createdAt": "2025-08-31T10:27:10.348Z",
+      "createdBy": "System"
+    },
+    {
+      "id": "sn-1756633890813-he005",
+      "productId": "1756633890813",
+      "serialNumber": "HE-005",
+      "manufactureDate": "03/2023",
+      "certificationDate": "05/2024",
+      "nextCertificationDate": "05/2029",
+      "status": "active",
+      "createdAt": "2025-08-31T10:27:10.348Z",
+      "createdBy": "System"
+    },
+    {
+      "id": "sn-1756633890813-he006",
+      "productId": "1756633890813",
+      "serialNumber": "HE-006",
+      "manufactureDate": "03/2023",
+      "certificationDate": "05/2024",
+      "nextCertificationDate": "05/2029",
+      "status": "lost",
+      "createdAt": "2025-08-31T10:27:10.348Z",
+      "createdBy": "System"
+    },
+    {
+      "id": "1756912519409evcz8",
+      "productId": "1756912519407",
+      "serialNumber": "346",
+      "manufactureDate": "01/2000",
+      "certificationDate": "01/2022",
+      "nextCertificationDate": "01/2027",
+      "status": "shipped",
+      "createdAt": "2025-09-03T15:15:19.409Z",
+      "createdBy": "System",
+      "updatedAt": "2025-09-03T15:32:43.399Z"
+    },
+    {
+      "id": "17569125194097xkpv",
+      "productId": "1756912519407",
+      "serialNumber": "347",
+      "manufactureDate": "01/2000",
+      "certificationDate": "02/2022",
+      "nextCertificationDate": "02/2027",
+      "status": "lost",
+      "createdAt": "2025-09-03T15:15:19.409Z",
+      "createdBy": "System",
+      "updatedAt": "2025-09-03T15:26:56.676Z"
+    },
+    {
+      "id": "1756912684340xa0p9",
+      "productId": "1756912519407",
+      "serialNumber": "348",
+      "manufactureDate": "01/2000",
+      "certificationDate": "02/2022",
+      "nextCertificationDate": "02/2027",
+      "status": "lost",
+      "createdAt": "2025-09-03T15:18:04.340Z",
+      "createdBy": "System",
+      "updatedAt": "2025-09-03T15:26:56.676Z"
+    },
+    {
+      "id": "17569126843408bjy5",
+      "productId": "1756912519407",
+      "serialNumber": "349",
+      "manufactureDate": "01/2000",
+      "certificationDate": "02/2022",
+      "nextCertificationDate": "02/2027",
+      "status": "lost",
+      "createdAt": "2025-09-03T15:18:04.340Z",
+      "createdBy": "System",
+      "updatedAt": "2025-09-03T15:26:56.676Z"
+    },
+    {
+      "id": "17569137675723d3g7",
+      "productId": "1756913767568",
+      "serialNumber": "567",
+      "manufactureDate": "01/2000",
+      "certificationDate": "02/2022",
+      "nextCertificationDate": "02/2027",
+      "status": "shipped",
+      "createdAt": "2025-09-03T15:36:07.572Z",
+      "createdBy": "System",
+      "updatedAt": "2025-09-03T15:37:58.453Z"
+    },
+    {
+      "id": "17569137675725a1q0",
+      "productId": "1756913767568",
+      "serialNumber": "568",
+      "manufactureDate": "01/2000",
+      "certificationDate": "02/2022",
+      "nextCertificationDate": "02/2027",
+      "status": "active",
+      "createdAt": "2025-09-03T15:36:07.572Z",
+      "createdBy": "System"
+    },
+    {
+      "id": "1756913767572tyfdj",
+      "productId": "1756913767568",
+      "serialNumber": "569",
+      "manufactureDate": "01/2000",
+      "certificationDate": "02/2022",
+      "nextCertificationDate": "02/2027",
+      "status": "active",
+      "createdAt": "2025-09-03T15:36:07.572Z",
+      "createdBy": "System"
+    },
+    {
+      "id": "17569137675720su5j",
+      "productId": "1756913767568",
+      "serialNumber": "570",
+      "manufactureDate": "01/2000",
+      "certificationDate": "02/2022",
+      "nextCertificationDate": "02/2027",
+      "status": "active",
+      "createdAt": "2025-09-03T15:36:07.572Z",
+      "createdBy": "System"
+    }
+  ]
+}

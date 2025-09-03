@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Test - CO_LAB CRM</title>
+    <style>
+        body {
+            font-family: monospace;
+            margin: 20px;
+            background: #1e1e1e;
+            color: #00ff00;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #00ff00;
+            background: #000;
+        }
+        h2 { color: #00ffff; }
+        .success { color: #00ff00; }
+        .error { color: #ff0000; }
+        .warning { color: #ffff00; }
+        .info { color: #ffffff; }
+        pre {
+            background: #111;
+            padding: 10px;
+            overflow-x: auto;
+        }
+        button {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 5px;
+        }
+        button:hover {
+            background: #00cc00;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 CO_LAB CRM Debug Test</h1>
+
+    <div class="test-section">
+        <h2>1. Backend Health Check</h2>
+        <button onclick="testHealth()">Test Health Endpoint</button>
+        <div id="health-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Direct API Test (No CORS)</h2>
+        <button onclick="testDirectAPI()">Test Direct API</button>
+        <div id="direct-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. CORS Preflight Test</h2>
+        <button onclick="testCORS()">Test CORS</button>
+        <div id="cors-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Login Test</h2>
+        <button onclick="testLogin()">Test Login</button>
+        <div id="login-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>5. Network Diagnostics</h2>
+        <button onclick="runFullDiagnostics()">Run Full Diagnostics</button>
+        <div id="diagnostics-result"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5001';
+        
+        function log(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
+            element.innerHTML += `<div class="${type}">[${timestamp}] ${message}</div>`;
+        }
+
+        async function testHealth() {
+            const resultDiv = document.getElementById('health-result');
+            resultDiv.innerHTML = '';
+            
+            try {
+                log('health-result', 'Testing health endpoint...', 'info');
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                log('health-result', `✅ Status: ${response.status}`, 'success');
+                log('health-result', `Response: <pre>${JSON.stringify(data, null, 2)}</pre>`, 'info');
+            } catch (error) {
+                log('health-result', `❌ Error: ${error.message}`, 'error');
+                log('health-result', `Stack: ${error.stack}`, 'error');
+            }
+        }
+
+        async function testDirectAPI() {
+            const resultDiv = document.getElementById('direct-result');
+            resultDiv.innerHTML = '';
+            
+            try {
+                log('direct-result', 'Testing direct API call without credentials...', 'info');
+                
+                // Test without credentials first
+                const response1 = await fetch(`${API_BASE}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({})
+                });
+                
+                log('direct-result', `Response status: ${response1.status}`, response1.ok ? 'success' : 'warning');
+                const text1 = await response1.text();
+                log('direct-result', `Response: ${text1}`, 'info');
+                
+            } catch (error) {
+                log('direct-result', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCORS() {
+            const resultDiv = document.getElementById('cors-result');
+            resultDiv.innerHTML = '';
+            
+            try {
+                log('cors-result', 'Testing CORS preflight...', 'info');
+                
+                // First, test OPTIONS request
+                const optionsResponse = await fetch(`${API_BASE}/api/auth/login`, {
+                    method: 'OPTIONS',
+                    headers: {
+                        'Access-Control-Request-Method': 'POST',
+                        'Access-Control-Request-Headers': 'Content-Type',
+                    }
+                });
+                
+                log('cors-result', `OPTIONS Status: ${optionsResponse.status}`, optionsResponse.ok ? 'success' : 'error');
+                
+                // Check CORS headers
+                const corsHeaders = {
+                    'Access-Control-Allow-Origin': optionsResponse.headers.get('Access-Control-Allow-Origin'),
+                    'Access-Control-Allow-Methods': optionsResponse.headers.get('Access-Control-Allow-Methods'),
+                    'Access-Control-Allow-Headers': optionsResponse.headers.get('Access-Control-Allow-Headers'),
+                    'Access-Control-Allow-Credentials': optionsResponse.headers.get('Access-Control-Allow-Credentials')
+                };
+                
+                log('cors-result', 'CORS Headers:', 'info');
+                for (const [key, value] of Object.entries(corsHeaders)) {
+                    if (value) {
+                        log('cors-result', `  ${key}: ${value}`, 'success');
+                    } else {
+                        log('cors-result', `  ${key}: NOT SET`, 'warning');
+                    }
+                }
+                
+            } catch (error) {
+                log('cors-result', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testLogin() {
+            const resultDiv = document.getElementById('login-result');
+            resultDiv.innerHTML = '';
+            
+            try {
+                log('login-result', 'Testing login with test credentials...', 'info');
+                
+                const response = await fetch(`${API_BASE}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        email: 'test@test.com',
+                        password: 'password123'
+                    })
+                });
+                
+                log('login-result', `Status: ${response.status}`, response.ok ? 'success' : 'error');
+                
+                const data = await response.json();
+                log('login-result', `✅ Login successful!`, 'success');
+                log('login-result', `User: ${data.user.email} (${data.user.name})`, 'info');
+                log('login-result', `Token: ${data.token.substring(0, 20)}...`, 'info');
+                
+            } catch (error) {
+                log('login-result', `❌ Error: ${error.message}`, 'error');
+                log('login-result', `Type: ${error.constructor.name}`, 'error');
+            }
+        }
+
+        async function runFullDiagnostics() {
+            const resultDiv = document.getElementById('diagnostics-result');
+            resultDiv.innerHTML = '';
+            
+            log('diagnostics-result', '🔄 Starting full diagnostics...', 'info');
+            
+            // Test 1: Can we reach the backend?
+            try {
+                const healthResponse = await fetch(`${API_BASE}/health`);
+                if (healthResponse.ok) {
+                    log('diagnostics-result', '✅ Backend is reachable', 'success');
+                } else {
+                    log('diagnostics-result', `⚠️ Backend returned status ${healthResponse.status}`, 'warning');
+                }
+            } catch (error) {
+                log('diagnostics-result', '❌ Cannot reach backend', 'error');
+                log('diagnostics-result', `Error: ${error.message}`, 'error');
+                return;
+            }
+            
+            // Test 2: Check CORS headers
+            try {
+                const corsResponse = await fetch(`${API_BASE}/api/auth/login`, {
+                    method: 'OPTIONS',
+                    headers: {
+                        'Access-Control-Request-Method': 'POST',
+                        'Access-Control-Request-Headers': 'Content-Type',
+                    }
+                });
+                
+                const allowOrigin = corsResponse.headers.get('Access-Control-Allow-Origin');
+                const allowCredentials = corsResponse.headers.get('Access-Control-Allow-Credentials');
+                
+                if (allowOrigin) {
+                    log('diagnostics-result', `✅ CORS is configured (Origin: ${allowOrigin})`, 'success');
+                } else {
+                    log('diagnostics-result', '⚠️ CORS headers not present', 'warning');
+                }
+                
+                if (allowCredentials === 'true') {
+                    log('diagnostics-result', '✅ Credentials are allowed', 'success');
+                }
+                
+            } catch (error) {
+                log('diagnostics-result', '❌ CORS test failed', 'error');
+            }
+            
+            // Test 3: Try actual login
+            try {
+                const loginResponse = await fetch(`${API_BASE}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        email: 'test@test.com',
+                        password: 'password123'
+                    })
+                });
+                
+                if (loginResponse.ok) {
+                    log('diagnostics-result', '✅ Login endpoint works', 'success');
+                    const data = await loginResponse.json();
+                    log('diagnostics-result', `✅ Test user authenticated: ${data.user.email}`, 'success');
+                } else {
+                    log('diagnostics-result', `⚠️ Login failed with status ${loginResponse.status}`, 'warning');
+                }
+            } catch (error) {
+                log('diagnostics-result', '❌ Login test failed', 'error');
+                log('diagnostics-result', `Error: ${error.message}`, 'error');
+            }
+            
+            // Test 4: Check browser info
+            log('diagnostics-result', '📊 Browser Info:', 'info');
+            log('diagnostics-result', `  User Agent: ${navigator.userAgent}`, 'info');
+            log('diagnostics-result', `  Current URL: ${window.location.href}`, 'info');
+            log('diagnostics-result', `  Protocol: ${window.location.protocol}`, 'info');
+            
+            log('diagnostics-result', '✅ Diagnostics complete!', 'success');
+        }
+        
+        // Auto-run diagnostics on page load
+        window.addEventListener('load', () => {
+            console.log('Debug page loaded. Click buttons to test each component.');
+        });
+    </script>
+</body>
+</html>

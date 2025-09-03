@@ -1,0 +1,21 @@
+-- AlterTable
+ALTER TABLE "calculations" ADD COLUMN "gasCost" REAL;
+ALTER TABLE "calculations" ADD COLUMN "cylinderCost" REAL;
+ALTER TABLE "calculations" ADD COLUMN "preparationCost" REAL;
+ALTER TABLE "calculations" ADD COLUMN "logisticsCost" REAL;
+ALTER TABLE "calculations" ADD COLUMN "workersCost" REAL;
+ALTER TABLE "calculations" ADD COLUMN "kickbacksCost" REAL;
+ALTER TABLE "calculations" ADD COLUMN "productName" TEXT;
+ALTER TABLE "calculations" ADD COLUMN "pricePerUnit" REAL;
+ALTER TABLE "calculations" ADD COLUMN "quantity" REAL;
+ALTER TABLE "calculations" ADD COLUMN "totalSaleAmount" REAL;
+ALTER TABLE "calculations" ADD COLUMN "sellingCompany" TEXT;
+ALTER TABLE "calculations" ADD COLUMN "organizationINN" TEXT;
+ALTER TABLE "calculations" ADD COLUMN "organizationName" TEXT;
+ALTER TABLE "calculations" ADD COLUMN "responsibleManager" TEXT;
+ALTER TABLE "calculations" ADD COLUMN "totalCostBreakdown" REAL;
+ALTER TABLE "calculations" ADD COLUMN "grossProfit" REAL;
+ALTER TABLE "calculations" ADD COLUMN "vatAmount" REAL;
+ALTER TABLE "calculations" ADD COLUMN "incomeTaxAmount" REAL;
+ALTER TABLE "calculations" ADD COLUMN "netProfit" REAL;
+ALTER TABLE "calculations" ADD COLUMN "profitabilityPercent" REAL;

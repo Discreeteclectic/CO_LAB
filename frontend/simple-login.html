@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Простой вход - CO_LAB CRM</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.svg">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { text-align: center; color: #333; }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .success { background: #d1edff; color: #004085; border: 1px solid #b6d7ff; }
+        .loading { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CO_LAB CRM</h1>
+        <p style="text-align: center; color: #666; margin-bottom: 20px;">Выберите пользователя или введите свои данные</p>
+        <div id="message"></div>
+        
+        <div style="margin-bottom: 20px;">
+            <button type="button" onclick="fillCredentials('admin@colab.uz', 'Admin2024!')" style="width: 100%; padding: 10px; margin-bottom: 5px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">👤 Администратор</button>
+            <button type="button" onclick="fillCredentials('vitaliy@colab.uz', 'Vitaliy2024')" style="width: 100%; padding: 10px; margin-bottom: 5px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">👨‍💼 Менеджер Виталий</button>
+            <button type="button" onclick="fillCredentials('orif@colab.uz', 'Orif2024')" style="width: 100%; padding: 10px; background: #17a2b8; color: white; border: none; border-radius: 4px; cursor: pointer;">👨‍💼 Менеджер Ориф</button>
+        </div>
+        
+        <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" placeholder="Введите email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Пароль:</label>
+                <input type="password" id="password" placeholder="Введите пароль" required>
+            </div>
+
+            <button type="submit" id="loginBtn">Войти</button>
+        </form>
+
+        <div style="margin-top: 20px;">
+            <h3>Диагностика:</h3>
+            <div id="diagnostics"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = '/api';  // Use relative URL for same-origin
+        
+        function fillCredentials(email, password) {
+            document.getElementById('email').value = email;
+            document.getElementById('password').value = password;
+        }
+        
+        function showMessage(text, type = 'error') {
+            const msg = document.getElementById('message');
+            msg.className = `message ${type}`;
+            msg.textContent = text;
+            msg.style.display = 'block';
+        }
+        
+        function updateDiagnostics(text) {
+            document.getElementById('diagnostics').innerHTML += '<div>' + text + '</div>';
+        }
+        
+        // Test connection on page load
+        window.addEventListener('load', async function() {
+            updateDiagnostics('🔍 Тестирование подключения...');
+            
+            try {
+                const response = await fetch('/health');
+                const data = await response.json();
+                updateDiagnostics('✅ Сервер доступен: ' + data.status);
+            } catch (error) {
+                updateDiagnostics('❌ Ошибка подключения: ' + error.message);
+            }
+        });
+        
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('loginBtn');
+            
+            btn.disabled = true;
+            btn.textContent = 'Выполняется вход...';
+            showMessage('Подключение к серверу...', 'loading');
+            
+            updateDiagnostics(`🔄 Попытка входа: ${email}`);
+            
+            try {
+                // First test CORS with OPTIONS
+                updateDiagnostics('📡 Проверка CORS...');
+                
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                updateDiagnostics(`📊 Ответ сервера: ${response.status}`);
+                
+                if (!response.ok) {
+                    const errorData = await response.text();
+                    updateDiagnostics(`❌ Ошибка: ${errorData}`);
+                    throw new Error(`HTTP ${response.status}: ${errorData}`);
+                }
+                
+                const data = await response.json();
+                updateDiagnostics('✅ Успешный вход!');
+                
+                showMessage('Вход выполнен успешно! Перенаправление...', 'success');
+                
+                // Добавляем кнопку для ручного перехода
+                const messageDiv = document.getElementById('message');
+                const targetPage = data.user.role === 'admin' ? 'warehouse.html' : 'orders.html';
+                messageDiv.innerHTML += `<br><br><button onclick="window.location.href='${targetPage}'" style="padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">Перейти в CRM вручную</button>`;
+                
+                // Store token
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                
+                updateDiagnostics('📦 Токен сохранен в localStorage');
+                updateDiagnostics('🔄 Перенаправление через 1 секунду...');
+                
+                setTimeout(() => {
+                    try {
+                        // Определяем страницу по роли пользователя
+                        const userRole = data.user.role;
+                        let redirectPage = 'orders.html'; // По умолчанию - заказы
+                        
+                        updateDiagnostics(`🔍 Роль пользователя: ${userRole}`);
+                        
+                        if (userRole === 'admin') {
+                            redirectPage = 'warehouse.html'; // Админ идет на склад
+                        } else if (userRole === 'manager') {
+                            redirectPage = 'orders.html'; // Менеджеры идут на заказы
+                        }
+                        
+                        updateDiagnostics(`➡️ Переходим на ${redirectPage}`);
+                        updateDiagnostics(`📍 Полный URL: ${window.location.origin}/${redirectPage}`);
+                        
+                        // Принудительный переход
+                        window.location.replace(redirectPage);
+                        
+                        // Запасной вариант
+                        setTimeout(() => {
+                            updateDiagnostics('⚠️ Перенаправление не сработало, пробуем еще раз...');
+                            window.location.assign(redirectPage);
+                        }, 500);
+                        
+                    } catch (redirectError) {
+                        updateDiagnostics(`❌ Ошибка перенаправления: ${redirectError.message}`);
+                        console.error('Redirect error:', redirectError);
+                        // Пробуем прямой переход
+                        document.location = 'orders.html';
+                    }
+                }, 1000);
+                
+            } catch (error) {
+                updateDiagnostics(`❌ Ошибка входа: ${error.message}`);
+                showMessage('Ошибка: ' + error.message, 'error');
+                console.error('Login error:', error);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Войти';
+            }
+        });
+    </script>
+</body>
+</html>

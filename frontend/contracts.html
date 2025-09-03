@@ -1,0 +1,1845 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление договорами - CO_LAB CRM</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            background: white;
+            box-sizing: border-box;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e1e5e9;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-left: 20px;
+            position: relative;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 45px;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            padding: 8px 0;
+            min-width: 180px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .user-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .user-dropdown::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            right: 12px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 8px solid white;
+        }
+
+        .dropdown-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 4px;
+        }
+
+        .user-name {
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .user-email {
+            color: #666;
+            font-size: 12px;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 16px;
+            color: #333;
+            text-decoration: none;
+            transition: background-color 0.2s;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .dropdown-item.logout {
+            color: #dc3545;
+            border-top: 1px solid #eee;
+            margin-top: 4px;
+        }
+
+        .dropdown-item.logout:hover {
+            background-color: #fff5f5;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-info:hover {
+            background: #138496;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input[type="text"], input[type="number"], input[type="date"], select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .contracts-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .contracts-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .contracts-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .contracts-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .search-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: nowrap;
+        }
+
+        .search-input {
+            flex: 2;
+            min-width: 300px;
+            padding: 10px 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            transition: border-color 0.3s ease;
+            height: 42px;
+            box-sizing: border-box;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-controls select {
+            padding: 10px 8px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 13px;
+            background: white;
+            min-width: 100px;
+            max-width: 140px;
+            height: 42px;
+            box-sizing: border-box;
+        }
+
+        .search-controls button {
+            white-space: nowrap;
+            padding: 10px 10px;
+            font-size: 13px;
+            height: 42px;
+            box-sizing: border-box;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            flex: 1;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 3% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e1e5e9;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(102, 126, 234, 0.3);
+            border-radius: 50%;
+            border-top-color: #667eea;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #fee;
+            border: 1px solid #fcc;
+            border-radius: 8px;
+            padding: 12px;
+            color: #c33;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .success-message {
+            background: #efe;
+            border: 1px solid #cfc;
+            border-radius: 8px;
+            padding: 12px;
+            color: #3c3;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        /* Статусы договоров */
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-draft {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .status-sent {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+
+        .status-signed {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .status-active {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .status-completed {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .status-cancelled {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid #e1e5e9;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .pagination button:hover {
+            background: #f8f9fa;
+        }
+
+        .pagination button.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .contract-preview {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            font-family: 'Times New Roman', serif;
+            white-space: pre-line;
+            font-size: 14px;
+            line-height: 1.6;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e1e5e9;
+        }
+
+        .tab-button {
+            padding: 12px 20px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #6c757d;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button:hover {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .tab-button.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        /* Схема движения договора */
+        .contract-status-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+            gap: 8px;
+        }
+
+        .status-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .status-circle {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 10px;
+            margin-bottom: 4px;
+            border: 2px solid;
+        }
+
+        .status-circle.completed {
+            background: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+
+        .status-circle.current {
+            background: #667eea;
+            border-color: #667eea;
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        .status-circle.pending {
+            background: #e9ecef;
+            border-color: #dee2e6;
+            color: #6c757d;
+        }
+
+        .status-arrow {
+            width: 20px;
+            height: 2px;
+            background: #dee2e6;
+            align-self: center;
+        }
+
+        .status-arrow.completed {
+            background: #28a745;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(102, 126, 234, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <div style="display: flex; align-items: center; gap: 30px;">
+                    <h1>Управление договорами</h1>
+                    <button class="btn btn-success" onclick="openCreateContractModal()">➕ Создать договор</button>
+                </div>
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <div class="nav-buttons">
+                        <a href="markup_calculator.html" class="btn btn-secondary">Калькулятор</a>
+                        <a href="clients.html" class="btn btn-secondary">Клиенты</a>
+                        <a href="warehouse.html" class="btn btn-secondary">Склад</a>
+                        <a href="orders.html" class="btn btn-secondary">Заявки</a>
+                    </div>
+                    <div class="user-info">
+                        <div class="user-avatar" id="userAvatar" onclick="toggleUserDropdown()">
+                            У
+                        </div>
+                        <div class="user-dropdown" id="userDropdown">
+                            <div class="dropdown-header">
+                                <div class="user-name" id="userName">Пользователь</div>
+                                <div class="user-email" id="userEmail">user@example.com</div>
+                            </div>
+                            <button class="dropdown-item logout" onclick="logout()">
+                                🚪 Выйти из системы
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Статистика договоров -->
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalContracts">-</div>
+                <div class="stat-label">Всего договоров</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="activeContracts">-</div>
+                <div class="stat-label">Активных</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="signedContracts">-</div>
+                <div class="stat-label">Подписанных</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalValue">-</div>
+                <div class="stat-label">Общая сумма</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div id="errorMessage" class="error-message" style="display: none;"></div>
+            <div id="successMessage" class="success-message" style="display: none;"></div>
+
+            <!-- Поисковые фильтры -->
+            <div class="search-controls">
+                <input type="text" class="search-input" id="searchInput" placeholder="🔍 Поиск по номеру договора, клиенту, описанию..." onkeyup="handleSearch()">
+                
+                <select id="statusFilter" onchange="handleSearch()">
+                    <option value="">Все статусы</option>
+                    <option value="DRAFT">Черновик</option>
+                    <option value="SENT">Отправлен</option>
+                    <option value="SIGNED">Подписан</option>
+                    <option value="ACTIVE">Активный</option>
+                    <option value="COMPLETED">Завершен</option>
+                    <option value="CANCELLED">Отменен</option>
+                </select>
+
+                <select id="contractTypeFilter" onchange="handleSearch()">
+                    <option value="">Все типы</option>
+                    <option value="SUPPLY">Поставка</option>
+                    <option value="SERVICE">Услуги</option>
+                    <option value="LEASE">Аренда</option>
+                    <option value="PURCHASE">Купля-продажа</option>
+                    <option value="EXCHANGE">Биржевой</option>
+                    <option value="OTHER">Другое</option>
+                </select>
+                
+                <button class="btn btn-primary" onclick="loadContracts()">🔄 Обновить</button>
+                <button class="btn btn-secondary" onclick="clearFilters()" title="Очистить фильтры">✕</button>
+            </div>
+            
+            <div id="contractsTableContainer">
+                <table class="contracts-table" id="contractsTable">
+                    <thead>
+                        <tr>
+                            <th>№ Договора</th>
+                            <th>Клиент</th>
+                            <th>Тип</th>
+                            <th>Дата заключения</th>
+                            <th>Сумма</th>
+                            <th>Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody id="contractsTableBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="pagination" class="pagination"></div>
+        </div>
+    </div>
+
+    <!-- Модальное окно создания/редактирования договора -->
+    <div id="contractModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="contractModalTitle">Создать договор</h2>
+                <span class="close" onclick="closeContractModal()">&times;</span>
+            </div>
+            
+            <div id="contractModalErrorMessage" class="error-message" style="display: none;"></div>
+            
+            <form id="contractForm">
+                <!-- Основная информация о договоре -->
+                <div class="section">
+                    <h3>Основная информация</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 1;">
+                            <label for="contractNumber">Номер договора *</label>
+                            <input type="text" id="contractNumber" required placeholder="Например: DOG-0001">
+                        </div>
+                        <div class="form-group" style="flex: 2;">
+                            <label for="contractClient">Клиент *</label>
+                            <select id="contractClient" required>
+                                <option value="">Выберите клиента</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 1;">
+                            <label for="contractDate">Дата заключения *</label>
+                            <input type="date" id="contractDate" required>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label for="contractType">Тип договора *</label>
+                            <select id="contractType" required>
+                                <option value="">Выберите тип</option>
+                                <option value="SUPPLY">Договор поставки</option>
+                                <option value="SERVICE">Договор оказания услуг</option>
+                                <option value="LEASE">Договор аренды</option>
+                                <option value="PURCHASE">Договор купли-продажи</option>
+                                <option value="EXCHANGE">Биржевой договор</option>
+                                <option value="OTHER">Другое</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label for="totalAmount">Сумма договора</label>
+                            <input type="number" id="totalAmount" step="0.01" min="0" placeholder="0.00">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 1;">
+                            <label for="validFrom">Действует с *</label>
+                            <input type="date" id="validFrom" required>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label for="validTo">Действует до</label>
+                            <input type="date" id="validTo">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Описание</label>
+                        <textarea id="description" placeholder="Краткое описание предмета договора"></textarea>
+                    </div>
+                </div>
+
+                <!-- Биржевая информация -->
+                <div class="section" id="exchangeSection" style="display: none;">
+                    <h3>Биржевая информация</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 1;">
+                            <label for="exchangeName">Название биржи</label>
+                            <input type="text" id="exchangeName" placeholder="Например: СПбМТСБ">
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label for="exchangeType">Тип биржи</label>
+                            <input type="text" id="exchangeType" placeholder="Например: товарная">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Условия договора -->
+                <div class="section">
+                    <h3>Условия и примечания</h3>
+                    
+                    <div class="form-group">
+                        <label for="terms">Условия договора</label>
+                        <textarea id="terms" placeholder="Основные условия выполнения договора"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="conditions">Дополнительные условия</label>
+                        <textarea id="conditions" placeholder="Особые условия, ограничения, требования"></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 1;">
+                            <label for="responsibleManager">Ответственный менеджер</label>
+                            <select id="responsibleManager" required>
+                                <option value="">Выберите менеджера</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label>
+                                <input type="checkbox" id="autoRenewal">
+                                Автоматическое продление
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="text-align: right; margin-top: 30px; padding-top: 20px; border-top: 2px solid #e1e5e9;">
+                    <button type="button" class="btn btn-secondary" onclick="closeContractModal()" style="margin-right: 10px;">Отмена</button>
+                    <button type="submit" class="btn btn-success" id="saveContractBtn">💾 Создать договор</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Модальное окно просмотра договора -->
+    <div id="viewContractModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="viewContractTitle">Договор #</h2>
+                <span class="close" onclick="closeViewContractModal()">&times;</span>
+            </div>
+            
+            <div id="viewContractContent">
+                <!-- Содержимое будет загружено динамически -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        let currentEditingContract = null;
+        let currentPage = 1;
+        const pageSize = 10;
+        let searchTimeout;
+
+        // Инициализация страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            // Temporarily disable auth check
+            // if (!requireAuth()) return;
+            
+            initializeUserInfo();
+            loadContracts();
+            loadClients();
+            loadManagers();
+            loadStats();
+            
+            // Установить текущую дату
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('contractDate').value = today;
+            document.getElementById('validFrom').value = today;
+            
+            // Показать/скрыть биржевую секцию при изменении типа договора
+            document.getElementById('contractType').addEventListener('change', function() {
+                const exchangeSection = document.getElementById('exchangeSection');
+                if (this.value === 'EXCHANGE') {
+                    exchangeSection.style.display = 'block';
+                } else {
+                    exchangeSection.style.display = 'none';
+                }
+            });
+        });
+
+        function initializeUserInfo() {
+            const user = APIHelpers.getCurrentUser();
+            if (user) {
+                document.getElementById('userName').textContent = user.name;
+                document.getElementById('userEmail').textContent = user.email;
+                
+                // Установить аватарку - первая буква имени
+                const firstLetter = user.name.charAt(0).toUpperCase();
+                document.getElementById('userAvatar').textContent = firstLetter;
+            }
+        }
+
+        function toggleUserDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Закрывать дропдаун при клике вне его
+        document.addEventListener('click', function(event) {
+            const userInfo = document.querySelector('.user-info');
+            const dropdown = document.getElementById('userDropdown');
+            
+            if (!userInfo.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        function logout() {
+            API.logout();
+        }
+
+        // Загрузка договоров
+        async function loadContracts(page = 1) {
+            try {
+                currentPage = page;
+                hideMessages();
+
+                const searchTerm = document.getElementById('searchInput').value.trim();
+                const statusFilter = document.getElementById('statusFilter').value;
+                const contractTypeFilter = document.getElementById('contractTypeFilter').value;
+                
+                const params = {
+                    page,
+                    limit: pageSize
+                };
+                
+                if (searchTerm) {
+                    params.search = searchTerm;
+                }
+                
+                if (statusFilter) {
+                    params.status = statusFilter;
+                }
+                
+                if (contractTypeFilter) {
+                    params.contractType = contractTypeFilter;
+                }
+                
+                const response = await fetch('/api/contracts?' + new URLSearchParams(params), {
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                displayContracts(data.contracts);
+                updatePagination(data.pagination);
+
+            } catch (error) {
+                console.error('Error loading contracts:', error);
+                showMessage('Ошибка загрузки договоров: ' + error.message, true);
+                APIHelpers.showError(document.getElementById('contractsTableContainer'), 'Ошибка загрузки договоров');
+            }
+        }
+
+        // Отображение договоров
+        function displayContracts(contracts) {
+            const container = document.getElementById('contractsTableContainer');
+            
+            if (contracts.length === 0) {
+                const searchTerm = document.getElementById('searchInput').value.trim();
+                const message = searchTerm ? 'По вашему запросу ничего не найдено' : 'Пока нет созданных договоров';
+                APIHelpers.showEmpty(container, message);
+                document.getElementById('pagination').innerHTML = '';
+                return;
+            }
+
+            // Восстанавливаем таблицу если она была скрыта
+            if (!document.getElementById('contractsTable')) {
+                container.innerHTML = `
+                    <table class="contracts-table" id="contractsTable">
+                        <thead>
+                            <tr>
+                                <th>№ Договора</th>
+                                <th>Клиент</th>
+                                <th>Тип</th>
+                                <th>Дата заключения</th>
+                                <th>Сумма</th>
+                                <th>Статус</th>
+                            </tr>
+                        </thead>
+                        <tbody id="contractsTableBody">
+                        </tbody>
+                    </table>
+                `;
+            }
+
+            // Получаем tableBody после возможного пересоздания таблицы
+            const tableBody = document.getElementById('contractsTableBody');
+            tableBody.innerHTML = contracts.map(contract => `
+                <tr onclick="viewContract('${contract.id}')" style="cursor: pointer;">
+                    <td><strong>${contract.contractNumber}</strong></td>
+                    <td>${contract.client.name}</td>
+                    <td>${getContractTypeText(contract.contractType)}</td>
+                    <td>${APIHelpers.formatDate(contract.contractDate)}</td>
+                    <td>${APIHelpers.formatCurrency(contract.totalAmount)}</td>
+                    <td><span class="status-badge status-${contract.status.toLowerCase()}">${getStatusText(contract.status)}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function getContractTypeText(type) {
+            const typeMap = {
+                'SUPPLY': 'Поставка',
+                'SERVICE': 'Услуги',
+                'LEASE': 'Аренда',
+                'PURCHASE': 'Купля-продажа',
+                'EXCHANGE': 'Биржевой',
+                'OTHER': 'Другое'
+            };
+            return typeMap[type] || type;
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'DRAFT': 'Черновик',
+                'SENT': 'Отправлен',
+                'SIGNED': 'Подписан',
+                'ACTIVE': 'Активный',
+                'COMPLETED': 'Завершен',
+                'CANCELLED': 'Отменен'
+            };
+            return statusMap[status] || status;
+        }
+
+        // Загрузка клиентов для выбора
+        async function loadClients() {
+            try {
+                const response = await API.getClients({ limit: 1000 });
+                const clientSelect = document.getElementById('contractClient');
+                
+                clientSelect.innerHTML = '<option value="">Выберите клиента</option>' +
+                    response.clients.map(client => 
+                        `<option value="${client.id}">${client.name}</option>`
+                    ).join('');
+                    
+            } catch (error) {
+                console.error('Error loading clients:', error);
+            }
+        }
+
+        // Загрузка менеджеров для выбора
+        async function loadManagers() {
+            try {
+                // Прямой запрос к API
+                const response = await fetch('/api/managers', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                const managerSelect = document.getElementById('responsibleManager');
+                
+                // Получить данные текущего пользователя
+                const currentUser = APIHelpers.getCurrentUser();
+                
+                if (data.managers && data.managers.length > 0) {
+                    managerSelect.innerHTML = '<option value="">Выберите менеджера</option>' +
+                        data.managers.map(manager => 
+                            `<option value="${manager.name}" ${currentUser && currentUser.name === manager.name ? 'selected' : ''}>${manager.name}</option>`
+                        ).join('');
+                } else {
+                    managerSelect.innerHTML = '<option value="">Менеджеры не найдены</option>';
+                }
+                    
+            } catch (error) {
+                console.error('Error loading managers:', error);
+                const managerSelect = document.getElementById('responsibleManager');
+                managerSelect.innerHTML = '<option value="">Ошибка: ' + error.message + '</option>';
+            }
+        }
+
+        // Загрузка статистики
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/contracts/stats/overview', {
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const stats = await response.json();
+                
+                document.getElementById('totalContracts').textContent = stats.totalContracts;
+                document.getElementById('activeContracts').textContent = stats.activeContracts;
+                document.getElementById('signedContracts').textContent = stats.signedContracts;
+                document.getElementById('totalValue').textContent = APIHelpers.formatCurrency(stats.totalValue);
+                
+            } catch (error) {
+                console.error('Error loading stats:', error);
+                // Показываем прочерки при ошибке
+                document.getElementById('totalContracts').textContent = '-';
+                document.getElementById('activeContracts').textContent = '-';
+                document.getElementById('signedContracts').textContent = '-';
+                document.getElementById('totalValue').textContent = '-';
+            }
+        }
+
+        // Создание договора
+        function openCreateContractModal() {
+            currentEditingContract = null;
+            document.getElementById('contractModalTitle').textContent = 'Создать договор';
+            document.getElementById('saveContractBtn').textContent = '💾 Создать договор';
+            document.getElementById('contractForm').reset();
+            document.getElementById('contractModalErrorMessage').style.display = 'none';
+            
+            // Установить текущую дату
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('contractDate').value = today;
+            document.getElementById('validFrom').value = today;
+            
+            document.getElementById('contractModal').style.display = 'block';
+        }
+
+        function closeContractModal() {
+            document.getElementById('contractModal').style.display = 'none';
+        }
+
+        // Обработка формы создания договора
+        document.getElementById('contractForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const contractData = {
+                contractNumber: document.getElementById('contractNumber').value.trim(),
+                clientId: document.getElementById('contractClient').value,
+                contractDate: document.getElementById('contractDate').value,
+                contractType: document.getElementById('contractType').value,
+                totalAmount: parseFloat(document.getElementById('totalAmount').value) || 0,
+                validFrom: document.getElementById('validFrom').value,
+                validTo: document.getElementById('validTo').value || null,
+                description: document.getElementById('description').value.trim() || null,
+                exchangeName: document.getElementById('exchangeName').value.trim() || null,
+                exchangeType: document.getElementById('exchangeType').value.trim() || null,
+                terms: document.getElementById('terms').value.trim() || null,
+                conditions: document.getElementById('conditions').value.trim() || null,
+                responsibleManager: document.getElementById('responsibleManager').value.trim() || null,
+                autoRenewal: document.getElementById('autoRenewal').checked
+            };
+
+            if (!contractData.contractNumber) {
+                showContractModalMessage('Пожалуйста, укажите номер договора', true);
+                return;
+            }
+
+            if (!contractData.clientId) {
+                showContractModalMessage('Пожалуйста, выберите клиента', true);
+                return;
+            }
+
+            if (!contractData.contractType) {
+                showContractModalMessage('Пожалуйста, выберите тип договора', true);
+                return;
+            }
+
+            try {
+                const saveBtn = document.getElementById('saveContractBtn');
+                const originalText = saveBtn.textContent;
+                saveBtn.innerHTML = '<div class="loading"></div>' + (currentEditingContract ? 'Сохранение...' : 'Создание...');
+                saveBtn.disabled = true;
+
+                let response;
+                if (currentEditingContract) {
+                    response = await fetch(`/api/contracts/${currentEditingContract}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + localStorage.getItem('token')
+                        },
+                        body: JSON.stringify(contractData)
+                    });
+                } else {
+                    response = await fetch('/api/contracts', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + localStorage.getItem('token')
+                        },
+                        body: JSON.stringify(contractData)
+                    });
+                }
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                showMessage(`Договор ${result.contract.contractNumber} успешно ${currentEditingContract ? 'обновлен' : 'создан'}!`);
+
+                closeContractModal();
+                loadContracts(currentPage);
+                loadStats();
+
+            } catch (error) {
+                console.error('Error saving contract:', error);
+                showContractModalMessage(error.message || 'Ошибка сохранения договора', true);
+            } finally {
+                const saveBtn = document.getElementById('saveContractBtn');
+                saveBtn.textContent = currentEditingContract ? '💾 Сохранить изменения' : '💾 Создать договор';
+                saveBtn.disabled = false;
+            }
+        });
+
+        function showContractModalMessage(message, isError = false) {
+            const errorEl = document.getElementById('contractModalErrorMessage');
+            if (isError) {
+                errorEl.textContent = message;
+                errorEl.style.display = 'block';
+                setTimeout(() => {
+                    errorEl.style.display = 'none';
+                }, 5000);
+            } else {
+                errorEl.style.display = 'none';
+            }
+        }
+
+        // Просмотр договора
+        async function viewContract(id) {
+            try {
+                const response = await fetch(`/api/contracts/${id}`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const contract = await response.json();
+                displayContractDetails(contract);
+                document.getElementById('viewContractModal').style.display = 'block';
+            } catch (error) {
+                console.error('Error loading contract:', error);
+                showMessage('Ошибка загрузки договора: ' + error.message, true);
+            }
+        }
+
+        function displayContractDetails(contract) {
+            const content = document.getElementById('viewContractContent');
+            const currentUser = APIHelpers.getCurrentUser();
+            const isAdmin = currentUser && currentUser.role === 'admin';
+            
+            content.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #e1e5e9;">
+                    <div>
+                        <h3 style="margin: 0;">Договор ${contract.contractNumber}</h3>
+                        <div style="margin-top: 8px;">
+                            <span class="status-badge status-${contract.status.toLowerCase()}" style="margin-right: 10px;">${getStatusText(contract.status)}</span>
+                            <span style="color: #666; font-size: 14px;">Сумма: ${APIHelpers.formatCurrency(contract.totalAmount)} сум</span>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-warning" onclick="editContract('${contract.id}'); closeViewContractModal();" title="Редактировать">✏️ Редактировать</button>
+                        ${contract.status === 'DRAFT' || contract.status === 'SENT' ? `<button class="btn btn-success" onclick="signContract('${contract.id}'); closeViewContractModal();" title="Подписать">✍️ Подписать</button>` : ''}
+                        ${isAdmin ? `<button class="btn btn-danger" onclick="deleteContract('${contract.id}', '${contract.contractNumber}'); closeViewContractModal();" title="Удалить">🗑️ Удалить</button>` : ''}
+                    </div>
+                </div>
+                
+                <div class="tabs">
+                    <button class="tab-button active" onclick="switchContractTab('info')">📋 Информация</button>
+                    <button class="tab-button" onclick="switchContractTab('preview')">📄 Предварительный просмотр</button>
+                    <button class="tab-button" onclick="switchContractTab('documents')">📎 Документы</button>
+                    <button class="tab-button" onclick="switchContractTab('history')">📜 История изменений</button>
+                </div>
+
+                <div id="contractInfoTab">
+                    <div class="section">
+                        <h3>Информация о договоре</h3>
+                        <div class="contract-status-flow">
+                            ${generateContractStatusFlow(contract.status)}
+                        </div>
+                        <p><strong>Номер:</strong> ${contract.contractNumber}</p>
+                        <p><strong>Клиент:</strong> ${contract.client.name} ${contract.client.inn ? `(ИНН: ${contract.client.inn})` : ''}</p>
+                        <p><strong>Тип:</strong> ${getContractTypeText(contract.contractType)}</p>
+                        <p><strong>Дата заключения:</strong> ${APIHelpers.formatDate(contract.contractDate)}</p>
+                        ${contract.signedDate ? `<p><strong>Дата подписания:</strong> ${APIHelpers.formatDate(contract.signedDate)}</p>` : ''}
+                        <p><strong>Статус:</strong> <span class="status-badge status-${contract.status.toLowerCase()}">${getStatusText(contract.status)}</span></p>
+                        <p><strong>Сумма:</strong> ${APIHelpers.formatCurrency(contract.totalAmount)}</p>
+                        <p><strong>Действует:</strong> с ${APIHelpers.formatDate(contract.validFrom)} ${contract.validTo ? `до ${APIHelpers.formatDate(contract.validTo)}` : '(бессрочно)'}</p>
+                        ${contract.autoRenewal ? '<p><strong>Автопродление:</strong> Да</p>' : ''}
+                        ${contract.description ? `<p><strong>Описание:</strong> ${contract.description}</p>` : ''}
+                    </div>
+
+                    ${contract.exchangeName ? `
+                        <div class="section">
+                            <h3>Биржевая информация</h3>
+                            <p><strong>Биржа:</strong> ${contract.exchangeName}</p>
+                            ${contract.exchangeType ? `<p><strong>Тип биржи:</strong> ${contract.exchangeType}</p>` : ''}
+                        </div>
+                    ` : ''}
+
+                    ${contract.orders && contract.orders.length > 0 ? `
+                        <div class="section">
+                            <h3>Связанные заявки</h3>
+                            ${contract.orders.map(order => `
+                                <div style="padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 10px;">
+                                    <strong>Заявка ${order.number}</strong><br>
+                                    <small>Статус: ${getStatusText(order.status)} | Сумма: ${APIHelpers.formatCurrency(order.totalAmount)}</small>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+
+                    ${contract.terms ? `
+                        <div class="section">
+                            <h3>Условия договора</h3>
+                            <p>${contract.terms}</p>
+                        </div>
+                    ` : ''}
+
+                    ${contract.conditions ? `
+                        <div class="section">
+                            <h3>Дополнительные условия</h3>
+                            <p>${contract.conditions}</p>
+                        </div>
+                    ` : ''}
+
+                    ${contract.responsibleManager ? `
+                        <div class="section">
+                            <h3>Ответственный менеджер</h3>
+                            <p>${contract.responsibleManager}</p>
+                        </div>
+                    ` : ''}
+                </div>
+
+                <div id="contractPreviewTab" style="display: none;">
+                    <div class="section">
+                        <h3>Предварительный просмотр договора</h3>
+                        <button class="btn btn-primary" onclick="generateContractPreview('${contract.id}')" style="margin-bottom: 20px;">
+                            📄 Генерировать предварительный просмотр
+                        </button>
+                        <div id="contractPreviewContent">
+                            <p style="text-align: center; color: #666; font-style: italic;">Нажмите кнопку выше для генерации предварительного просмотра</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="contractDocumentsTab" style="display: none;">
+                    <div class="section">
+                        <h3>Прикрепленные документы</h3>
+                        <div class="file-upload-area">
+                            <input type="file" id="contractFileInput" multiple style="display: none;" onchange="uploadContractFiles('${contract.id}')">
+                            <button class="btn btn-outline" onclick="document.getElementById('contractFileInput').click()">
+                                📎 Прикрепить файл
+                            </button>
+                        </div>
+                        <div id="contractFilesList" class="files-list">
+                            ${contract.files && contract.files.length > 0 ? contract.files.map(file => `
+                                <div class="file-item">
+                                    <div class="file-info">
+                                        <strong>${file.originalName}</strong>
+                                        <small>${formatFileSize(file.size)} • ${APIHelpers.formatDateTime(file.createdAt)}</small>
+                                    </div>
+                                    <button class="btn btn-sm" onclick="downloadFile('${file.id}')" title="Скачать">
+                                        ⬇️
+                                    </button>
+                                </div>
+                            `).join('') : '<p class="no-files">Файлы не прикреплены</p>'}
+                        </div>
+                    </div>
+                </div>
+
+                <div id="contractHistoryTab" style="display: none;">
+                    <div class="section">
+                        <h3>История изменений</h3>
+                        <div id="contractHistoryContent">
+                            <p style="text-align: center; color: #666; font-style: italic;">Загрузка...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="text-align: right; margin-top: 30px; padding-top: 20px; border-top: 2px solid #e1e5e9;">
+                    <button class="btn btn-secondary" onclick="closeViewContractModal()">Закрыть</button>
+                </div>
+            `;
+            
+            document.getElementById('viewContractTitle').textContent = `Информация о договоре`;
+            
+            // Сохраняем ID для использования в других функциях
+            window.currentViewingContractId = contract.id;
+        }
+
+        function getCurrentContractId() {
+            return window.currentViewingContractId;
+        }
+
+        async function loadContractHistory(contractId) {
+            try {
+                const response = await API.getContractHistory(contractId);
+                displayContractHistory(response.history);
+            } catch (error) {
+                console.error('Error loading contract history:', error);
+                document.getElementById('contractHistoryContent').innerHTML = 
+                    '<p style="text-align: center; color: #dc3545;">Ошибка загрузки истории изменений</p>';
+            }
+        }
+
+        function generateContractStatusFlow(currentStatus) {
+            const contractStatuses = [
+                { id: 'DRAFT', name: 'Черновик', icon: '📝' },
+                { id: 'SENT', name: 'Отправлен', icon: '📤' },
+                { id: 'SIGNED', name: 'Подписан', icon: '✍️' },
+                { id: 'ACTIVE', name: 'Активный', icon: '✅' },
+                { id: 'COMPLETED', name: 'Завершен', icon: '🏁' }
+            ];
+
+            const statusIndex = contractStatuses.findIndex(s => s.id === currentStatus);
+            
+            return contractStatuses.map((status, index) => {
+                let stepClass = 'pending';
+                if (index < statusIndex || (currentStatus === 'ACTIVE' && status.id === 'ACTIVE')) {
+                    stepClass = 'completed';
+                } else if (status.id === currentStatus) {
+                    stepClass = 'current';
+                }
+
+                // Особые случаи для конечных статусов
+                if (currentStatus === 'CANCELLED' || currentStatus === 'REJECTED') {
+                    stepClass = index <= 1 ? 'completed' : 'pending';
+                    if (status.id === currentStatus) stepClass = 'current';
+                }
+
+                const hasArrow = index < contractStatuses.length - 1;
+                let arrowClass = 'pending';
+                if (index < statusIndex) {
+                    arrowClass = 'completed';
+                }
+
+                return `
+                    <div class="status-step">
+                        <div class="status-circle ${stepClass}">
+                            ${status.icon}
+                        </div>
+                        <small style="color: #6c757d; font-weight: 500; font-size: 10px;">${status.name}</small>
+                    </div>
+                    ${hasArrow ? `<div class="status-arrow ${arrowClass}"></div>` : ''}
+                `;
+            }).join('');
+        }
+
+        function displayContractHistory(history) {
+            const container = document.getElementById('contractHistoryContent');
+            
+            if (!history || history.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666; font-style: italic;">История изменений пока пуста</p>';
+                return;
+            }
+
+            container.innerHTML = history.map(record => {
+                const actionText = {
+                    'CREATE': 'Создан',
+                    'UPDATE': 'Изменен',
+                    'SIGN': 'Подписан',
+                    'DELETE': 'Удален'
+                };
+
+                const changesList = record.changes.map(change => 
+                    `<li><strong>${change.field}:</strong> "${change.oldValue}" → "${change.newValue}"</li>`
+                ).join('');
+
+                return `
+                    <div style="border: 1px solid #dee2e6; border-radius: 8px; padding: 15px; margin-bottom: 15px; background: white;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                            <div>
+                                <strong style="color: #495057;">${actionText[record.action] || record.action}</strong>
+                                <span style="color: #6c757d; margin-left: 10px;">${APIHelpers.formatDateTime(record.createdAt)}</span>
+                            </div>
+                            <span style="color: #6c757d; font-size: 14px;">${record.changedBy}</span>
+                        </div>
+                        ${record.changes && record.changes.length > 0 ? `
+                            <div style="color: #6c757d; font-size: 14px;">
+                                <strong>Изменения:</strong>
+                                <ul style="margin: 5px 0 0 20px; padding: 0;">
+                                    ${changesList}
+                                </ul>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function switchContractTab(tab) {
+            // Скрыть все вкладки
+            document.getElementById('contractInfoTab').style.display = 'none';
+            document.getElementById('contractPreviewTab').style.display = 'none';
+            document.getElementById('contractDocumentsTab').style.display = 'none';
+            document.getElementById('contractHistoryTab').style.display = 'none';
+
+            // Убрать активный класс со всех кнопок
+            document.querySelectorAll('#viewContractContent .tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Показать выбранную вкладку
+            document.getElementById('contract' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Tab').style.display = 'block';
+            
+            // Добавить активный класс к соответствующей кнопке
+            event.target.classList.add('active');
+            
+            // Загрузить историю при первом открытии вкладки
+            if (tab === 'history') {
+                const contractId = getCurrentContractId();
+                if (contractId) {
+                    loadContractHistory(contractId);
+                }
+            }
+        }
+
+        async function generateContractPreview(contractId) {
+            try {
+                const response = await fetch(`/api/contracts/${contractId}/preview`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                document.getElementById('contractPreviewContent').innerHTML = `
+                    <div class="contract-preview">${data.preview}</div>
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="btn btn-success" onclick="generateContractDocument('${contractId}')">
+                            📝 Сгенерировать итоговый документ
+                        </button>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error generating preview:', error);
+                showMessage('Ошибка генерации предварительного просмотра: ' + error.message, true);
+            }
+        }
+
+        async function generateContractDocument(contractId) {
+            try {
+                const response = await fetch(`/api/contracts/${contractId}/generate-document`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                showMessage('Документ договора успешно сгенерирован!');
+            } catch (error) {
+                console.error('Error generating document:', error);
+                showMessage('Ошибка генерации документа: ' + error.message, true);
+            }
+        }
+
+        function closeViewContractModal() {
+            document.getElementById('viewContractModal').style.display = 'none';
+        }
+
+        // Редактирование договора
+        async function editContract(id) {
+            try {
+                const response = await fetch(`/api/contracts/${id}`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const contract = await response.json();
+                populateContractForm(contract);
+                currentEditingContract = id;
+                document.getElementById('contractModalTitle').textContent = `Редактировать договор ${contract.contractNumber}`;
+                document.getElementById('saveContractBtn').textContent = '💾 Сохранить изменения';
+                document.getElementById('contractModal').style.display = 'block';
+            } catch (error) {
+                console.error('Error loading contract:', error);
+                showMessage('Ошибка загрузки договора: ' + error.message, true);
+            }
+        }
+
+        function populateContractForm(contract) {
+            document.getElementById('contractNumber').value = contract.contractNumber;
+            document.getElementById('contractClient').value = contract.clientId;
+            document.getElementById('contractDate').value = contract.contractDate.split('T')[0];
+            document.getElementById('contractType').value = contract.contractType;
+            document.getElementById('totalAmount').value = contract.totalAmount;
+            document.getElementById('validFrom').value = contract.validFrom.split('T')[0];
+            document.getElementById('validTo').value = contract.validTo ? contract.validTo.split('T')[0] : '';
+            document.getElementById('description').value = contract.description || '';
+            document.getElementById('exchangeName').value = contract.exchangeName || '';
+            document.getElementById('exchangeType').value = contract.exchangeType || '';
+            document.getElementById('terms').value = contract.terms || '';
+            document.getElementById('conditions').value = contract.conditions || '';
+            document.getElementById('responsibleManager').value = contract.responsibleManager || '';
+            document.getElementById('autoRenewal').checked = contract.autoRenewal;
+
+            // Показать секцию биржи если необходимо
+            const exchangeSection = document.getElementById('exchangeSection');
+            if (contract.contractType === 'EXCHANGE') {
+                exchangeSection.style.display = 'block';
+            } else {
+                exchangeSection.style.display = 'none';
+            }
+        }
+
+        // Подписание договора
+        async function signContract(id) {
+            try {
+                if (!confirm('Подписать этот договор? После подписания договор станет активным.')) {
+                    return;
+                }
+
+                const response = await fetch(`/api/contracts/${id}/sign`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    },
+                    body: JSON.stringify({
+                        signedDate: new Date().toISOString()
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                showMessage(`Договор ${result.contract.contractNumber} успешно подписан!`);
+                loadContracts(currentPage);
+                loadStats();
+            } catch (error) {
+                console.error('Error signing contract:', error);
+                showMessage('Ошибка подписания договора: ' + error.message, true);
+            }
+        }
+
+        // Удаление договора
+        async function deleteContract(id, number) {
+            if (confirm(`Удалить договор ${number}? Это действие нельзя отменить.`)) {
+                try {
+                    const response = await fetch(`/api/contracts/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': 'Bearer ' + localStorage.getItem('token')
+                        }
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    showMessage(result.message || `Договор ${number} успешно удален`);
+                    loadContracts(currentPage);
+                    loadStats();
+                } catch (error) {
+                    console.error('Error deleting contract:', error);
+                    showMessage('Ошибка удаления договора: ' + error.message, true);
+                }
+            }
+        }
+
+        // Поиск с задержкой
+        function handleSearch() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                currentPage = 1;
+                loadContracts(1);
+            }, 500);
+        }
+
+        // Очистка фильтров
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('contractTypeFilter').value = '';
+            
+            currentPage = 1;
+            loadContracts(1);
+        }
+
+        // Вспомогательные функции
+        function showMessage(message, isError = false) {
+            const errorEl = document.getElementById('errorMessage');
+            const successEl = document.getElementById('successMessage');
+            
+            if (isError) {
+                errorEl.textContent = message;
+                errorEl.style.display = 'block';
+                successEl.style.display = 'none';
+            } else {
+                successEl.textContent = message;
+                successEl.style.display = 'block';
+                errorEl.style.display = 'none';
+            }
+
+            setTimeout(() => {
+                if (errorEl) errorEl.style.display = 'none';
+                if (successEl) successEl.style.display = 'none';
+            }, 5000);
+        }
+
+        function hideMessages() {
+            const errorEl = document.getElementById('errorMessage');
+            const successEl = document.getElementById('successMessage');
+            if (errorEl) errorEl.style.display = 'none';
+            if (successEl) successEl.style.display = 'none';
+        }
+
+        function updatePagination(pagination) {
+            const paginationEl = document.getElementById('pagination');
+            
+            if (pagination.pages <= 1) {
+                paginationEl.innerHTML = '';
+                return;
+            }
+
+            let paginationHTML = '';
+            
+            paginationHTML += `
+                <button onclick="loadContracts(${pagination.page - 1})" ${pagination.page <= 1 ? 'disabled' : ''}>
+                    ← Предыдущая
+                </button>
+            `;
+
+            for (let i = 1; i <= pagination.pages; i++) {
+                if (i === pagination.page) {
+                    paginationHTML += `<button class="active">${i}</button>`;
+                } else if (Math.abs(i - pagination.page) <= 2 || i === 1 || i === pagination.pages) {
+                    paginationHTML += `<button onclick="loadContracts(${i})">${i}</button>`;
+                } else if (Math.abs(i - pagination.page) === 3) {
+                    paginationHTML += '<span>...</span>';
+                }
+            }
+
+            paginationHTML += `
+                <button onclick="loadContracts(${pagination.page + 1})" ${pagination.page >= pagination.pages ? 'disabled' : ''}>
+                    Следующая →
+                </button>
+            `;
+
+            paginationEl.innerHTML = paginationHTML;
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Б';
+            
+            const k = 1024;
+            const sizes = ['Б', 'КБ', 'МБ', 'ГБ'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Закрытие модальных окон при клике вне их
+        window.onclick = function(event) {
+            const modals = ['contractModal', 'viewContractModal'];
+            modals.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="CO-LAB CRM">
+    <title>Уведомления - CO-LAB CRM</title>
+    <link rel="stylesheet" href="./mobile-styles.css">
+    <link rel="manifest" href="./manifest.json">
+    <style>
+        .notifications-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .mark-all-read-btn {
+            background: none;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .mark-all-read-btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .notification-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        .notification-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+        
+        .notification-card.unread {
+            border-left: 4px solid var(--primary-color);
+            background: linear-gradient(135deg, #ffffff, #f8fafc);
+        }
+        
+        .notification-card.priority {
+            border-left: 4px solid #ef4444;
+        }
+        
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        
+        .notification-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            margin-right: 12px;
+        }
+        
+        .notification-icon.order { background: #dbeafe; color: #2563eb; }
+        .notification-icon.client { background: #dcfce7; color: #16a34a; }
+        .notification-icon.system { background: #fef3c7; color: #d97706; }
+        .notification-icon.reminder { background: #fce7f3; color: #e879f9; }
+        .notification-icon.alert { background: #fee2e2; color: #dc2626; }
+        
+        .notification-content {
+            flex: 1;
+        }
+        
+        .notification-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0 0 4px 0;
+            line-height: 1.3;
+        }
+        
+        .notification-message {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+        
+        .notification-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+        
+        .notification-time {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .notification-type {
+            background: var(--light-gray);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        .notification-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #f3f4f6;
+        }
+        
+        .notification-action-btn {
+            flex: 1;
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .notification-action-btn:hover {
+            background: var(--light-gray);
+        }
+        
+        .notification-action-btn.primary {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .filters-container {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+        
+        .filter-chip {
+            white-space: nowrap;
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            background: white;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .filter-chip.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .unread-indicator {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            background: var(--primary-color);
+            border-radius: 50%;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+        
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+        
+        .notification-summary {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+        }
+        
+        .summary-item {
+            text-align: center;
+        }
+        
+        .summary-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        
+        .summary-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-container">
+        <!-- Header -->
+        <div class="mobile-header">
+            <div class="mobile-nav">
+                <button class="menu-toggle">☰</button>
+                <h1>🔔 Уведомления</h1>
+                <button class="mobile-nav-btn" onclick="window.history.back()">Назад</button>
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="mobile-sidebar">
+            <div class="mobile-sidebar-header">
+                <h3>CO-LAB CRM</h3>
+                <button class="mobile-sidebar-close">✕</button>
+            </div>
+            <ul class="mobile-menu">
+                <li><a href="./mobile-dashboard.html">🏠 Дашборд</a></li>
+                <li><a href="./mobile-clients.html">👥 Клиенты</a></li>
+                <li><a href="./mobile-orders.html">📋 Заказы</a></li>
+                <li><a href="./mobile-warehouse.html">📦 Склад</a></li>
+                <li><a href="./mobile-analytics.html">📊 Аналитика</a></li>
+                <li><a href="./mobile-dialogues.html">💬 Диалоги</a></li>
+                <li><a href="./mobile-notifications.html" class="active">🔔 Уведомления</a></li>
+            </ul>
+        </div>
+        
+        <!-- Overlay -->
+        <div class="mobile-overlay"></div>
+        
+        <!-- Content -->
+        <div class="mobile-content" id="main-content">
+            <!-- Summary -->
+            <div class="notification-summary">
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <div class="summary-value" id="total-notifications">—</div>
+                        <div class="summary-label">Всего</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-value" id="unread-notifications">—</div>
+                        <div class="summary-label">Непрочитано</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-value" id="priority-notifications">—</div>
+                        <div class="summary-label">Важные</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Header Actions -->
+            <div class="notifications-header">
+                <h2 style="margin: 0; font-size: 18px; font-weight: 600; color: var(--text-primary);">
+                    Все уведомления
+                </h2>
+                <button class="mark-all-read-btn" onclick="markAllAsRead()">
+                    ✓ Прочитать все
+                </button>
+            </div>
+            
+            <!-- Filters -->
+            <div class="filters-container">
+                <button class="filter-chip active" data-filter="all">
+                    🔔 Все
+                </button>
+                <button class="filter-chip" data-filter="unread">
+                    📬 Непрочитанные
+                </button>
+                <button class="filter-chip" data-filter="order">
+                    📋 Заказы
+                </button>
+                <button class="filter-chip" data-filter="client">
+                    👥 Клиенты
+                </button>
+                <button class="filter-chip" data-filter="system">
+                    ⚙️ Система
+                </button>
+                <button class="filter-chip" data-filter="reminder">
+                    ⏰ Напоминания
+                </button>
+            </div>
+            
+            <!-- Notifications List -->
+            <div id="notifications-list">
+                <div class="mobile-loading">
+                    <div class="mobile-spinner"></div>
+                    <p>Загрузка уведомлений...</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bottom Navigation -->
+        <div class="mobile-bottom-nav">
+            <a href="./mobile-dashboard.html" class="mobile-bottom-nav-item">
+                <div class="mobile-bottom-nav-icon">🏠</div>
+                <span>Дашборд</span>
+            </a>
+            <a href="./mobile-clients.html" class="mobile-bottom-nav-item">
+                <div class="mobile-bottom-nav-icon">👥</div>
+                <span>Клиенты</span>
+            </a>
+            <a href="./mobile-orders.html" class="mobile-bottom-nav-item">
+                <div class="mobile-bottom-nav-icon">📋</div>
+                <span>Заказы</span>
+            </a>
+            <a href="./mobile-notifications.html" class="mobile-bottom-nav-item active">
+                <div class="mobile-bottom-nav-icon">🔔</div>
+                <span>Уведомления</span>
+            </a>
+        </div>
+    </div>
+
+    <script src="./mobile-app.js"></script>
+    <script>
+        class MobileNotificationsManager {
+            constructor() {
+                this.notifications = [];
+                this.filteredNotifications = [];
+                this.currentFilter = 'all';
+                this.init();
+            }
+            
+            async init() {
+                this.setupEventListeners();
+                await this.loadNotifications();
+                this.renderNotifications();
+                this.updateSummary();
+            }
+            
+            setupEventListeners() {
+                // Filter chips
+                document.querySelectorAll('.filter-chip').forEach(chip => {
+                    chip.addEventListener('click', (e) => {
+                        document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                        e.target.classList.add('active');
+                        this.currentFilter = e.target.dataset.filter;
+                        this.filterAndRenderNotifications();
+                    });
+                });
+            }
+            
+            async loadNotifications() {
+                try {
+                    // Mock notifications data
+                    this.notifications = [
+                        {
+                            id: 1,
+                            type: 'order',
+                            priority: 'high',
+                            isRead: false,
+                            title: 'Новый срочный заказ',
+                            message: 'Заказ ORD-2024-001 от ООО "Газпром" требует немедленной обработки',
+                            createdAt: new Date(Date.now() - 30 * 60 * 1000), // 30 minutes ago
+                            relatedId: 'ORD-2024-001',
+                            actions: [
+                                { label: 'Просмотреть', action: 'view-order', primary: true },
+                                { label: 'Отложить', action: 'snooze' }
+                            ]
+                        },
+                        {
+                            id: 2,
+                            type: 'client',
+                            priority: 'medium',
+                            isRead: false,
+                            title: 'Новое сообщение от клиента',
+                            message: 'Иван Петров (ООО "Газпром") отправил сообщение в диалоге',
+                            createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+                            relatedId: 'dialogue-1',
+                            actions: [
+                                { label: 'Ответить', action: 'reply', primary: true },
+                                { label: 'Отметить прочитанным', action: 'mark-read' }
+                            ]
+                        },
+                        {
+                            id: 3,
+                            type: 'reminder',
+                            priority: 'medium',
+                            isRead: true,
+                            title: 'Напоминание о звонке',
+                            message: 'Запланированный звонок клиенту "АО Роснефть" через 15 минут',
+                            createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
+                            relatedId: 'call-reminder-123',
+                            actions: [
+                                { label: 'Позвонить', action: 'make-call', primary: true },
+                                { label: 'Перенести', action: 'reschedule' }
+                            ]
+                        }
+                    ];
+                } catch (error) {
+                    console.error('Error loading notifications:', error);
+                    mobileApp.showNotification('Ошибка загрузки уведомлений', 'danger');
+                }
+            }
+            
+            filterAndRenderNotifications() {
+                if (this.currentFilter === 'all') {
+                    this.filteredNotifications = this.notifications;
+                } else if (this.currentFilter === 'unread') {
+                    this.filteredNotifications = this.notifications.filter(n => !n.isRead);
+                } else {
+                    this.filteredNotifications = this.notifications.filter(n => n.type === this.currentFilter);
+                }
+                
+                // Sort by creation date (newest first)
+                this.filteredNotifications.sort((a, b) => b.createdAt - a.createdAt);
+                
+                this.renderNotifications();
+            }
+            
+            renderNotifications() {
+                const container = document.getElementById('notifications-list');
+                
+                if (this.filteredNotifications.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🔔</div>
+                            <div class="empty-state-text">Уведомлений нет</div>
+                            <div class="empty-state-subtext">
+                                ${this.currentFilter === 'all' ? 
+                                    'Все уведомления прочитаны' : 
+                                    'Нет уведомлений в выбранной категории'}
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = this.filteredNotifications.map(notification => `
+                    <div class="notification-card ${!notification.isRead ? 'unread' : ''} ${notification.priority === 'high' ? 'priority' : ''}" 
+                         onclick="openNotification(${notification.id})">
+                        
+                        ${!notification.isRead ? '<div class="unread-indicator"></div>' : ''}
+                        
+                        <div class="notification-header">
+                            <div style="display: flex; align-items: flex-start;">
+                                <div class="notification-icon ${notification.type}">
+                                    ${this.getTypeIcon(notification.type)}
+                                </div>
+                                <div class="notification-content">
+                                    <h4 class="notification-title">${notification.title}</h4>
+                                    <div class="notification-message">${notification.message}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="notification-meta">
+                            <div class="notification-time">
+                                🕒 ${this.formatTime(notification.createdAt)}
+                            </div>
+                            <div class="notification-type">${this.getTypeLabel(notification.type)}</div>
+                        </div>
+                        
+                        ${notification.actions && notification.actions.length > 0 ? `
+                            <div class="notification-actions">
+                                ${notification.actions.map(action => `
+                                    <button class="notification-action-btn ${action.primary ? 'primary' : ''}" 
+                                            onclick="event.stopPropagation(); handleNotificationAction('${action.action}', ${notification.id})">
+                                        ${action.label}
+                                    </button>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `).join('');
+            }
+            
+            getTypeIcon(type) {
+                const icons = {
+                    'order': '📋',
+                    'client': '👤',
+                    'system': '⚙️',
+                    'reminder': '⏰',
+                    'alert': '⚠️'
+                };
+                return icons[type] || '🔔';
+            }
+            
+            getTypeLabel(type) {
+                const labels = {
+                    'order': 'Заказ',
+                    'client': 'Клиент',
+                    'system': 'Система',
+                    'reminder': 'Напоминание',
+                    'alert': 'Тревога'
+                };
+                return labels[type] || type;
+            }
+            
+            formatTime(date) {
+                const now = new Date();
+                const diff = now - date;
+                
+                if (diff < 60000) return 'Только что';
+                if (diff < 3600000) return `${Math.floor(diff / 60000)} мин назад`;
+                if (diff < 86400000) return `${Math.floor(diff / 3600000)} ч назад`;
+                if (diff < 604800000) return `${Math.floor(diff / 86400000)} дн назад`;
+                
+                return date.toLocaleDateString('ru-RU');
+            }
+            
+            updateSummary() {
+                const total = this.notifications.length;
+                const unread = this.notifications.filter(n => !n.isRead).length;
+                const priority = this.notifications.filter(n => n.priority === 'high' && !n.isRead).length;
+                
+                document.getElementById('total-notifications').textContent = total;
+                document.getElementById('unread-notifications').textContent = unread;
+                document.getElementById('priority-notifications').textContent = priority;
+            }
+        }
+        
+        // Global functions
+        function openNotification(notificationId) {
+            mobileApp.showNotification(`Открытие уведомления ${notificationId}`, 'info');
+        }
+        
+        function handleNotificationAction(action, notificationId) {
+            mobileApp.showNotification(`Действие: ${action}`, 'info');
+        }
+        
+        function markAllAsRead() {
+            mobileApp.showNotification('Все уведомления отмечены как прочитанные', 'success');
+        }
+        
+        // Initialize
+        let notificationsManager;
+        document.addEventListener('DOMContentLoaded', () => {
+            if (mobileApp.user) {
+                notificationsManager = new MobileNotificationsManager();
+            } else {
+                window.location.href = './mobile-login.html';
+            }
+        });
+    </script>
+</body>
+</html>

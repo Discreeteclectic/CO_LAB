@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="CO-LAB CRM">
+    <title>Заказы - CO-LAB CRM</title>
+    <link rel="stylesheet" href="./mobile-styles.css">
+    <link rel="manifest" href="./manifest.json">
+    <style>
+        .orders-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+        
+        .stat-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        
+        .order-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        .order-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+        
+        .order-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            border-radius: 12px 0 0 12px;
+        }
+        
+        .order-card.pending::before { background: #f59e0b; }
+        .order-card.processing::before { background: #3b82f6; }
+        .order-card.completed::before { background: #10b981; }
+        .order-card.cancelled::before { background: #ef4444; }
+        
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        
+        .order-number {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+        
+        .order-status {
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .order-status.pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+        }
+        
+        .order-status.processing {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+        
+        .order-status.completed {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+        
+        .order-status.cancelled {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+        
+        .order-client {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .order-date {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+        
+        .order-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .order-detail {
+            text-align: center;
+        }
+        
+        .order-detail-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+        
+        .order-detail-label {
+            font-size: 10px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+        
+        .order-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .order-action-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+        
+        .order-action-btn:hover {
+            background: var(--light-gray);
+        }
+        
+        .order-action-btn.primary {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .order-action-btn.primary:hover {
+            background: var(--primary-dark);
+        }
+        
+        .order-action-btn.success {
+            background: var(--success-color);
+            color: white;
+            border-color: var(--success-color);
+        }
+        
+        .order-action-btn.danger {
+            background: var(--danger-color);
+            color: white;
+            border-color: var(--danger-color);
+        }
+        
+        .status-filters {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+        
+        .status-filter {
+            white-space: nowrap;
+            padding: 8px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            background: white;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .status-filter.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .priority-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        
+        .priority-badge.high {
+            background: #ef4444;
+        }
+        
+        .priority-badge.medium {
+            background: #f59e0b;
+        }
+        
+        .priority-badge.low {
+            background: #10b981;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+        
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+        
+        .empty-state-text {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+        
+        .empty-state-subtext {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-container">
+        <!-- Header -->
+        <div class="mobile-header">
+            <div class="mobile-nav">
+                <button class="menu-toggle">☰</button>
+                <h1>📋 Заказы</h1>
+                <button class="mobile-nav-btn" onclick="window.history.back()">Назад</button>
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="mobile-sidebar">
+            <div class="mobile-sidebar-header">
+                <h3>CO-LAB CRM</h3>
+                <button class="mobile-sidebar-close">✕</button>
+            </div>
+            <ul class="mobile-menu">
+                <li><a href="./mobile-dashboard.html">🏠 Дашборд</a></li>
+                <li><a href="./mobile-clients.html">👥 Клиенты</a></li>
+                <li><a href="./mobile-orders.html" class="active">📋 Заказы</a></li>
+                <li><a href="./mobile-warehouse.html">📦 Склад</a></li>
+                <li><a href="./mobile-analytics.html">📊 Аналитика</a></li>
+                <li><a href="./mobile-dialogues.html">💬 Диалоги</a></li>
+                <li><a href="./mobile-notifications.html">🔔 Уведомления</a></li>
+            </ul>
+        </div>
+        
+        <!-- Overlay -->
+        <div class="mobile-overlay"></div>
+        
+        <!-- Content -->
+        <div class="mobile-content" id="main-content">
+            <!-- Stats Cards -->
+            <div class="orders-stats">
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-value" id="total-orders">—</div>
+                    <div class="stat-label">Всего заказов</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-value" id="total-revenue">—</div>
+                    <div class="stat-label">Общая сумма</div>
+                </div>
+            </div>
+            
+            <!-- Status Filters -->
+            <div class="status-filters">
+                <button class="status-filter active" data-status="all">
+                    📋 Все
+                </button>
+                <button class="status-filter" data-status="pending">
+                    ⏳ В ожидании
+                </button>
+                <button class="status-filter" data-status="processing">
+                    🔄 В работе
+                </button>
+                <button class="status-filter" data-status="completed">
+                    ✅ Завершён
+                </button>
+                <button class="status-filter" data-status="cancelled">
+                    ❌ Отменён
+                </button>
+            </div>
+            
+            <!-- Orders List -->
+            <div id="orders-list">
+                <div class="mobile-loading">
+                    <div class="mobile-spinner"></div>
+                    <p>Загрузка заказов...</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- FAB -->
+        <button class="fab" onclick="createNewOrder()" title="Новый заказ">+</button>
+        
+        <!-- Bottom Navigation -->
+        <div class="mobile-bottom-nav">
+            <a href="./mobile-dashboard.html" class="mobile-bottom-nav-item">
+                <div class="mobile-bottom-nav-icon">🏠</div>
+                <span>Дашборд</span>
+            </a>
+            <a href="./mobile-clients.html" class="mobile-bottom-nav-item">
+                <div class="mobile-bottom-nav-icon">👥</div>
+                <span>Клиенты</span>
+            </a>
+            <a href="./mobile-orders.html" class="mobile-bottom-nav-item active">
+                <div class="mobile-bottom-nav-icon">📋</div>
+                <span>Заказы</span>
+            </a>
+            <a href="./mobile-analytics.html" class="mobile-bottom-nav-item">
+                <div class="mobile-bottom-nav-icon">📊</div>
+                <span>Аналитика</span>
+            </a>
+        </div>
+    </div>
+
+    <script src="./mobile-app.js"></script>
+    <script>
+        class MobileOrdersManager {
+            constructor() {
+                this.orders = [];
+                this.filteredOrders = [];
+                this.currentFilter = 'all';
+                this.init();
+            }
+            
+            async init() {
+                this.setupEventListeners();
+                await this.loadOrders();
+                this.renderOrders();
+                this.updateStats();
+            }
+            
+            setupEventListeners() {
+                // Status filters
+                document.querySelectorAll('.status-filter').forEach(filter => {
+                    filter.addEventListener('click', (e) => {
+                        document.querySelectorAll('.status-filter').forEach(f => f.classList.remove('active'));
+                        e.target.classList.add('active');
+                        this.currentFilter = e.target.dataset.status;
+                        this.filterAndRenderOrders();
+                    });
+                });
+            }
+            
+            async loadOrders() {
+                try {
+                    // Mock orders data for demo
+                    this.orders = [
+                        {
+                            id: 'ORD-2024-001',
+                            clientName: 'ООО "Газпром"',
+                            clientId: 1,
+                            status: 'processing',
+                            priority: 'high',
+                            createdAt: '2024-01-20',
+                            totalAmount: 85000,
+                            itemsCount: 5,
+                            description: 'Поставка кислородных баллонов'
+                        },
+                        {
+                            id: 'ORD-2024-002',
+                            clientName: 'АО "Роснефть"',
+                            clientId: 2,
+                            status: 'completed',
+                            priority: 'medium',
+                            createdAt: '2024-01-18',
+                            totalAmount: 45000,
+                            itemsCount: 3,
+                            description: 'Пропановые баллоны 50л'
+                        },
+                        {
+                            id: 'ORD-2024-003',
+                            clientName: 'ЗАО "Лукойл-газ"',
+                            clientId: 3,
+                            status: 'pending',
+                            priority: 'medium',
+                            createdAt: '2024-01-19',
+                            totalAmount: 67000,
+                            itemsCount: 4,
+                            description: 'Редукторы и комплектующие'
+                        },
+                        {
+                            id: 'ORD-2024-004',
+                            clientName: 'ООО "Северсталь"',
+                            clientId: 4,
+                            status: 'processing',
+                            priority: 'low',
+                            createdAt: '2024-01-17',
+                            totalAmount: 32000,
+                            itemsCount: 2,
+                            description: 'Аргонные баллоны'
+                        },
+                        {
+                            id: 'ORD-2024-005',
+                            clientName: 'АО "Металлургия"',
+                            clientId: 5,
+                            status: 'cancelled',
+                            priority: 'low',
+                            createdAt: '2024-01-15',
+                            totalAmount: 28000,
+                            itemsCount: 3,
+                            description: 'Отменён клиентом'
+                        }
+                    ];
+                } catch (error) {
+                    console.error('Error loading orders:', error);
+                    mobileApp.showNotification('Ошибка загрузки заказов', 'danger');
+                }
+            }
+            
+            filterAndRenderOrders() {
+                if (this.currentFilter === 'all') {
+                    this.filteredOrders = this.orders;
+                } else {
+                    this.filteredOrders = this.orders.filter(order => order.status === this.currentFilter);
+                }
+                this.renderOrders();
+            }
+            
+            renderOrders() {
+                const container = document.getElementById('orders-list');
+                
+                if (this.filteredOrders.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📋</div>
+                            <div class="empty-state-text">Заказов не найдено</div>
+                            <div class="empty-state-subtext">
+                                ${this.currentFilter === 'all' ? 
+                                    'Создайте первый заказ нажав кнопку +' : 
+                                    'Нет заказов с таким статусом'}
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = this.filteredOrders.map(order => `
+                    <div class="order-card ${order.status}" onclick="openOrderDetails('${order.id}')">
+                        ${order.priority !== 'low' ? `<div class="priority-badge ${order.priority}"></div>` : ''}
+                        
+                        <div class="order-header">
+                            <h3 class="order-number">${order.id}</h3>
+                            <span class="order-status ${order.status}">
+                                ${this.getStatusLabel(order.status)}
+                            </span>
+                        </div>
+                        
+                        <div class="order-client">
+                            👤 ${order.clientName}
+                        </div>
+                        
+                        <div class="order-date">
+                            📅 ${mobileApp.formatDate(new Date(order.createdAt))}
+                        </div>
+                        
+                        <div class="order-details">
+                            <div class="order-detail">
+                                <div class="order-detail-value">${mobileApp.formatCurrency(order.totalAmount)}</div>
+                                <div class="order-detail-label">Сумма</div>
+                            </div>
+                            <div class="order-detail">
+                                <div class="order-detail-value">${order.itemsCount}</div>
+                                <div class="order-detail-label">Позиций</div>
+                            </div>
+                        </div>
+                        
+                        <div style="font-size: 13px; color: var(--text-secondary); margin: 8px 0;">
+                            ${order.description}
+                        </div>
+                        
+                        <div class="order-actions">
+                            ${this.getOrderActions(order)}
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            getStatusLabel(status) {
+                const labels = {
+                    'pending': 'Ожидание',
+                    'processing': 'В работе',
+                    'completed': 'Завершён',
+                    'cancelled': 'Отменён'
+                };
+                return labels[status] || status;
+            }
+            
+            getOrderActions(order) {
+                switch (order.status) {
+                    case 'pending':
+                        return `
+                            <button class="order-action-btn primary" onclick="event.stopPropagation(); processOrder('${order.id}')">
+                                🔄 В работу
+                            </button>
+                            <button class="order-action-btn danger" onclick="event.stopPropagation(); cancelOrder('${order.id}')">
+                                ❌ Отменить
+                            </button>
+                        `;
+                    case 'processing':
+                        return `
+                            <button class="order-action-btn success" onclick="event.stopPropagation(); completeOrder('${order.id}')">
+                                ✅ Завершить
+                            </button>
+                            <button class="order-action-btn" onclick="event.stopPropagation(); editOrder('${order.id}')">
+                                ✏️ Изменить
+                            </button>
+                        `;
+                    case 'completed':
+                        return `
+                            <button class="order-action-btn" onclick="event.stopPropagation(); viewInvoice('${order.id}')">
+                                📄 Счёт
+                            </button>
+                            <button class="order-action-btn" onclick="event.stopPropagation(); repeatOrder('${order.id}')">
+                                🔄 Повторить
+                            </button>
+                        `;
+                    case 'cancelled':
+                        return `
+                            <button class="order-action-btn" onclick="event.stopPropagation(); restoreOrder('${order.id}')">
+                                🔄 Восстановить
+                            </button>
+                        `;
+                    default:
+                        return '';
+                }
+            }
+            
+            updateStats() {
+                const totalOrders = this.orders.length;
+                const totalRevenue = this.orders
+                    .filter(order => order.status === 'completed')
+                    .reduce((sum, order) => sum + order.totalAmount, 0);
+                
+                document.getElementById('total-orders').textContent = totalOrders;
+                document.getElementById('total-revenue').textContent = 
+                    mobileApp.formatCurrency(totalRevenue).replace(' ₽', 'к');
+            }
+        }
+        
+        // Global functions
+        function openOrderDetails(orderId) {
+            mobileApp.showNotification(`Открытие заказа ${orderId}`, 'info');
+            // Here you would navigate to order details page
+        }
+        
+        function processOrder(orderId) {
+            mobileApp.showNotification(`Заказ ${orderId} переведён в работу`, 'success');
+            // Here you would update order status
+        }
+        
+        function completeOrder(orderId) {
+            mobileApp.showNotification(`Заказ ${orderId} завершён`, 'success');
+            // Here you would complete the order
+        }
+        
+        function cancelOrder(orderId) {
+            if (confirm('Отменить заказ?')) {
+                mobileApp.showNotification(`Заказ ${orderId} отменён`, 'warning');
+                // Here you would cancel the order
+            }
+        }
+        
+        function editOrder(orderId) {
+            mobileApp.showNotification(`Редактирование заказа ${orderId}`, 'info');
+            // Here you would navigate to edit order page
+        }
+        
+        function viewInvoice(orderId) {
+            mobileApp.showNotification(`Просмотр счёта для заказа ${orderId}`, 'info');
+            // Here you would show the invoice
+        }
+        
+        function repeatOrder(orderId) {
+            mobileApp.showNotification(`Повтор заказа ${orderId}`, 'info');
+            // Here you would create a new order based on this one
+        }
+        
+        function restoreOrder(orderId) {
+            mobileApp.showNotification(`Восстановление заказа ${orderId}`, 'success');
+            // Here you would restore the cancelled order
+        }
+        
+        function createNewOrder() {
+            mobileApp.showNotification('Создание нового заказа', 'info');
+            // Here you would navigate to create order page
+        }
+        
+        // Initialize
+        let ordersManager;
+        document.addEventListener('DOMContentLoaded', () => {
+            if (mobileApp.user) {
+                ordersManager = new MobileOrdersManager();
+            } else {
+                window.location.href = './mobile-login.html';
+            }
+        });
+    </script>
+</body>
+</html>

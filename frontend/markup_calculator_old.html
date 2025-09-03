@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор наценки</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 15px;
+        }
+
+        .main-layout {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .input-section {
+            flex: 1;
+            min-width: 500px;
+        }
+
+        .results-section {
+            flex: 1;
+            min-width: 500px;
+        }
+
+        .history-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f1f3f4;
+            border-radius: 10px;
+            border-left: 4px solid #6c757d;
+        }
+
+        .history-item {
+            background: white;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #e1e5e9;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .history-item:hover {
+            background: #f8f9fa;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .history-date {
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        .history-summary {
+            font-size: 13px;
+            color: #495057;
+        }
+
+        .history-delete {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .history-delete:hover {
+            background: #c82333;
+        }
+
+        .toggle-history {
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .toggle-history:hover {
+            background: #5a6268;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            padding: 25px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+            font-size: 13px;
+        }
+
+        input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="number"]:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-add {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-add:hover {
+            background: #218838;
+        }
+
+        .btn-remove {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-remove:hover {
+            background: #c82333;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            margin: 20px 0 15px 0;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .export-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 15px 0;
+            display: none;
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .export-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(40, 167, 69, 0.4);
+            background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
+        }
+
+        .export-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .products-list {
+            margin-bottom: 15px;
+        }
+
+        .product-item {
+            display: flex;
+            gap: 10px;
+            align-items: end;
+            margin-bottom: 10px;
+            padding: 12px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e1e5e9;
+        }
+
+        .product-item:first-child .btn-remove {
+            display: none;
+        }
+
+        .result {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .result h3 {
+            color: #333;
+            margin-bottom: 12px;
+            font-size: 18px;
+        }
+
+        .product-result {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e1e5e9;
+        }
+
+        .product-result h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            padding: 4px 0;
+            font-size: 14px;
+        }
+
+        .result-item:last-child {
+            border-top: 2px solid #667eea;
+            padding-top: 10px;
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            color: #667eea;
+        }
+
+        .summary-section {
+            border-top: 3px solid #28a745;
+            border-left-color: #28a745;
+        }
+
+        .summary-section h3 {
+            color: #28a745;
+        }
+
+        .currency {
+            font-weight: 600;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #e1e5e9;">
+            <h1>📊 Калькулятор наценки</h1>
+            <a href="clients.html" class="btn btn-secondary" style="background: #6c757d; color: white; padding: 12px 20px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; text-align: center; transition: all 0.3s ease; margin-right: 10px;">👥 Клиенты</a>
+            <a href="warehouse.html" class="btn btn-secondary" style="background: #6c757d; color: white; padding: 12px 20px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; text-align: center; transition: all 0.3s ease;">📦 Склад</a>
+        </div>
+        
+        <div class="main-layout">
+            <div class="input-section">
+                <form id="calculatorForm">
+            
+            <div class="client-file-section">
+                <h3>👤 Информация о расчете</h3>
+                <div class="form-row">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="clientSelect">Клиент:</label>
+                        <select id="clientSelect" onchange="handleClientSelection()">
+                            <option value="">Выберите клиента</option>
+                            <option value="new">➕ Добавить нового</option>
+                        </select>
+                        <input type="text" id="clientName" placeholder="Введите название клиента" style="display: none; margin-top: 10px;">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="calculationName">Название расчета:</label>
+                        <input type="text" id="calculationName" placeholder="Например: Поставка оборудования">
+                    </div>
+                </div>
+                <div class="file-input">
+                    <label for="attachments">Прикрепить файлы:</label>
+                    <input type="file" id="attachments" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png">
+                    <div id="attachedFiles" class="attached-files"></div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h3>📦 Товары</h3>
+                <div id="productsList" class="products-list">
+                    <div class="product-item">
+                        <div style="flex: 2;">
+                            <label>Название товара:</label>
+                            <input type="text" class="product-name" placeholder="Товар 1">
+                        </div>
+                        <div style="flex: 1;">
+                            <label>Себестоимость (сум):</label>
+                            <input type="number" class="product-cost" step="0.01" min="0" required>
+                        </div>
+                        <div style="flex: 1;">
+                            <label>Пошлина (%):</label>
+                            <input type="number" class="product-duty" step="0.01" min="0" value="0">
+                        </div>
+                        <button type="button" class="btn btn-remove" onclick="removeProduct(this)">❌</button>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-add" onclick="addProduct()">➕ Добавить товар</button>
+            </div>
+
+            <div class="section">
+                <h3>💼 Общие расходы</h3>
+                <div class="form-row">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="brokerPercent">Процент посредника (%):</label>
+                        <input type="number" id="brokerPercent" step="0.01" min="0" value="0">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="transportCost">Транспортные расходы (сум):</label>
+                        <input type="number" id="transportCost" step="0.01" min="0" value="0">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="certificationCost">Сертификация (сум):</label>
+                        <input type="number" id="certificationCost" step="0.01" min="0" value="0">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="customsCost">Расходы на брокера и склад (сум):</label>
+                        <input type="number" id="customsCost" step="0.01" min="0" value="4000000">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="vatPercent">НДС (%):</label>
+                        <input type="number" id="vatPercent" step="0.01" min="0" value="12">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="quattroMargin">Маржа Quattro (%):</label>
+                        <input type="number" id="quattroMargin" step="0.01" min="0" value="30">
+                    </div>
+                </div>
+            </div>
+
+                    <button type="submit" class="calculate-btn">🧮 Рассчитать</button>
+                    <button type="button" class="export-btn" id="exportBtn2" onclick="exportToExcel()" style="display: none;">📊 Экспорт в Excel</button>
+                </form>
+            </div>
+
+            <div class="results-section">
+                <button type="button" class="toggle-history" onclick="toggleHistory()">🗄️ История расчетов</button>
+                
+                <div id="historySection" class="history-section" style="display: none;">
+                    <h3>🗄️ Сохраненные расчеты:</h3>
+                    <div id="historyList"></div>
+                </div>
+                
+                <div id="result" class="result" style="display: none;">
+            <h3>📈 Результаты расчета:</h3>
+            <div id="productsResults"></div>
+            
+            <button type="button" class="export-btn" id="exportBtn" onclick="exportToExcel()">📊 Экспорт в Excel</button>
+                
+            <div class="section summary-section">
+                <h3>📊 Общая сводка:</h3>
+                <div class="result-item">
+                    <span>Общая себестоимость всех товаров:</span>
+                    <span class="currency" id="totalBaseCost">0 сум</span>
+                </div>
+                <div class="result-item">
+                    <span>Общие транспортные расходы:</span>
+                    <span class="currency" id="totalTransport">0 сум</span>
+                </div>
+                <div class="result-item">
+                    <span>Общая комиссия посредника:</span>
+                    <span class="currency" id="totalBroker">0 сум</span>
+                </div>
+                <div class="result-item">
+                    <span>Общая пошлина:</span>
+                    <span class="currency" id="totalDuty">0 сум</span>
+                </div>
+                <div class="result-item">
+                    <span>Общая сертификация:</span>
+                    <span class="currency" id="totalCertification">0 сум</span>
+                </div>
+                <div class="result-item">
+                    <span>Общие расходы на брокера и склад:</span>
+                    <span class="currency" id="totalCustoms">0 сум</span>
+                </div>
+                <div class="result-item">
+                    <span>Общий НДС:</span>
+                    <span class="currency" id="totalVat">0 сум</span>
+                </div>
+                <div class="result-item">
+                    <span>Общая маржа Quattro:</span>
+                    <span class="currency" id="totalQuattro">0 сум</span>
+                </div>
+                <div class="result-item">
+                    <span>ИТОГОВАЯ СТОИМОСТЬ ВСЕХ ТОВАРОВ:</span>
+                    <span class="currency" id="grandTotal">0 сум</span>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let productCount = 1;
+        let clientsDatabase = JSON.parse(localStorage.getItem('clientsDatabase') || '[]');
+
+        // Инициализация списка клиентов
+        function initializeClientSelect() {
+            const clientSelect = document.getElementById('clientSelect');
+            const existingOptions = clientSelect.querySelectorAll('option:not([value=""]):not([value="new"])');
+            existingOptions.forEach(option => option.remove());
+            
+            clientsDatabase.forEach(client => {
+                const option = document.createElement('option');
+                option.value = client;
+                option.textContent = client;
+                clientSelect.insertBefore(option, clientSelect.querySelector('option[value="new"]'));
+            });
+        }
+
+        function handleClientSelection() {
+            const clientSelect = document.getElementById('clientSelect');
+            const clientNameInput = document.getElementById('clientName');
+            
+            if (clientSelect.value === 'new') {
+                clientNameInput.style.display = 'block';
+                clientNameInput.focus();
+            } else {
+                clientNameInput.style.display = 'none';
+                clientNameInput.value = '';
+            }
+        }
+
+        function addNewClient(clientName) {
+            if (clientName && !clientsDatabase.includes(clientName)) {
+                clientsDatabase.push(clientName);
+                localStorage.setItem('clientsDatabase', JSON.stringify(clientsDatabase));
+                initializeClientSelect();
+                
+                // Автоматически выбираем нового клиента
+                document.getElementById('clientSelect').value = clientName;
+                document.getElementById('clientName').style.display = 'none';
+            }
+        }
+
+        function getCurrentClient() {
+            const clientSelect = document.getElementById('clientSelect');
+            const clientNameInput = document.getElementById('clientName');
+            
+            if (clientSelect.value === 'new') {
+                return clientNameInput.value.trim();
+            }
+            return clientSelect.value;
+        }
+        let calculationHistory = JSON.parse(localStorage.getItem('calculationHistory') || '[]');
+
+        // Функции для работы с историей
+        function saveCalculation(calculationData) {
+            const clientName = getCurrentClient();
+            const calculationName = document.getElementById('calculationName').value.trim();
+            
+            if (!clientName) {
+                alert('Пожалуйста, выберите или добавьте клиента');
+                return;
+            }
+            
+            if (!calculationName) {
+                alert('Пожалуйста, укажите название расчета');
+                return;
+            }
+            
+            // Добавляем нового клиента если нужно
+            if (document.getElementById('clientSelect').value === 'new') {
+                addNewClient(clientName);
+            }
+            
+            const calculation = {
+                id: Date.now(),
+                date: new Date().toLocaleString('ru-RU'),
+                client: clientName,
+                calculationName: calculationName,
+                attachments: [...attachedFiles],
+                ...calculationData
+            };
+            
+            calculationHistory.unshift(calculation);
+            
+            // Оставляем только последние 50 расчетов
+            if (calculationHistory.length > 50) {
+                calculationHistory = calculationHistory.slice(0, 50);
+            }
+            
+            localStorage.setItem('calculationHistory', JSON.stringify(calculationHistory));
+            updateHistoryDisplay();
+            
+            alert('Расчет успешно сохранен!');
+        }
+
+        function loadCalculation(calculationId) {
+            const calculation = calculationHistory.find(c => c.id === calculationId);
+            if (!calculation) return;
+
+            // Очищаем текущие товары
+            document.getElementById('productsList').innerHTML = '';
+            productCount = 0;
+
+            // Загружаем параметры
+            document.getElementById('brokerPercent').value = calculation.brokerPercent || 0;
+            document.getElementById('transportCost').value = calculation.transportCost || 0;
+            document.getElementById('certificationCost').value = calculation.certificationCost || 0;
+            document.getElementById('customsCost').value = calculation.customsCost || 0;
+            document.getElementById('vatPercent').value = calculation.vatPercent || 12;
+            document.getElementById('quattroMargin').value = calculation.quattroMargin || 30;
+
+            // Загружаем товары
+            calculation.products.forEach(product => {
+                addProduct();
+                const lastProduct = document.querySelector('#productsList .product-item:last-child');
+                lastProduct.querySelector('.product-name').value = product.name;
+                lastProduct.querySelector('.product-cost').value = product.cost;
+                lastProduct.querySelector('.product-duty').value = product.duty;
+            });
+
+            // Пересчитываем
+            document.getElementById('calculatorForm').dispatchEvent(new Event('submit'));
+        }
+
+        function deleteCalculation(calculationId) {
+            calculationHistory = calculationHistory.filter(c => c.id !== calculationId);
+            localStorage.setItem('calculationHistory', JSON.stringify(calculationHistory));
+            updateHistoryDisplay();
+        }
+
+        function updateHistoryDisplay() {
+            const historyList = document.getElementById('historyList');
+            
+            if (calculationHistory.length === 0) {
+                historyList.innerHTML = '<p style="color: #6c757d; font-style: italic;">Пока нет сохраненных расчетов</p>';
+                return;
+            }
+
+            historyList.innerHTML = calculationHistory.map(calc => {
+                const totalProducts = calc.products.length;
+                const totalAmount = calc.results.reduce((sum, r) => sum + r.finalPrice, 0);
+                
+                return `
+                    <div class="history-item" onclick="loadCalculation(${calc.id})">
+                        <div class="history-item-header">
+                            <span class="history-date">${calc.date}</span>
+                            <button class="history-delete" onclick="event.stopPropagation(); deleteCalculation(${calc.id})">✖</button>
+                        </div>
+                        <div class="history-summary">
+                            📦 ${totalProducts} товар(ов) | 💰 ${totalAmount.toLocaleString('ru-RU', {minimumFractionDigits: 0})} сум
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleHistory() {
+            const historySection = document.getElementById('historySection');
+            const isVisible = historySection.style.display !== 'none';
+            historySection.style.display = isVisible ? 'none' : 'block';
+            
+            if (!isVisible) {
+                updateHistoryDisplay();
+            }
+        }
+
+        function addProduct() {
+            productCount++;
+            const productsList = document.getElementById('productsList');
+            const productItem = document.createElement('div');
+            productItem.className = 'product-item';
+            productItem.innerHTML = `
+                <div style="flex: 2;">
+                    <label>Название товара:</label>
+                    <input type="text" class="product-name" placeholder="Товар ${productCount}">
+                </div>
+                <div style="flex: 1;">
+                    <label>Себестоимость (сум):</label>
+                    <input type="number" class="product-cost" step="0.01" min="0" required>
+                </div>
+                <div style="flex: 1;">
+                    <label>Пошлина (%):</label>
+                    <input type="number" class="product-duty" step="0.01" min="0" value="0">
+                </div>
+                <button type="button" class="btn btn-remove" onclick="removeProduct(this)">❌</button>
+            `;
+            productsList.appendChild(productItem);
+        }
+
+        function removeProduct(button) {
+            button.parentElement.remove();
+        }
+
+        document.getElementById('calculatorForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const products = [];
+            const productItems = document.querySelectorAll('.product-item');
+            
+            productItems.forEach((item, index) => {
+                const name = item.querySelector('.product-name').value || `Товар ${index + 1}`;
+                const cost = parseFloat(item.querySelector('.product-cost').value) || 0;
+                const duty = parseFloat(item.querySelector('.product-duty').value) || 0;
+                products.push({ name, cost, duty });
+            });
+            
+            if (products.length === 0) return;
+            
+            const brokerPercent = parseFloat(document.getElementById('brokerPercent').value) || 0;
+            const transportCost = parseFloat(document.getElementById('transportCost').value) || 0;
+            const certificationCost = parseFloat(document.getElementById('certificationCost').value) || 0;
+            const customsCost = parseFloat(document.getElementById('customsCost').value) || 0;
+            const vatPercent = parseFloat(document.getElementById('vatPercent').value) || 0;
+            const quattroMargin = parseFloat(document.getElementById('quattroMargin').value) || 0;
+            
+            const totalBaseCost = products.reduce((sum, product) => sum + product.cost, 0);
+            
+            const results = products.map(product => {
+                const productShare = product.cost / totalBaseCost;
+                const productTransport = transportCost * productShare;
+                
+                const brokerFee = (product.cost + productTransport) * (brokerPercent / 100);
+                const dutyAmount = (product.cost + productTransport + brokerFee) * (product.duty / 100);
+                const productCertification = certificationCost * productShare;
+                const productCustoms = customsCost * productShare;
+                
+                const productTotalCost = product.cost + productTransport + brokerFee + dutyAmount + productCertification + productCustoms;
+                const vatAmount = productTotalCost * (vatPercent / 100);
+                const costWithVat = productTotalCost + vatAmount;
+                const quattroMarginAmount = costWithVat * (quattroMargin / 100);
+                const finalPrice = costWithVat + quattroMarginAmount;
+                
+                return {
+                    name: product.name,
+                    baseCost: product.cost,
+                    transport: productTransport,
+                    broker: brokerFee,
+                    duty: dutyAmount,
+                    certification: productCertification,
+                    customs: productCustoms,
+                    vat: vatAmount,
+                    quattro: quattroMarginAmount,
+                    totalCost: productTotalCost,
+                    finalPrice: finalPrice
+                };
+            });
+            
+            displayResults(results);
+        });
+
+        function displayResults(results) {
+            const productsResults = document.getElementById('productsResults');
+            productsResults.innerHTML = '';
+            
+            results.forEach(result => {
+                const productResult = document.createElement('div');
+                productResult.className = 'product-result';
+                productResult.innerHTML = `
+                    <h4>📦 ${result.name}</h4>
+                    <div class="result-item">
+                        <span>Себестоимость:</span>
+                        <span class="currency">${result.baseCost.toLocaleString('ru-RU', {minimumFractionDigits: 2})} сум</span>
+                    </div>
+                    <div class="result-item">
+                        <span>Доля транспортных расходов:</span>
+                        <span class="currency">${result.transport.toLocaleString('ru-RU', {minimumFractionDigits: 2})} сум</span>
+                    </div>
+                    <div class="result-item">
+                        <span>Комиссия посредника:</span>
+                        <span class="currency">${result.broker.toLocaleString('ru-RU', {minimumFractionDigits: 2})} сум</span>
+                    </div>
+                    <div class="result-item">
+                        <span>Пошлина:</span>
+                        <span class="currency">${result.duty.toLocaleString('ru-RU', {minimumFractionDigits: 2})} сум</span>
+                    </div>
+                    <div class="result-item">
+                        <span>Доля сертификации:</span>
+                        <span class="currency">${result.certification.toLocaleString('ru-RU', {minimumFractionDigits: 2})} сум</span>
+                    </div>
+                    <div class="result-item">
+                        <span>Доля расходов на брокера и склад:</span>
+                        <span class="currency">${result.customs.toLocaleString('ru-RU', {minimumFractionDigits: 2})} сум</span>
+                    </div>
+                    <div class="result-item">
+                        <span>НДС:</span>
+                        <span class="currency">${result.vat.toLocaleString('ru-RU', {minimumFractionDigits: 2})} сум</span>
+                    </div>
+                    <div class="result-item">
+                        <span>Маржа Quattro:</span>
+                        <span class="currency">${result.quattro.toLocaleString('ru-RU', {minimumFractionDigits: 2})} сум</span>
+                    </div>
+                    <div class="result-item">
+                        <span>ФИНАЛЬНАЯ ЦЕНА:</span>
+                        <span class="currency">${result.finalPrice.toLocaleString('ru-RU', {minimumFractionDigits: 2})} сум</span>
+                    </div>
+                `;
+                productsResults.appendChild(productResult);
+            });
+            
+            const totals = results.reduce((acc, result) => ({
+                baseCost: acc.baseCost + result.baseCost,
+                transport: acc.transport + result.transport,
+                broker: acc.broker + result.broker,
+                duty: acc.duty + result.duty,
+                certification: acc.certification + result.certification,
+                customs: acc.customs + result.customs,
+                vat: acc.vat + result.vat,
+                quattro: acc.quattro + result.quattro,
+                finalPrice: acc.finalPrice + result.finalPrice
+            }), { baseCost: 0, transport: 0, broker: 0, duty: 0, certification: 0, customs: 0, vat: 0, quattro: 0, finalPrice: 0 });
+            
+            document.getElementById('totalBaseCost').textContent = totals.baseCost.toLocaleString('ru-RU', {minimumFractionDigits: 2}) + ' сум';
+            document.getElementById('totalTransport').textContent = totals.transport.toLocaleString('ru-RU', {minimumFractionDigits: 2}) + ' сум';
+            document.getElementById('totalBroker').textContent = totals.broker.toLocaleString('ru-RU', {minimumFractionDigits: 2}) + ' сум';
+            document.getElementById('totalDuty').textContent = totals.duty.toLocaleString('ru-RU', {minimumFractionDigits: 2}) + ' сум';
+            document.getElementById('totalCertification').textContent = totals.certification.toLocaleString('ru-RU', {minimumFractionDigits: 2}) + ' сум';
+            document.getElementById('totalCustoms').textContent = totals.customs.toLocaleString('ru-RU', {minimumFractionDigits: 2}) + ' сум';
+            document.getElementById('totalVat').textContent = totals.vat.toLocaleString('ru-RU', {minimumFractionDigits: 2}) + ' сум';
+            document.getElementById('totalQuattro').textContent = totals.quattro.toLocaleString('ru-RU', {minimumFractionDigits: 2}) + ' сум';
+            document.getElementById('grandTotal').textContent = totals.finalPrice.toLocaleString('ru-RU', {minimumFractionDigits: 2}) + ' сум';
+            
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('exportBtn').style.display = 'block';
+            document.getElementById('exportBtn2').style.display = 'block';
+            
+            // Автоматическое сохранение расчета
+            const calculationData = {
+                products: products,
+                brokerPercent: brokerPercent,
+                transportCost: transportCost,
+                certificationCost: certificationCost,
+                customsCost: customsCost,
+                vatPercent: vatPercent,
+                quattroMargin: quattroMargin,
+                results: results,
+                totals: totals
+            };
+            saveCalculation(calculationData);
+        }
+
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', function() {
+                if (document.getElementById('result').style.display === 'block') {
+                    document.getElementById('calculatorForm').dispatchEvent(new Event('submit'));
+                }
+            });
+        });
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeClientSelect();
+        });
+        
+        // Инициализация сейчас (для случая если DOM уже загружен)
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeClientSelect);
+        } else {
+            initializeClientSelect();
+        }
+    </script>
+</body>
+</html>

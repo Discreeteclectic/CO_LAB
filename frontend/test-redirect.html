@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест перенаправления</title>
+</head>
+<body>
+    <h1>Тест перенаправления</h1>
+    <p>Текущий URL: <span id="currentUrl"></span></p>
+    <p>Данные пользователя: <pre id="userData"></pre></p>
+    <p>Токен: <span id="token"></span></p>
+    
+    <button onclick="testRedirect()">Тест перенаправления на orders.html</button>
+    <button onclick="clearData()">Очистить данные и вернуться к логину</button>
+    
+    <div id="log"></div>
+
+    <script>
+        // Показываем текущие данные
+        document.getElementById('currentUrl').textContent = window.location.href;
+        document.getElementById('userData').textContent = localStorage.getItem('user') || 'Нет данных';
+        document.getElementById('token').textContent = localStorage.getItem('token') || 'Нет токена';
+        
+        function testRedirect() {
+            console.log('Тестируем перенаправление...');
+            document.getElementById('log').innerHTML += '<p>Попытка перехода на orders.html...</p>';
+            window.location.href = 'orders.html';
+        }
+        
+        function clearData() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'simple-login.html';
+        }
+        
+        // Проверяем, работает ли переход
+        console.log('Страница загружена');
+        console.log('localStorage:', {
+            token: localStorage.getItem('token'),
+            user: localStorage.getItem('user')
+        });
+    </script>
+</body>
+</html>

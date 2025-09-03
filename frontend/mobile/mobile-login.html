@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="CO-LAB CRM">
+    <title>Вход - CO-LAB CRM</title>
+    <link rel="stylesheet" href="./mobile-styles.css">
+    <link rel="manifest" href="./manifest.json">
+    <link rel="apple-touch-icon" href="../icons/icon-192x192.png">
+    <style>
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .login-header {
+            text-align: center;
+            padding: 60px 20px 40px;
+            color: white;
+        }
+        
+        .login-logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .login-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0 0 8px;
+        }
+        
+        .login-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            margin: 0;
+        }
+        
+        .login-form-container {
+            flex: 1;
+            background: white;
+            border-radius: 24px 24px 0 0;
+            padding: 32px 24px;
+            min-height: 400px;
+        }
+        
+        .login-form-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0 0 24px;
+            text-align: center;
+        }
+        
+        .login-input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .login-input {
+            width: 100%;
+            padding: 16px 20px 16px 52px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 16px;
+            background: white;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+        
+        .login-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+        
+        .login-input-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 18px;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+        }
+        
+        .login-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
+        }
+        
+        .login-btn:active {
+            transform: translateY(0);
+        }
+        
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .login-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            text-align: center;
+            display: none;
+        }
+        
+        .login-footer {
+            text-align: center;
+            padding: 24px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .forgot-password {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.2s ease;
+        }
+        
+        .forgot-password:hover {
+            opacity: 0.8;
+        }
+        
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: none;
+            margin-right: 8px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .demo-accounts {
+            background: var(--light-gray);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 20px 0;
+        }
+        
+        .demo-accounts h4 {
+            margin: 0 0 12px;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+        
+        .demo-account {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 13px;
+        }
+        
+        .demo-account:last-child {
+            border-bottom: none;
+        }
+        
+        .demo-account-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <div class="login-logo">
+                🏢
+            </div>
+            <h1 class="login-title">CO-LAB CRM</h1>
+            <p class="login-subtitle">Система управления взаимоотношениями с клиентами</p>
+        </div>
+        
+        <div class="login-form-container">
+            <h2 class="login-form-title">Добро пожаловать!</h2>
+            
+            <div class="login-error" id="login-error"></div>
+            
+            <form id="login-form">
+                <div class="login-input-group">
+                    <span class="login-input-icon">📧</span>
+                    <input type="email" id="email" class="login-input" placeholder="Электронная почта" required>
+                </div>
+                
+                <div class="login-input-group">
+                    <span class="login-input-icon">🔒</span>
+                    <input type="password" id="password" class="login-input" placeholder="Пароль" required>
+                </div>
+                
+                <button type="submit" class="login-btn" id="login-btn">
+                    <span class="loading-spinner" id="loading-spinner"></span>
+                    <span id="login-btn-text">Войти в систему</span>
+                </button>
+            </form>
+            
+            <div class="demo-accounts">
+                <h4>🧪 Демо-аккаунты для тестирования:</h4>
+                <div class="demo-account">
+                    <span>Администратор: admin@colab.ru</span>
+                    <button class="demo-account-btn" onclick="fillDemo('admin@colab.ru', 'admin123')">Заполнить</button>
+                </div>
+                <div class="demo-account">
+                    <span>Менеджер: manager@colab.ru</span>
+                    <button class="demo-account-btn" onclick="fillDemo('manager@colab.ru', 'manager123')">Заполнить</button>
+                </div>
+                <div class="demo-account">
+                    <span>Пользователь: user@colab.ru</span>
+                    <button class="demo-account-btn" onclick="fillDemo('user@colab.ru', 'user123')">Заполнить</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="login-footer">
+            <a href="#" class="forgot-password">Забыли пароль?</a>
+            <br><br>
+            <small>© 2024 CO-LAB CRM. Все права защищены.</small>
+        </div>
+    </div>
+
+    <script src="./mobile-app.js"></script>
+    <script>
+        // Login form handling
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('login-error');
+            const loginBtn = document.getElementById('login-btn');
+            const loadingSpinner = document.getElementById('loading-spinner');
+            const btnText = document.getElementById('login-btn-text');
+            
+            // Show loading state
+            loginBtn.disabled = true;
+            loadingSpinner.style.display = 'inline-block';
+            btnText.textContent = 'Выполняется вход...';
+            errorDiv.style.display = 'none';
+            
+            try {
+                const result = await mobileApp.login(email, password);
+                
+                if (result.success) {
+                    btnText.textContent = 'Успешно! Перенаправление...';
+                    loadingSpinner.style.display = 'none';
+                    
+                    // Redirect to dashboard
+                    setTimeout(() => {
+                        window.location.href = './mobile-dashboard.html';
+                    }, 1000);
+                } else {
+                    throw new Error(result.error || 'Ошибка входа');
+                }
+            } catch (error) {
+                // Show error
+                errorDiv.textContent = error.message || 'Произошла ошибка при входе';
+                errorDiv.style.display = 'block';
+                
+                // Reset button
+                loginBtn.disabled = false;
+                loadingSpinner.style.display = 'none';
+                btnText.textContent = 'Войти в систему';
+            }
+        });
+        
+        // Demo account filler
+        function fillDemo(email, password) {
+            document.getElementById('email').value = email;
+            document.getElementById('password').value = password;
+        }
+        
+        // PWA install prompt
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Show install button
+            const installBtn = document.createElement('button');
+            installBtn.className = 'mobile-btn mobile-btn-outline';
+            installBtn.style.margin = '16px 0 0';
+            installBtn.innerHTML = '📱 Установить приложение';
+            installBtn.onclick = async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    deferredPrompt = null;
+                    installBtn.remove();
+                }
+            };
+            
+            document.querySelector('.login-form-container').appendChild(installBtn);
+        });
+        
+        // Auto-focus first input on desktop
+        if (!mobileApp.isMobile()) {
+            document.getElementById('email').focus();
+        }
+        
+        // Handle keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && e.target.matches('input')) {
+                const inputs = Array.from(document.querySelectorAll('input'));
+                const currentIndex = inputs.indexOf(e.target);
+                const nextInput = inputs[currentIndex + 1];
+                
+                if (nextInput) {
+                    nextInput.focus();
+                } else {
+                    document.getElementById('login-form').dispatchEvent(new Event('submit'));
+                }
+            }
+        });
+    </script>
+</body>
+</html>

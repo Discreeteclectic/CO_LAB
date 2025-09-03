@@ -1,0 +1,2428 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Рабочее место менеджера - CO_LAB CRM</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 100%;
+            min-height: 100vh;
+            background: white;
+            box-sizing: border-box;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        /* Header Styles */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            border-bottom: 2px solid #e1e5e9;
+            background: white;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .header-title {
+            color: #333;
+            font-size: 24px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .notification-bell {
+            position: relative;
+            cursor: pointer;
+            background: #f8f9fa;
+            border: 1px solid #e1e5e9;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .notification-bell:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .notification-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-left: 20px;
+            position: relative;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            padding: 10px 0;
+            min-width: 200px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .user-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .user-dropdown::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            right: 12px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 8px solid white;
+        }
+
+        .dropdown-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 5px;
+        }
+
+        .user-name {
+            color: #333;
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .user-role {
+            color: #667eea;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .user-email {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #333;
+            text-decoration: none;
+            transition: background-color 0.2s;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            gap: 10px;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .dropdown-item.logout {
+            color: #dc3545;
+            border-top: 1px solid #eee;
+            margin-top: 5px;
+        }
+
+        .dropdown-item.logout:hover {
+            background-color: #fff5f5;
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+
+        /* Dashboard Overview */
+        .welcome-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .welcome-message {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .welcome-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .metric-icon {
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+
+        .metric-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .metric-label {
+            color: #6c757d;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .metric-change {
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .metric-change.positive {
+            color: #28a745;
+        }
+
+        .metric-change.negative {
+            color: #dc3545;
+        }
+
+        /* Performance Summary */
+        .performance-summary {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+
+        .performance-summary h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .performance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .performance-item {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .performance-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .performance-desc {
+            color: #6c757d;
+            font-size: 13px;
+        }
+
+        /* Tabbed Interface */
+        .main-tabs {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .tab-header {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e1e5e9;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 20px;
+            background: none;
+            border: none;
+            font-size: 16px;
+            font-weight: 500;
+            color: #6c757d;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .tab-button.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .tab-button:hover:not(.active) {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .tab-content {
+            padding: 30px;
+            min-height: 500px;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        /* Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .data-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .data-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Search and Filter Controls */
+        .controls-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            min-width: 300px;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .filter-select {
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+        }
+
+        /* Status Indicators */
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-high {
+            background: #fee;
+            color: #dc3545;
+        }
+
+        .status-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-low {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Priority Indicators */
+        .priority-high {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .priority-medium {
+            color: #ffc107;
+            font-weight: bold;
+        }
+
+        .priority-low {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        /* Right Sidebar */
+        .main-content {
+            display: flex;
+            gap: 30px;
+        }
+
+        .content-area {
+            flex: 1;
+        }
+
+        .sidebar {
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .sidebar-widget {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .sidebar-widget h4 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .quick-action {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            color: #333;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid #eee;
+        }
+
+        .quick-action:last-child {
+            border-bottom: none;
+        }
+
+        .quick-action:hover {
+            color: #667eea;
+            padding-left: 10px;
+        }
+
+        .quick-action-icon {
+            margin-right: 12px;
+            width: 16px;
+        }
+
+        .activity-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-time {
+            color: #6c757d;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .activity-desc {
+            color: #333;
+            font-size: 14px;
+        }
+
+        .reminder-item {
+            padding: 12px;
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .reminder-time {
+            color: #856404;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .reminder-desc {
+            color: #856404;
+            font-size: 14px;
+        }
+
+        .system-status {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .system-status:last-child {
+            border-bottom: none;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .status-online {
+            background: #28a745;
+        }
+
+        .status-warning {
+            background: #ffc107;
+        }
+
+        .status-offline {
+            background: #dc3545;
+        }
+
+        /* Loading States */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(102, 126, 234, 0.3);
+            border-radius: 50%;
+            border-top-color: #667eea;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+            z-index: 10;
+        }
+
+        /* Messages */
+        .message {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .message-error {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c33;
+        }
+
+        .message-success {
+            background: #efe;
+            border: 1px solid #cfc;
+            color: #3c3;
+        }
+
+        .message-info {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            color: #0c5460;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .pagination-info {
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pagination-controls button {
+            padding: 8px 12px;
+            border: 1px solid #e1e5e9;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .pagination-controls button:hover:not(:disabled) {
+            background: #f8f9fa;
+            transform: translateY(-1px);
+        }
+
+        .pagination-controls button.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .pagination-controls button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+
+            .header-left, .header-right {
+                justify-content: space-between;
+            }
+
+            .nav-buttons {
+                flex-wrap: wrap;
+            }
+
+            .btn {
+                padding: 10px 15px;
+                font-size: 13px;
+            }
+
+            .main-content {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+
+            .metrics-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+
+            .tab-header {
+                flex-wrap: wrap;
+            }
+
+            .tab-button {
+                min-width: 150px;
+            }
+
+            .search-input {
+                min-width: 200px;
+            }
+
+            .controls-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-controls {
+                justify-content: center;
+            }
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e1e5e9;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .close:hover {
+            color: #333;
+            background: #f8f9fa;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input[type="text"], input[type="email"], input[type="tel"], 
+        select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Auto-refresh indicator */
+        .refresh-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #667eea;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 25px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+        }
+
+        .refresh-indicator.hidden {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state-title {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #495057;
+        }
+
+        .empty-state-desc {
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        /* Chart container placeholder */
+        .chart-container {
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            color: #6c757d;
+            margin: 20px 0;
+        }
+
+        .chart-placeholder {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        /* Badge styles */
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 12px;
+            text-transform: uppercase;
+        }
+
+        .badge-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .badge-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .badge-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .badge-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        /* Action buttons */
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .action-btn {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+        }
+    </style>
+    <!-- Chart.js for analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <div class="header-title">
+                    👨‍💼 Рабочее место менеджера
+                </div>
+            </div>
+            <div class="header-right">
+                <!-- Quick Access Menu -->
+                <div class="nav-buttons">
+                    <a href="clients.html" class="btn btn-secondary btn-sm">👥 Клиенты</a>
+                    <a href="orders.html" class="btn btn-secondary btn-sm">📋 Заявки</a>
+                </div>
+                
+                <!-- Notification Bell -->
+                <div class="notification-bell" onclick="showNotifications()" id="notificationBell">
+                    🔔
+                    <span class="notification-count" id="notificationCount">0</span>
+                </div>
+                
+                <!-- User Info -->
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar" onclick="toggleUserDropdown()">
+                        М
+                    </div>
+                    <div class="user-dropdown" id="userDropdown">
+                        <div class="dropdown-header">
+                            <div class="user-name" id="userName">Менеджер</div>
+                            <div class="user-role">Менеджер</div>
+                            <div class="user-email" id="userEmail">manager@example.com</div>
+                        </div>
+                        <a href="#" class="dropdown-item" onclick="showProfile()">
+                            👤 Профиль
+                        </a>
+                        <a href="#" class="dropdown-item" onclick="showSettings()">
+                            ⚙️ Настройки
+                        </a>
+                        <button class="dropdown-item logout" onclick="logout()">
+                            🚪 Выйти из системы
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+            <div class="welcome-message" id="welcomeMessage">Добро пожаловать, Менеджер!</div>
+            <div class="welcome-subtitle">Управляйте клиентами и диалогами эффективно</div>
+        </div>
+
+        <!-- Key Metrics -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-icon">👥</div>
+                <div class="metric-number" id="totalClientsMetric">-</div>
+                <div class="metric-label">Всего клиентов</div>
+                <div class="metric-change positive" id="clientsChange">+5% за месяц</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon">💬</div>
+                <div class="metric-number" id="activeDialoguesMetric">-</div>
+                <div class="metric-label">Активные диалоги</div>
+                <div class="metric-change positive" id="dialoguesChange">+12% за неделю</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon">📋</div>
+                <div class="metric-number" id="recentOrdersMetric">-</div>
+                <div class="metric-label">Заявки за месяц</div>
+                <div class="metric-change negative" id="ordersChange">-2% за месяц</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon">✉️</div>
+                <div class="metric-number" id="unreadMessagesMetric">-</div>
+                <div class="metric-label">Непрочитанные</div>
+                <div class="metric-change" id="messagesChange">Требует внимания</div>
+            </div>
+        </div>
+
+        <!-- Performance Summary -->
+        <div class="performance-summary">
+            <h3>📊 Показатели за последние 30 дней</h3>
+            <div class="performance-grid">
+                <div class="performance-item">
+                    <div class="performance-value" id="responseTimeValue">2.3 ч</div>
+                    <div class="performance-desc">Среднее время ответа</div>
+                </div>
+                <div class="performance-item">
+                    <div class="performance-value" id="satisfactionValue">94%</div>
+                    <div class="performance-desc">Удовлетворенность клиентов</div>
+                </div>
+                <div class="performance-item">
+                    <div class="performance-value" id="conversionValue">23%</div>
+                    <div class="performance-desc">Конверсия в заказы</div>
+                </div>
+                <div class="performance-item">
+                    <div class="performance-value" id="revenueValue">₽2.1M</div>
+                    <div class="performance-desc">Общий оборот</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <div class="content-area">
+                <!-- Tabbed Interface -->
+                <div class="main-tabs">
+                    <div class="tab-header">
+                        <button class="tab-button active" onclick="showTab('clients')" id="tabClients">
+                            👥 Назначенные клиенты
+                        </button>
+                        <button class="tab-button" onclick="showTab('dialogues')" id="tabDialogues">
+                            💬 Активные диалоги
+                        </button>
+                        <button class="tab-button" onclick="showTab('notifications')" id="tabNotifications">
+                            🔔 Уведомления
+                        </button>
+                        <button class="tab-button" onclick="showTab('analytics')" id="tabAnalytics">
+                            📈 Аналитика
+                        </button>
+                    </div>
+
+                    <!-- Tab: Assigned Clients -->
+                    <div id="clientsTab" class="tab-content">
+                        <div class="tab-pane active">
+                            <div class="controls-section">
+                                <div class="search-controls">
+                                    <input type="text" class="search-input" id="clientsSearch" placeholder="🔍 Поиск клиентов..." onkeyup="searchClients()">
+                                    <select class="filter-select" id="clientsFilter" onchange="filterClients()">
+                                        <option value="all">Все клиенты</option>
+                                        <option value="active">Активные</option>
+                                        <option value="inactive">Неактивные</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <button class="btn btn-success" onclick="showAssignClientModal()">
+                                        ➕ Назначить клиента
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="table-container" style="position: relative;">
+                                <div id="clientsLoadingOverlay" class="loading-overlay" style="display: none;">
+                                    <div>
+                                        <div class="loading"></div>
+                                        <span>Загрузка клиентов...</span>
+                                    </div>
+                                </div>
+
+                                <table class="data-table" id="clientsTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Клиент</th>
+                                            <th>Контактная информация</th>
+                                            <th>Статус</th>
+                                            <th>Последний диалог</th>
+                                            <th>Заказы</th>
+                                            <th>Выручка</th>
+                                            <th>Действия</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="clientsTableBody">
+                                        <!-- Client data will be loaded here -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div id="clientsPagination" class="pagination"></div>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Active Dialogues -->
+                    <div id="dialoguesTab" class="tab-content">
+                        <div class="tab-pane">
+                            <div class="controls-section">
+                                <div class="search-controls">
+                                    <input type="text" class="search-input" id="dialoguesSearch" placeholder="🔍 Поиск диалогов..." onkeyup="searchDialogues()">
+                                    <select class="filter-select" id="dialoguesFilter" onchange="filterDialogues()">
+                                        <option value="all">Все диалоги</option>
+                                        <option value="unread">Непрочитанные</option>
+                                        <option value="high">Высокий приоритет</option>
+                                        <option value="pending">Ожидает ответа</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <button class="btn btn-primary" onclick="createNewDialogue()">
+                                        💬 Новый диалог
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="table-container" style="position: relative;">
+                                <div id="dialoguesLoadingOverlay" class="loading-overlay" style="display: none;">
+                                    <div>
+                                        <div class="loading"></div>
+                                        <span>Загрузка диалогов...</span>
+                                    </div>
+                                </div>
+
+                                <table class="data-table" id="dialoguesTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Клиент</th>
+                                            <th>Тема</th>
+                                            <th>Приоритет</th>
+                                            <th>Последнее сообщение</th>
+                                            <th>Непрочитанные</th>
+                                            <th>Время</th>
+                                            <th>Действия</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="dialoguesTableBody">
+                                        <!-- Dialogues data will be loaded here -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div id="dialoguesPagination" class="pagination"></div>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Notifications -->
+                    <div id="notificationsTab" class="tab-content">
+                        <div class="tab-pane">
+                            <div class="controls-section">
+                                <div class="search-controls">
+                                    <select class="filter-select" id="notificationsFilter" onchange="filterNotifications()">
+                                        <option value="all">Все уведомления</option>
+                                        <option value="unread">Непрочитанные</option>
+                                        <option value="MESSAGE">Сообщения</option>
+                                        <option value="REMINDER">Напоминания</option>
+                                        <option value="ALERT">Оповещения</option>
+                                        <option value="SYSTEM">Системные</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <button class="btn btn-outline" onclick="markAllNotificationsRead()">
+                                        ✓ Отметить все прочитанными
+                                    </button>
+                                    <button class="btn btn-danger" onclick="clearAllNotifications()">
+                                        🗑️ Очистить все
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="notifications-container" id="notificationsContainer">
+                                <!-- Notifications will be loaded here -->
+                            </div>
+
+                            <div id="notificationsPagination" class="pagination"></div>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Analytics -->
+                    <div id="analyticsTab" class="tab-content">
+                        <div class="tab-pane">
+                            <div class="controls-section">
+                                <div class="search-controls">
+                                    <select class="filter-select" id="analyticsPeriod" onchange="updateAnalytics()">
+                                        <option value="7">Последние 7 дней</option>
+                                        <option value="30" selected>Последние 30 дней</option>
+                                        <option value="90">Последние 3 месяца</option>
+                                        <option value="365">Последний год</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <button class="btn btn-primary" onclick="exportAnalytics()">
+                                        📊 Экспорт отчета
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Charts Section -->
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                                <div class="sidebar-widget">
+                                    <h4>📈 Клиенты по месяцам</h4>
+                                    <div class="chart-container">
+                                        <canvas id="clientsChart" width="400" height="200"></canvas>
+                                    </div>
+                                </div>
+                                <div class="sidebar-widget">
+                                    <h4>💬 Активность диалогов</h4>
+                                    <div class="chart-container">
+                                        <canvas id="dialoguesChart" width="400" height="200"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Analytics Cards -->
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                                <div class="sidebar-widget">
+                                    <h4>📊 Статистика клиентов</h4>
+                                    <div class="performance-item">
+                                        <div class="performance-value" id="clientAcquisitionRate">12</div>
+                                        <div class="performance-desc">Новых клиентов в месяц</div>
+                                    </div>
+                                    <div class="performance-item">
+                                        <div class="performance-value" id="clientRetentionRate">87%</div>
+                                        <div class="performance-desc">Удержание клиентов</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="sidebar-widget">
+                                    <h4>💰 Показатели заказов</h4>
+                                    <div class="performance-item">
+                                        <div class="performance-value" id="avgOrderValue">₽45,250</div>
+                                        <div class="performance-desc">Средний чек</div>
+                                    </div>
+                                    <div class="performance-item">
+                                        <div class="performance-value" id="ordersGrowth">+15%</div>
+                                        <div class="performance-desc">Рост заказов</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="sidebar-widget">
+                                    <h4>⏱️ Время ответа</h4>
+                                    <div class="performance-item">
+                                        <div class="performance-value" id="avgResponseTime">1.4 ч</div>
+                                        <div class="performance-desc">Среднее время</div>
+                                    </div>
+                                    <div class="performance-item">
+                                        <div class="performance-value" id="responseTimeImprovement">-23%</div>
+                                        <div class="performance-desc">Улучшение за месяц</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Sidebar -->
+            <div class="sidebar">
+                <!-- Quick Actions -->
+                <div class="sidebar-widget">
+                    <h4>⚡ Быстрые действия</h4>
+                    <a href="#" class="quick-action" onclick="createNewDialogue()">
+                        <span class="quick-action-icon">💬</span>
+                        Создать диалог
+                    </a>
+                    <a href="#" class="quick-action" onclick="showAssignClientModal()">
+                        <span class="quick-action-icon">👥</span>
+                        Назначить клиента
+                    </a>
+                    <a href="#" class="quick-action" onclick="createReminder()">
+                        <span class="quick-action-icon">⏰</span>
+                        Добавить напоминание
+                    </a>
+                    <a href="#" class="quick-action" onclick="exportAnalytics()">
+                        <span class="quick-action-icon">📊</span>
+                        Экспорт отчета
+                    </a>
+                    <a href="#" class="quick-action" onclick="showSettings()">
+                        <span class="quick-action-icon">⚙️</span>
+                        Настройки
+                    </a>
+                </div>
+
+                <!-- Recent Activities -->
+                <div class="sidebar-widget">
+                    <h4>📝 Последние действия</h4>
+                    <div id="recentActivities">
+                        <!-- Activities will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Important Reminders -->
+                <div class="sidebar-widget">
+                    <h4>⏰ Важные напоминания</h4>
+                    <div id="importantReminders">
+                        <!-- Reminders will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- System Status -->
+                <div class="sidebar-widget">
+                    <h4>🖥️ Статус системы</h4>
+                    <div class="system-status">
+                        <div style="display: flex; align-items: center;">
+                            <div class="status-indicator status-online"></div>
+                            CRM Система
+                        </div>
+                        <span style="font-size: 12px; color: #28a745;">Онлайн</span>
+                    </div>
+                    <div class="system-status">
+                        <div style="display: flex; align-items: center;">
+                            <div class="status-indicator status-online"></div>
+                            Telegram Bot
+                        </div>
+                        <span style="font-size: 12px; color: #28a745;">Активен</span>
+                    </div>
+                    <div class="system-status">
+                        <div style="display: flex; align-items: center;">
+                            <div class="status-indicator status-warning"></div>
+                            Резервное копирование
+                        </div>
+                        <span style="font-size: 12px; color: #ffc107;">2 ч назад</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auto-refresh indicator -->
+    <div class="refresh-indicator hidden" id="refreshIndicator">
+        <div class="loading" style="width: 14px; height: 14px; border-width: 2px;"></div>
+        Обновление данных...
+    </div>
+
+    <!-- Quick Reply Modal -->
+    <div id="quickReplyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>💬 Быстрый ответ</h3>
+                <span class="close" onclick="closeQuickReplyModal()">&times;</span>
+            </div>
+            <div class="form-group">
+                <label>Клиент:</label>
+                <div id="replyClientInfo" style="padding: 10px; background: #f8f9fa; border-radius: 5px; margin-bottom: 15px;"></div>
+            </div>
+            <div class="form-group">
+                <label for="replyMessage">Сообщение:</label>
+                <textarea id="replyMessage" placeholder="Введите ваш ответ..."></textarea>
+            </div>
+            <div style="text-align: right; margin-top: 20px;">
+                <button type="button" class="btn btn-secondary" onclick="closeQuickReplyModal()" style="margin-right: 10px;">Отмена</button>
+                <button type="button" class="btn btn-primary" onclick="sendQuickReply()">Отправить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assign Client Modal -->
+    <div id="assignClientModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>👥 Назначить клиента</h3>
+                <span class="close" onclick="closeAssignClientModal()">&times;</span>
+            </div>
+            <div class="form-group">
+                <label for="clientSelect">Выберите клиента:</label>
+                <select id="clientSelect" style="width: 100%;">
+                    <option value="">Загрузка клиентов...</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="assignmentNotes">Примечания (необязательно):</label>
+                <textarea id="assignmentNotes" placeholder="Дополнительная информация о назначении..."></textarea>
+            </div>
+            <div style="text-align: right; margin-top: 20px;">
+                <button type="button" class="btn btn-secondary" onclick="closeAssignClientModal()" style="margin-right: 10px;">Отмена</button>
+                <button type="button" class="btn btn-success" onclick="assignClient()">Назначить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Reminder Modal -->
+    <div id="reminderModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>⏰ Создать напоминание</h3>
+                <span class="close" onclick="closeReminderModal()">&times;</span>
+            </div>
+            <div class="form-group">
+                <label for="reminderTitle">Заголовок:</label>
+                <input type="text" id="reminderTitle" placeholder="Название напоминания">
+            </div>
+            <div class="form-group">
+                <label for="reminderDescription">Описание:</label>
+                <textarea id="reminderDescription" placeholder="Подробное описание..."></textarea>
+            </div>
+            <div class="form-row">
+                <div class="form-group" style="flex: 1;">
+                    <label for="reminderDate">Дата:</label>
+                    <input type="date" id="reminderDate">
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label for="reminderTime">Время:</label>
+                    <input type="time" id="reminderTime">
+                </div>
+            </div>
+            <div style="text-align: right; margin-top: 20px;">
+                <button type="button" class="btn btn-secondary" onclick="closeReminderModal()" style="margin-right: 10px;">Отмена</button>
+                <button type="button" class="btn btn-warning" onclick="createReminderAction()">Создать</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        // Global variables
+        let currentUser = null;
+        let autoRefreshInterval = null;
+        let currentTab = 'clients';
+        let currentQuickReplyId = null;
+
+        // Data storage
+        let assignedClients = [];
+        let activeDialogues = [];
+        let notifications = [];
+        let dashboardMetrics = {};
+
+        // Pagination states
+        let clientsPage = 1;
+        let dialoguesPage = 1;
+        let notificationsPage = 1;
+        const itemsPerPage = 10;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!requireManagerAuth()) return;
+            
+            initializeUserInfo();
+            loadDashboardData();
+            startAutoRefresh();
+            initializeCharts();
+        });
+
+        // Authentication check for managers only
+        function requireManagerAuth() {
+            if (!APIHelpers.isAuthenticated()) {
+                window.location.href = 'login.html';
+                return false;
+            }
+
+            const user = APIHelpers.getCurrentUser();
+            if (!user || user.role !== 'MANAGER') {
+                alert('Доступ запрещен. Требуются права менеджера.');
+                window.location.href = 'login.html';
+                return false;
+            }
+
+            currentUser = user;
+            return true;
+        }
+
+        // Initialize user information
+        function initializeUserInfo() {
+            if (currentUser) {
+                document.getElementById('userName').textContent = currentUser.name;
+                document.getElementById('userEmail').textContent = currentUser.email;
+                document.getElementById('welcomeMessage').textContent = `Добро пожаловать, ${currentUser.name}!`;
+                
+                // Set avatar - first letter of name
+                const firstLetter = currentUser.name.charAt(0).toUpperCase();
+                document.getElementById('userAvatar').textContent = firstLetter;
+            }
+        }
+
+        // Load all dashboard data
+        async function loadDashboardData() {
+            await Promise.all([
+                loadDashboardMetrics(),
+                loadAssignedClients(),
+                loadActiveDialogues(),
+                loadNotifications(),
+                loadRecentActivities(),
+                loadReminders()
+            ]);
+        }
+
+        // Load dashboard metrics
+        async function loadDashboardMetrics() {
+            try {
+                // This would typically be an API call to get manager-specific metrics
+                // For now, we'll simulate the data
+                const metrics = {
+                    totalClients: 45,
+                    activeDialogues: 12,
+                    recentOrders: 28,
+                    unreadMessages: 7
+                };
+
+                document.getElementById('totalClientsMetric').textContent = metrics.totalClients;
+                document.getElementById('activeDialoguesMetric').textContent = metrics.activeDialogues;
+                document.getElementById('recentOrdersMetric').textContent = metrics.recentOrders;
+                document.getElementById('unreadMessagesMetric').textContent = metrics.unreadMessages;
+                document.getElementById('notificationCount').textContent = metrics.unreadMessages;
+
+                dashboardMetrics = metrics;
+            } catch (error) {
+                console.error('Error loading dashboard metrics:', error);
+            }
+        }
+
+        // Load assigned clients
+        async function loadAssignedClients() {
+            try {
+                showLoading('clientsLoadingOverlay');
+                
+                // Simulate API call for assigned clients
+                // In real implementation, this would be: await API.getManagerClients(currentUser.id, { page: clientsPage, limit: itemsPerPage });
+                const response = await API.getClients({ page: clientsPage, limit: itemsPerPage });
+                
+                assignedClients = response.clients || [];
+                displayAssignedClients(assignedClients);
+                
+                hideLoading('clientsLoadingOverlay');
+            } catch (error) {
+                console.error('Error loading assigned clients:', error);
+                showError('clientsTableBody', 'Ошибка загрузки клиентов');
+                hideLoading('clientsLoadingOverlay');
+            }
+        }
+
+        // Display assigned clients
+        function displayAssignedClients(clients) {
+            const tableBody = document.getElementById('clientsTableBody');
+            
+            if (clients.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            <div class="empty-state-icon">👥</div>
+                            <div class="empty-state-title">Нет назначенных клиентов</div>
+                            <div class="empty-state-desc">Назначьте клиентов для работы с ними</div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tableBody.innerHTML = clients.map(client => {
+                const status = Math.random() > 0.5 ? 'active' : 'inactive';
+                const lastDialogue = `${Math.floor(Math.random() * 7) + 1} дней назад`;
+                const orders = Math.floor(Math.random() * 20);
+                const revenue = (Math.random() * 500000).toFixed(0);
+
+                return `
+                    <tr>
+                        <td>
+                            <strong>${client.name}</strong>
+                            ${client.code ? `<br><small style="color: #6c757d;">Код: ${client.code}</small>` : ''}
+                        </td>
+                        <td>
+                            ${client.phone ? `📞 ${client.phone}<br>` : ''}
+                            ${client.email ? `📧 ${client.email}<br>` : ''}
+                            ${client.telegram ? `💬 ${client.telegram}` : ''}
+                        </td>
+                        <td>
+                            <span class="status-badge ${status === 'active' ? 'status-active' : 'status-inactive'}">
+                                ${status === 'active' ? 'Активен' : 'Неактивен'}
+                            </span>
+                        </td>
+                        <td>${lastDialogue}</td>
+                        <td><span class="badge badge-primary">${orders}</span></td>
+                        <td>₽${parseInt(revenue).toLocaleString()}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn btn-primary" onclick="startDialogue('${client.id}')" title="Создать диалог">
+                                    💬
+                                </button>
+                                <button class="action-btn btn-warning" onclick="viewClient('${client.id}')" title="Просмотр">
+                                    👁️
+                                </button>
+                                <button class="action-btn btn-danger" onclick="unassignClient('${client.id}')" title="Отменить назначение">
+                                    ❌
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Load active dialogues
+        async function loadActiveDialogues() {
+            try {
+                showLoading('dialoguesLoadingOverlay');
+                
+                // Simulate API call for active dialogues
+                // In real implementation: await API.getManagerDialogues(currentUser.id, { page: dialoguesPage, limit: itemsPerPage });
+                const mockDialogues = [
+                    {
+                        id: 1,
+                        client: 'ООО "Технология"',
+                        subject: 'Уточнение по заказу #1234',
+                        priority: 'high',
+                        lastMessage: 'Когда будет готов заказ?',
+                        unreadCount: 3,
+                        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000)
+                    },
+                    {
+                        id: 2,
+                        client: 'ИП Иванов',
+                        subject: 'Новая заявка на расчет',
+                        priority: 'medium',
+                        lastMessage: 'Прикрепляю техническое задание',
+                        unreadCount: 1,
+                        timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000)
+                    },
+                    {
+                        id: 3,
+                        client: 'ЗАО "Стройинвест"',
+                        subject: 'Вопрос по оплате',
+                        priority: 'low',
+                        lastMessage: 'Счет получили, оплатим завтра',
+                        unreadCount: 0,
+                        timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000)
+                    }
+                ];
+                
+                activeDialogues = mockDialogues;
+                displayActiveDialogues(activeDialogues);
+                
+                hideLoading('dialoguesLoadingOverlay');
+            } catch (error) {
+                console.error('Error loading active dialogues:', error);
+                showError('dialoguesTableBody', 'Ошибка загрузки диалогов');
+                hideLoading('dialoguesLoadingOverlay');
+            }
+        }
+
+        // Display active dialogues
+        function displayActiveDialogues(dialogues) {
+            const tableBody = document.getElementById('dialoguesTableBody');
+            
+            if (dialogues.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            <div class="empty-state-icon">💬</div>
+                            <div class="empty-state-title">Нет активных диалогов</div>
+                            <div class="empty-state-desc">Диалоги появятся, когда клиенты начнут общение</div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tableBody.innerHTML = dialogues.map(dialogue => {
+                const priorityClass = `priority-${dialogue.priority}`;
+                const priorityText = {
+                    high: 'Высокий',
+                    medium: 'Средний',
+                    low: 'Низкий'
+                }[dialogue.priority];
+
+                return `
+                    <tr>
+                        <td><strong>${dialogue.client}</strong></td>
+                        <td>${dialogue.subject}</td>
+                        <td><span class="${priorityClass}">⚡ ${priorityText}</span></td>
+                        <td>
+                            ${dialogue.lastMessage}
+                            <br><small style="color: #6c757d;">ID: ${dialogue.id}</small>
+                        </td>
+                        <td>
+                            ${dialogue.unreadCount > 0 ? 
+                                `<span class="badge badge-danger">${dialogue.unreadCount}</span>` : 
+                                '<span class="badge badge-success">0</span>'
+                            }
+                        </td>
+                        <td>${APIHelpers.formatDateTime(dialogue.timestamp)}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn btn-primary" onclick="openQuickReply(${dialogue.id})" title="Быстрый ответ">
+                                    ↩️
+                                </button>
+                                <button class="action-btn btn-success" onclick="openDialogue(${dialogue.id})" title="Открыть диалог">
+                                    📱
+                                </button>
+                                <button class="action-btn btn-warning" onclick="setPriority(${dialogue.id})" title="Изменить приоритет">
+                                    ⚡
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Load notifications
+        async function loadNotifications() {
+            try {
+                // Simulate API call for notifications
+                const mockNotifications = [
+                    {
+                        id: 1,
+                        type: 'MESSAGE',
+                        title: 'Новое сообщение от ООО "Технология"',
+                        message: 'Поступило новое сообщение по заказу #1234',
+                        timestamp: new Date(Date.now() - 30 * 60 * 1000),
+                        read: false
+                    },
+                    {
+                        id: 2,
+                        type: 'REMINDER',
+                        title: 'Напоминание о звонке',
+                        message: 'Не забудьте позвонить клиенту ИП Петров в 15:00',
+                        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
+                        read: false
+                    },
+                    {
+                        id: 3,
+                        type: 'ALERT',
+                        title: 'Просроченный заказ',
+                        message: 'Заказ #1230 просрочен на 2 дня',
+                        timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000),
+                        read: true
+                    },
+                    {
+                        id: 4,
+                        type: 'SYSTEM',
+                        title: 'Обновление системы',
+                        message: 'Запланировано обновление системы на 22:00',
+                        timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000),
+                        read: true
+                    }
+                ];
+                
+                notifications = mockNotifications;
+                displayNotifications(notifications);
+            } catch (error) {
+                console.error('Error loading notifications:', error);
+            }
+        }
+
+        // Display notifications
+        function displayNotifications(notifs) {
+            const container = document.getElementById('notificationsContainer');
+            
+            if (notifs.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔔</div>
+                        <div class="empty-state-title">Нет уведомлений</div>
+                        <div class="empty-state-desc">Уведомления появятся здесь</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = notifs.map(notification => {
+                const typeIcons = {
+                    MESSAGE: '💬',
+                    REMINDER: '⏰',
+                    ALERT: '⚠️',
+                    SYSTEM: '🖥️'
+                };
+
+                const typeColors = {
+                    MESSAGE: '#667eea',
+                    REMINDER: '#ffc107',
+                    ALERT: '#dc3545',
+                    SYSTEM: '#6c757d'
+                };
+
+                return `
+                    <div class="notification-item" style="
+                        padding: 15px;
+                        margin-bottom: 10px;
+                        border-radius: 10px;
+                        border-left: 4px solid ${typeColors[notification.type]};
+                        background: ${notification.read ? '#f8f9fa' : '#fff'};
+                        opacity: ${notification.read ? '0.7' : '1'};
+                    ">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div style="flex: 1;">
+                                <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                                    <span style="margin-right: 10px; font-size: 18px;">${typeIcons[notification.type]}</span>
+                                    <strong>${notification.title}</strong>
+                                    ${!notification.read ? '<span class="badge badge-primary" style="margin-left: 10px;">Новое</span>' : ''}
+                                </div>
+                                <div style="color: #333; margin-bottom: 10px;">${notification.message}</div>
+                                <div style="color: #6c757d; font-size: 12px;">
+                                    ${APIHelpers.formatDateTime(notification.timestamp)}
+                                </div>
+                            </div>
+                            <div class="action-buttons">
+                                ${!notification.read ? 
+                                    `<button class="action-btn btn-success" onclick="markNotificationRead(${notification.id})" title="Отметить прочитанным">✓</button>` : ''
+                                }
+                                <button class="action-btn btn-danger" onclick="deleteNotification(${notification.id})" title="Удалить">🗑️</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Load recent activities
+        function loadRecentActivities() {
+            const activities = [
+                {
+                    time: 'Сейчас',
+                    description: 'Ответил на сообщение от ООО "Технология"'
+                },
+                {
+                    time: '2 часа назад',
+                    description: 'Создал новый диалог с ИП Петров'
+                },
+                {
+                    time: '5 часов назад',
+                    description: 'Назначил клиента ЗАО "Стройинвест"'
+                },
+                {
+                    time: 'Вчера',
+                    description: 'Экспортировал отчет по продажам'
+                }
+            ];
+
+            const container = document.getElementById('recentActivities');
+            container.innerHTML = activities.map(activity => `
+                <div class="activity-item">
+                    <div class="activity-time">${activity.time}</div>
+                    <div class="activity-desc">${activity.description}</div>
+                </div>
+            `).join('');
+        }
+
+        // Load reminders
+        function loadReminders() {
+            const reminders = [
+                {
+                    time: 'Сегодня 15:00',
+                    description: 'Позвонить ООО "Альфа" по заказу'
+                },
+                {
+                    time: 'Завтра 10:30',
+                    description: 'Встреча с новым клиентом'
+                },
+                {
+                    time: '25 авг 14:00',
+                    description: 'Отправить КП ИП Сидоров'
+                }
+            ];
+
+            const container = document.getElementById('importantReminders');
+            container.innerHTML = reminders.map(reminder => `
+                <div class="reminder-item">
+                    <div class="reminder-time">${reminder.time}</div>
+                    <div class="reminder-desc">${reminder.description}</div>
+                </div>
+            `).join('');
+        }
+
+        // Initialize charts
+        function initializeCharts() {
+            // Clients chart
+            const clientsCtx = document.getElementById('clientsChart').getContext('2d');
+            new Chart(clientsCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн'],
+                    datasets: [{
+                        label: 'Новые клиенты',
+                        data: [12, 15, 8, 22, 18, 25],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Dialogues chart
+            const dialoguesCtx = document.getElementById('dialoguesChart').getContext('2d');
+            new Chart(dialoguesCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Активные', 'Завершенные', 'Ожидают'],
+                    datasets: [{
+                        data: [12, 45, 8],
+                        backgroundColor: [
+                            '#28a745',
+                            '#667eea',
+                            '#ffc107'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        // Tab management
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName + 'Tab').style.display = 'block';
+            document.getElementById('tab' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).classList.add('active');
+            
+            currentTab = tabName;
+
+            // Load data for the selected tab if needed
+            switch(tabName) {
+                case 'clients':
+                    loadAssignedClients();
+                    break;
+                case 'dialogues':
+                    loadActiveDialogues();
+                    break;
+                case 'notifications':
+                    loadNotifications();
+                    break;
+                case 'analytics':
+                    updateAnalytics();
+                    break;
+            }
+        }
+
+        // Auto-refresh functionality
+        function startAutoRefresh() {
+            autoRefreshInterval = setInterval(async () => {
+                showRefreshIndicator();
+                await loadDashboardData();
+                hideRefreshIndicator();
+            }, 30000); // Refresh every 30 seconds
+        }
+
+        function showRefreshIndicator() {
+            document.getElementById('refreshIndicator').classList.remove('hidden');
+        }
+
+        function hideRefreshIndicator() {
+            setTimeout(() => {
+                document.getElementById('refreshIndicator').classList.add('hidden');
+            }, 2000);
+        }
+
+        // Utility functions
+        function showLoading(overlayId) {
+            const overlay = document.getElementById(overlayId);
+            if (overlay) {
+                overlay.style.display = 'flex';
+            }
+        }
+
+        function hideLoading(overlayId) {
+            const overlay = document.getElementById(overlayId);
+            if (overlay) {
+                overlay.style.display = 'none';
+            }
+        }
+
+        function showError(elementId, message) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 40px; color: #dc3545;">
+                            ${message}
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // Event handlers
+        function toggleUserDropdown() {
+            document.getElementById('userDropdown').classList.toggle('show');
+        }
+
+        function showNotifications() {
+            showTab('notifications');
+        }
+
+        function showProfile() {
+            alert('Функция профиля будет реализована позже');
+        }
+
+        function showSettings() {
+            alert('Функция настроек будет реализована позже');
+        }
+
+        function logout() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+            }
+            API.logout();
+        }
+
+        // Client management
+        function showAssignClientModal() {
+            document.getElementById('assignClientModal').style.display = 'block';
+            loadUnassignedClients();
+        }
+
+        function closeAssignClientModal() {
+            document.getElementById('assignClientModal').style.display = 'none';
+        }
+
+        async function loadUnassignedClients() {
+            try {
+                const response = await API.getClients({ limit: 100 });
+                const select = document.getElementById('clientSelect');
+                
+                select.innerHTML = response.clients.map(client => 
+                    `<option value="${client.id}">${client.name}</option>`
+                ).join('');
+            } catch (error) {
+                console.error('Error loading clients for assignment:', error);
+            }
+        }
+
+        function assignClient() {
+            const clientId = document.getElementById('clientSelect').value;
+            const notes = document.getElementById('assignmentNotes').value;
+            
+            if (!clientId) {
+                alert('Выберите клиента для назначения');
+                return;
+            }
+
+            // Here would be API call to assign client
+            alert('Клиент успешно назначен!');
+            closeAssignClientModal();
+            loadAssignedClients();
+        }
+
+        function startDialogue(clientId) {
+            // Implement dialogue creation
+            alert(`Создание диалога с клиентом ${clientId}`);
+        }
+
+        function viewClient(clientId) {
+            window.open(`clients.html?client=${clientId}`, '_blank');
+        }
+
+        function unassignClient(clientId) {
+            if (confirm('Вы уверены, что хотите отменить назначение этого клиента?')) {
+                // API call to unassign client
+                alert('Назначение клиента отменено');
+                loadAssignedClients();
+            }
+        }
+
+        // Dialogue management
+        function openQuickReply(dialogueId) {
+            currentQuickReplyId = dialogueId;
+            const dialogue = activeDialogues.find(d => d.id === dialogueId);
+            
+            if (dialogue) {
+                document.getElementById('replyClientInfo').innerHTML = `
+                    <strong>${dialogue.client}</strong><br>
+                    <small>Тема: ${dialogue.subject}</small>
+                `;
+            }
+            
+            document.getElementById('quickReplyModal').style.display = 'block';
+        }
+
+        function closeQuickReplyModal() {
+            document.getElementById('quickReplyModal').style.display = 'none';
+            document.getElementById('replyMessage').value = '';
+            currentQuickReplyId = null;
+        }
+
+        function sendQuickReply() {
+            const message = document.getElementById('replyMessage').value.trim();
+            
+            if (!message) {
+                alert('Введите сообщение');
+                return;
+            }
+
+            // API call to send reply
+            alert('Ответ отправлен!');
+            closeQuickReplyModal();
+            loadActiveDialogues();
+        }
+
+        function openDialogue(dialogueId) {
+            // Open dialogue in Telegram or dedicated dialogue interface
+            alert(`Открытие диалога ${dialogueId}`);
+        }
+
+        function setPriority(dialogueId) {
+            const priorities = ['low', 'medium', 'high'];
+            const current = activeDialogues.find(d => d.id === dialogueId)?.priority;
+            const currentIndex = priorities.indexOf(current);
+            const newPriority = priorities[(currentIndex + 1) % priorities.length];
+            
+            // API call to update priority
+            alert(`Приоритет изменен на: ${newPriority}`);
+            loadActiveDialogues();
+        }
+
+        function createNewDialogue() {
+            alert('Функция создания нового диалога будет реализована позже');
+        }
+
+        // Notification management
+        function markNotificationRead(notificationId) {
+            notifications = notifications.map(n => 
+                n.id === notificationId ? {...n, read: true} : n
+            );
+            displayNotifications(notifications);
+            updateNotificationCount();
+        }
+
+        function deleteNotification(notificationId) {
+            notifications = notifications.filter(n => n.id !== notificationId);
+            displayNotifications(notifications);
+            updateNotificationCount();
+        }
+
+        function markAllNotificationsRead() {
+            notifications = notifications.map(n => ({...n, read: true}));
+            displayNotifications(notifications);
+            updateNotificationCount();
+        }
+
+        function clearAllNotifications() {
+            if (confirm('Вы уверены, что хотите очистить все уведомления?')) {
+                notifications = [];
+                displayNotifications(notifications);
+                updateNotificationCount();
+            }
+        }
+
+        function updateNotificationCount() {
+            const unreadCount = notifications.filter(n => !n.read).length;
+            const countEl = document.getElementById('notificationCount');
+            countEl.textContent = unreadCount;
+            countEl.style.display = unreadCount > 0 ? 'flex' : 'none';
+        }
+
+        // Search and filter functions
+        function searchClients() {
+            // Implement client search
+            const searchTerm = document.getElementById('clientsSearch').value.toLowerCase();
+            // Filter and display results
+        }
+
+        function filterClients() {
+            // Implement client filtering
+            const filter = document.getElementById('clientsFilter').value;
+            // Apply filter and display results
+        }
+
+        function searchDialogues() {
+            // Implement dialogue search
+            const searchTerm = document.getElementById('dialoguesSearch').value.toLowerCase();
+            // Filter and display results
+        }
+
+        function filterDialogues() {
+            // Implement dialogue filtering
+            const filter = document.getElementById('dialoguesFilter').value;
+            // Apply filter and display results
+        }
+
+        function filterNotifications() {
+            const filter = document.getElementById('notificationsFilter').value;
+            let filteredNotifications = notifications;
+
+            if (filter !== 'all') {
+                if (filter === 'unread') {
+                    filteredNotifications = notifications.filter(n => !n.read);
+                } else {
+                    filteredNotifications = notifications.filter(n => n.type === filter);
+                }
+            }
+
+            displayNotifications(filteredNotifications);
+        }
+
+        // Reminder management
+        function createReminder() {
+            document.getElementById('reminderModal').style.display = 'block';
+        }
+
+        function closeReminderModal() {
+            document.getElementById('reminderModal').style.display = 'none';
+        }
+
+        function createReminderAction() {
+            const title = document.getElementById('reminderTitle').value.trim();
+            const description = document.getElementById('reminderDescription').value.trim();
+            const date = document.getElementById('reminderDate').value;
+            const time = document.getElementById('reminderTime').value;
+
+            if (!title || !date || !time) {
+                alert('Заполните все обязательные поля');
+                return;
+            }
+
+            // API call to create reminder
+            alert('Напоминание создано!');
+            closeReminderModal();
+            loadReminders();
+        }
+
+        // Analytics
+        function updateAnalytics() {
+            const period = document.getElementById('analyticsPerod')?.value || '30';
+            // Update charts and analytics based on selected period
+            console.log(`Updating analytics for ${period} days`);
+        }
+
+        function exportAnalytics() {
+            alert('Экспорт аналитики будет реализован позже');
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            const userInfo = document.querySelector('.user-info');
+            const dropdown = document.getElementById('userDropdown');
+            
+            if (!userInfo.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+            }
+        });
+    </script>
+</body>
+</html>

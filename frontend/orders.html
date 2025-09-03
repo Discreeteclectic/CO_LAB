@@ -1,0 +1,3275 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Заявки - CO_LAB CRM</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            background: white;
+            box-sizing: border-box;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e1e5e9;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-left: 20px;
+            position: relative;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 45px;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            padding: 8px 0;
+            min-width: 180px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .user-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .user-dropdown::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            right: 12px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 8px solid white;
+        }
+
+        .dropdown-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 4px;
+        }
+
+        .user-name {
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .user-email {
+            color: #666;
+            font-size: 12px;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 16px;
+            color: #333;
+            text-decoration: none;
+            transition: background-color 0.2s;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .dropdown-item.logout {
+            color: #dc3545;
+            border-top: 1px solid #eee;
+            margin-top: 4px;
+        }
+
+        .dropdown-item.logout:hover {
+            background-color: #fff5f5;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-edit {
+            background: #ffc107;
+            color: #212529;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-edit:hover {
+            background: #e0a800;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input[type="text"], input[type="number"], input[type="date"], select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .orders-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .orders-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .orders-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .search-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: nowrap;
+        }
+
+        .search-input {
+            flex: 2;
+            min-width: 300px;
+            padding: 10px 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            transition: border-color 0.3s ease;
+            height: 42px;
+            box-sizing: border-box;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-controls select {
+            padding: 10px 8px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 13px;
+            background: white;
+            min-width: 100px;
+            max-width: 140px;
+            height: 42px;
+            box-sizing: border-box;
+        }
+
+        .search-controls button {
+            white-space: nowrap;
+            padding: 10px 10px;
+            font-size: 13px;
+            height: 42px;
+            box-sizing: border-box;
+        }
+
+        .date-range-row {
+            display: flex;
+            gap: 20px;
+            align-items: flex-end;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .search-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .search-group label {
+            font-size: 12px;
+            font-weight: 500;
+            color: #666;
+            margin-bottom: 3px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            flex: 1;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 3% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e1e5e9;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(102, 126, 234, 0.3);
+            border-radius: 50%;
+            border-top-color: #667eea;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #fee;
+            border: 1px solid #fcc;
+            border-radius: 8px;
+            padding: 12px;
+            color: #c33;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .success-message {
+            background: #efe;
+            border: 1px solid #cfc;
+            border-radius: 8px;
+            padding: 12px;
+            color: #3c3;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        /* Статусы заявок */
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-created {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .status-calculation {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+
+        .status-proposal_sent {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .status-proposal_accepted {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .status-proposal_rejected {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .status-paid {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+
+        .status-picking {
+            background: #fff8e1;
+            color: #f57c00;
+        }
+
+        .status-shipped {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .status-closed {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .status-for_shipment_unpaid {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .file-upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .files-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #e1e5e9;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            background: #fafafa;
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-info strong {
+            display: block;
+            color: #333;
+        }
+
+        .file-info small {
+            color: #666;
+            font-size: 12px;
+        }
+
+        .no-files {
+            text-align: center;
+            color: #999;
+            font-style: italic;
+            padding: 20px;
+        }
+
+
+        .status-progress {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .status-step {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .status-step.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .status-step.completed {
+            background: #28a745;
+            color: white;
+        }
+
+        .status-step.pending {
+            background: #e9ecef;
+            color: #6c757d;
+        }
+
+        .status-branch {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .order-items {
+            margin: 20px 0;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .order-item-info {
+            flex: 1;
+        }
+
+        .order-item-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .quantity-input {
+            width: 80px;
+            padding: 6px;
+            text-align: center;
+        }
+
+        .price-input {
+            width: 120px;
+            padding: 6px;
+            text-align: right;
+        }
+
+        .total-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border: 2px solid #667eea;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .total-row.final {
+            font-size: 18px;
+            font-weight: bold;
+            color: #667eea;
+            border-top: 2px solid #e1e5e9;
+            padding-top: 10px;
+        }
+
+        .product-selector {
+            background: white;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .product-search {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+
+        .product-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .product-option {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .product-option:hover {
+            background: #f8f9fa;
+        }
+
+        .product-option.selected {
+            background: #d3d3d3;
+            border-left: 4px solid #007bff;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid #e1e5e9;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .pagination button:hover {
+            background: #f8f9fa;
+        }
+
+        .pagination button.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Стили для вкладок */
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e1e5e9;
+        }
+
+        .tab-button {
+            padding: 12px 20px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #6c757d;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button:hover {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .tab-button.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        /* Стили для строк истории */
+        .history-row:hover {
+            background-color: #f0f8ff !important;
+            cursor: pointer;
+        }
+
+        .history-row {
+            transition: background-color 0.2s ease;
+        }
+
+        /* Calculation section styles */
+        .calculation-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .calculation-summary {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 15px 0;
+        }
+
+        .calculation-field {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .calculation-field:last-child {
+            border-bottom: none;
+        }
+
+        .calculation-field label {
+            font-weight: 500;
+            color: #555;
+        }
+
+        .calculation-field span {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .workflow-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .btn-workflow {
+            padding: 8px 16px;
+            font-size: 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-workflow:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-workflow.calculation {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-workflow.proposal {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-workflow.accept {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-workflow.reject {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-workflow.duplicate {
+            background: #6c757d;
+            color: white;
+        }
+
+        /* Enhanced progress bar */
+        .enhanced-progress {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .progress-step {
+            flex: 1;
+            text-align: center;
+            padding: 12px 8px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .progress-step:not(:last-child)::after {
+            content: '→';
+            position: absolute;
+            right: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+            color: #ddd;
+            font-weight: bold;
+        }
+
+        .progress-step.current {
+            background: #667eea;
+            color: white;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .progress-step.completed {
+            background: #28a745;
+            color: white;
+        }
+
+        .progress-step.available {
+            background: #e9ecef;
+            color: #495057;
+            cursor: pointer;
+        }
+
+        .progress-step.available:hover {
+            background: #dee2e6;
+        }
+
+        .progress-step.unavailable {
+            background: #f8f9fa;
+            color: #adb5bd;
+        }
+
+        /* Proposal response modal */
+        .response-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .response-buttons .btn {
+            min-width: 120px;
+            padding: 12px 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <div style="display: flex; align-items: center; gap: 30px;">
+                    <h1>Управление заявками</h1>
+                    <button class="btn btn-success" onclick="openCreateOrderModal()">➕ Создать заявку</button>
+                </div>
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <div class="nav-buttons">
+                        <a href="contracts.html" class="btn btn-secondary">Договоры</a>
+                        <a href="markup_calculator.html" class="btn btn-secondary">Калькулятор</a>
+                        <a href="warehouse.html" class="btn btn-secondary">Склад</a>
+                        <a href="clients.html" class="btn btn-secondary">Клиенты</a>
+                    </div>
+                    <div class="user-info">
+                        <div class="user-avatar" id="userAvatar" onclick="toggleUserDropdown()">
+                            У
+                        </div>
+                        <div class="user-dropdown" id="userDropdown">
+                            <div class="dropdown-header">
+                                <div class="user-name" id="userName">Пользователь</div>
+                                <div class="user-email" id="userEmail">user@example.com</div>
+                            </div>
+                            <a href="profile.html" class="dropdown-item" style="text-decoration: none; color: #333;">
+                                👤 Мой профиль
+                            </a>
+                            <button class="dropdown-item logout" onclick="logout()">
+                                🚪 Выйти из системы
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalOrders">-</div>
+                <div class="stat-label">Всего заявок</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="activeOrders">-</div>
+                <div class="stat-label">Активных заявок</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalRevenue">-</div>
+                <div class="stat-label">Общая сумма</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="completedOrders">-</div>
+                <div class="stat-label">Завершенных</div>
+            </div>
+        </div>
+
+        <div class="section" style="position: relative;">
+            <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+                <div>
+                    <div class="loading"></div>
+                    <span>Загрузка...</span>
+                </div>
+            </div>
+
+            <div id="errorMessage" class="error-message" style="display: none;"></div>
+            <div id="successMessage" class="success-message" style="display: none;"></div>
+
+            <!-- Вкладки для заявок -->
+            <div class="tabs">
+                <button class="tab-button active" id="activeTab" onclick="switchTab('active')">
+                    Активные заявки
+                </button>
+                <button class="tab-button" id="historyTab" onclick="switchTab('history')">
+                    История заявок
+                </button>
+            </div>
+
+            <!-- Строка поиска для активных заявок -->
+            <div class="search-controls" id="activeSearchControls">
+                <input type="text" class="search-input" id="searchInput" placeholder="🔍 Поиск по номеру заявки, клиенту, ИНН, сумме..." onkeyup="handleSearch()">
+                
+                <select id="statusFilter" onchange="handleSearch()">
+                    <option value="">Все статусы</option>
+                    <option value="CREATED">Создана</option>
+                    <option value="CALCULATION">Просчет</option>
+                    <option value="PROPOSAL_SENT">КП отправлено</option>
+                    <option value="PROPOSAL_ACCEPTED">КП принято</option>
+                    <option value="PROPOSAL_REJECTED">КП отклонено</option>
+                    <option value="PAID">Оплачена</option>
+                    <option value="FOR_SHIPMENT_UNPAID">В отгрузку без оплаты</option>
+                    <option value="PICKING">Комплектация</option>
+                    <option value="SHIPPED">Отгружена</option>
+                    <option value="CLOSED">Закрыта</option>
+                </select>
+                
+                <select id="dateFilter" onchange="handleDateFilterChange()">
+                    <option value="">Все даты</option>
+                    <option value="today">Сегодня</option>
+                    <option value="yesterday">Вчера</option>
+                    <option value="this_week">Эта неделя</option>
+                    <option value="this_month">Этот месяц</option>
+                    <option value="custom">Выбрать период</option>
+                </select>
+                <span id="dateFilterIndicator" style="font-size: 12px; color: #667eea; margin-left: 8px; display: none;"></span>
+                
+                <button class="btn btn-primary" onclick="loadOrders()">🔄 Обновить</button>
+                <button class="btn btn-secondary" onclick="clearFilters()" title="Очистить фильтры">✕</button>
+            </div>
+            
+            <!-- Строка поиска для истории заявок -->
+            <div class="search-controls" id="historySearchControls" style="display: none;">
+                <input type="text" class="search-input" id="historySearchInput" placeholder="🔍 Поиск по номеру заявки, клиенту, ИНН, сумме..." onkeyup="handleHistorySearch()">
+                
+                <select id="historyDateFilter" onchange="handleHistoryDateFilterChange()">
+                    <option value="">Все даты</option>
+                    <option value="today">Сегодня</option>
+                    <option value="yesterday">Вчера</option>
+                    <option value="this_week">Эта неделя</option>
+                    <option value="this_month">Этот месяц</option>
+                    <option value="custom">Выбрать период</option>
+                </select>
+                <span id="historyDateFilterIndicator" style="font-size: 12px; color: #667eea; margin-left: 8px; display: none;"></span>
+                
+                <button class="btn btn-primary" onclick="loadOrders()">🔄 Обновить</button>
+                <button class="btn btn-secondary" onclick="clearHistoryFilters()" title="Очистить фильтры">✕</button>
+            </div>
+                
+            <div class="date-range-row" id="dateRangeRow" style="display: none;">
+                <div class="search-group">
+                    <label for="dateFrom">От:</label>
+                    <input type="date" id="dateFrom" onchange="handleSearch()">
+                </div>
+                <div class="search-group">
+                    <label for="dateTo">До:</label>
+                    <input type="date" id="dateTo" onchange="handleSearch()">
+                </div>
+            </div>
+            
+            <div class="date-range-row" id="historyDateRangeRow" style="display: none;">
+                <div class="search-group">
+                    <label for="historyDateFrom">От:</label>
+                    <input type="date" id="historyDateFrom" onchange="handleHistorySearch()">
+                </div>
+                <div class="search-group">
+                    <label for="historyDateTo">До:</label>
+                    <input type="date" id="historyDateTo" onchange="handleHistorySearch()">
+                </div>
+            </div>
+            
+            <div id="ordersTableContainer">
+                <table class="orders-table" id="ordersTable">
+                    <thead>
+                        <tr>
+                            <th>№ Заявки</th>
+                            <th>Клиент</th>
+                            <th>Дата создания</th>
+                            <th>Сумма</th>
+                            <th>Товаров</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTableBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="pagination" class="pagination"></div>
+        </div>
+    </div>
+
+    <!-- Модальное окно создания заявки -->
+    <div id="orderModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="orderModalTitle">Создать заявку</h2>
+            </div>
+            
+            <div id="orderModalErrorMessage" class="error-message" style="display: none;"></div>
+            
+            <form id="orderForm">
+                <!-- Основная информация о заявке -->
+                <div class="section">
+                    <h3>Основная информация</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 2;">
+                            <label for="orderClient">Клиент *</label>
+                            <select id="orderClient" required>
+                                <option value="">Выберите клиента</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label for="orderDate">Дата заявки</label>
+                            <input type="date" id="orderDate" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 1;">
+                            <label for="orderManager">Менеджер *</label>
+                            <select id="orderManager" required>
+                                <option value="">Выберите менеджера</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="orderNotes">Примечания</label>
+                        <textarea id="orderNotes" placeholder="Дополнительная информация по заявке"></textarea>
+                    </div>
+                </div>
+
+                <!-- Товары в заявке -->
+                <div class="section">
+                    <h3>Товары</h3>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <span>Список товаров в заявке:</span>
+                        <button type="button" class="btn btn-primary" onclick="openProductSelector()">➕ Добавить товар</button>
+                    </div>
+
+                    <div id="orderItemsList" class="order-items">
+                        <div class="empty-state">Товары не добавлены</div>
+                    </div>
+
+                    <div id="orderTotal" class="total-section" style="display: none;">
+                        <div class="total-row">
+                            <span>Количество позиций:</span>
+                            <span id="totalItems">0</span>
+                        </div>
+                        <div class="total-row">
+                            <span>Общее количество:</span>
+                            <span id="totalQuantity">0</span>
+                        </div>
+                        <div class="total-row final">
+                            <span>Итого к оплате:</span>
+                            <span id="totalAmount">0 сум</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="text-align: right; margin-top: 30px; padding-top: 20px; border-top: 2px solid #e1e5e9;">
+                    <button type="button" class="btn btn-secondary" onclick="closeOrderModal()" style="margin-right: 10px;">Отмена</button>
+                    <button type="submit" class="btn btn-success" id="saveOrderBtn">💾 Создать заявку</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Модальное окно выбора товаров -->
+    <div id="productSelectorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Выбор товаров со склада</h2>
+            </div>
+            
+            <div class="product-selector">
+                <input type="text" class="product-search" id="productSearch" placeholder="🔍 Поиск товаров..." onkeyup="searchProducts()">
+                <div class="product-list" id="productList">
+                    <div class="loading" style="text-align: center; padding: 20px;">Загрузка товаров...</div>
+                </div>
+            </div>
+
+            <div style="text-align: right; margin-top: 20px;">
+                <button type="button" class="btn btn-secondary" onclick="closeProductSelector()" style="margin-right: 10px;">Отмена</button>
+                <button type="button" class="btn btn-success" id="addSelectedProductsBtn" onclick="addSelectedProduct()" disabled>Добавить выбранные товары</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно просмотра заявки -->
+    <div id="viewOrderModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="viewOrderTitle">Заявка #</h2>
+            </div>
+            
+            <div id="viewOrderContent">
+                <!-- Содержимое будет загружено динамически -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно выбора статуса -->
+    <div id="statusSelectionModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2 id="statusSelectionTitle">Изменение статуса заявки</h2>
+                <span class="close" onclick="closeStatusSelectionModal()">&times;</span>
+            </div>
+            
+            <div style="padding: 20px;">
+                <p id="statusSelectionText" style="margin-bottom: 25px; font-size: 16px; text-align: center;">
+                    Выберите следующий статус для заявки:
+                </p>
+                
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <button class="btn btn-success" id="statusPaidBtn" onclick="selectOrderStatus('PAID')" style="padding: 15px; font-size: 16px;">
+                        💰 Заявка оплачена
+                    </button>
+                    <button class="btn btn-primary" id="statusForShipmentBtn" onclick="selectOrderStatus('FOR_SHIPMENT_UNPAID')" style="padding: 15px; font-size: 16px;">
+                        📦 Отправить на комплектацию без оплаты
+                    </button>
+                    <button class="btn btn-secondary" onclick="closeStatusSelectionModal()" style="padding: 15px; font-size: 16px;">
+                        ❌ Отмена
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно создания расчета -->
+    <div id="calculationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="calculationModalTitle">Создать расчет для заявки</h2>
+                <span class="close" onclick="closeCalculationModal()">&times;</span>
+            </div>
+            
+            <div id="calculationModalErrorMessage" class="error-message" style="display: none;"></div>
+            
+            <form id="calculationForm">
+                <div class="section">
+                    <h3>Основные параметры</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 2;">
+                            <label for="calculationName">Название расчета *</label>
+                            <input type="text" id="calculationName" required placeholder="Расчет стоимости для заявки">
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label for="responsibleManager">Ответственный менеджер</label>
+                            <input type="text" id="responsibleManager" placeholder="Имя менеджера">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>Себестоимость</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="gasCost">Газ (сум)</label>
+                            <input type="number" id="gasCost" min="0" step="0.01" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="cylinderCost">Баллон (сум)</label>
+                            <input type="number" id="cylinderCost" min="0" step="0.01" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="preparationCost">Подготовка товара (сум)</label>
+                            <input type="number" id="preparationCost" min="0" step="0.01" placeholder="0">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="logisticsCost">Логистика (сум)</label>
+                            <input type="number" id="logisticsCost" min="0" step="0.01" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="workersCost">Грузчики (сум)</label>
+                            <input type="number" id="workersCost" min="0" step="0.01" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="kickbacksCost">Откаты по сделке (сум)</label>
+                            <input type="number" id="kickbacksCost" min="0" step="0.01" placeholder="0">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>Продажная цена</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="pricePerUnit">Цена за штуку (сум)</label>
+                            <input type="number" id="pricePerUnit" min="0" step="0.01" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="quantity">Количество</label>
+                            <input type="number" id="quantity" min="0" step="1" placeholder="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="productName">Наименование товара</label>
+                            <input type="text" id="productName" placeholder="Автоматически из заявки">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>Информация об организации</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="sellingCompany">Продажная компания</label>
+                            <input type="text" id="sellingCompany" placeholder="Нова, СО-ЛАБ и т.д.">
+                        </div>
+                        <div class="form-group">
+                            <label for="organizationINN">ИНН организации</label>
+                            <input type="text" id="organizationINN" placeholder="123456789">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="organizationName">Наименование организации</label>
+                            <input type="text" id="organizationName" placeholder="Полное наименование">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>Налоговые параметры</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="vatPercent">НДС (%)</label>
+                            <input type="number" id="vatPercent" min="0" max="100" step="0.1" value="12" placeholder="12">
+                        </div>
+                        <div class="form-group">
+                            <label for="incomeTaxPercent">Подоходный налог (%)</label>
+                            <input type="number" id="incomeTaxPercent" min="0" max="100" step="0.1" value="20" placeholder="20">
+                        </div>
+                    </div>
+                </div>
+
+                <div style="text-align: right; margin-top: 30px; padding-top: 20px; border-top: 2px solid #e1e5e9;">
+                    <button type="button" class="btn btn-secondary" onclick="closeCalculationModal()" style="margin-right: 10px;">Отмена</button>
+                    <button type="submit" class="btn btn-success" id="saveCalculationBtn">💾 Создать расчет</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Модальное окно ответа на КП -->
+    <div id="proposalResponseModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2 id="proposalResponseTitle">Ответ на коммерческое предложение</h2>
+                <span class="close" onclick="closeProposalResponseModal()">&times;</span>
+            </div>
+            
+            <div id="proposalResponseErrorMessage" class="error-message" style="display: none;"></div>
+            
+            <form id="proposalResponseForm">
+                <div class="section">
+                    <p style="text-align: center; font-size: 16px; margin-bottom: 20px;" id="proposalResponseText">
+                        Выберите ответ клиента на КП:
+                    </p>
+                    
+                    <div class="form-group">
+                        <label for="responseNotes">Комментарий (опционально)</label>
+                        <textarea id="responseNotes" placeholder="Дополнительная информация от клиента" rows="3"></textarea>
+                    </div>
+
+                    <div class="response-buttons">
+                        <button type="button" class="btn btn-success" onclick="submitProposalResponse('ACCEPTED')">
+                            ✅ КП принято
+                        </button>
+                        <button type="button" class="btn btn-danger" onclick="submitProposalResponse('REJECTED')">
+                            ❌ КП отклонено
+                        </button>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button type="button" class="btn btn-secondary" onclick="closeProposalResponseModal()">Отмена</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        let currentEditingOrder = null;
+        let currentPage = 1;
+        const pageSize = 10;
+        let searchTimeout;
+        let selectedProduct = null;
+        let orderItems = [];
+        let currentTab = 'active'; // 'active' или 'history'
+        let pendingStatusChange = null; // Для хранения данных о смене статуса
+        let currentOrderForCalculation = null; // Для хранения заявки при создании расчета
+        let currentOrderForProposal = null; // Для хранения заявки при ответе на КП
+
+        // Инициализация страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            // Проверка авторизации уже выполнена в api.js
+            // Здесь просто инициализируем страницу
+            
+            initializeUserInfo();
+            loadOrders();
+            loadClients();
+            loadManagers();
+            
+            // Установить текущую дату
+            document.getElementById('orderDate').value = new Date().toISOString().split('T')[0];
+            
+            // Проверить параметр URL для автоматического открытия заявки
+            const urlParams = new URLSearchParams(window.location.search);
+            const viewOrderId = urlParams.get('view');
+            if (viewOrderId) {
+                setTimeout(() => viewOrder(viewOrderId), 1000); // Небольшая задержка для загрузки данных
+            }
+        });
+
+        function initializeUserInfo() {
+            const user = APIHelpers.getCurrentUser();
+            if (user) {
+                document.getElementById('userName').textContent = user.name;
+                document.getElementById('userEmail').textContent = user.email;
+                
+                // Установить аватарку
+                updateUserAvatar(user);
+                
+                // Добавить ссылку на управление пользователями для админа
+                if (user.role === 'admin') {
+                    const dropdown = document.getElementById('userDropdown');
+                    const profileLink = dropdown.querySelector('a[href="profile.html"]');
+                    if (profileLink) {
+                        profileLink.insertAdjacentHTML('afterend', `
+                            <a href="admin-users.html" class="dropdown-item" style="text-decoration: none; color: #333;">
+                                🔧 Управление пользователями
+                            </a>
+                        `);
+                    }
+                }
+            }
+        }
+
+        function updateUserAvatar(user) {
+            const avatarElement = document.getElementById('userAvatar');
+            
+            if (user.avatar) {
+                // Если есть загруженная аватарка
+                avatarElement.innerHTML = `<img src="${user.avatar}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+            } else {
+                // Если нет аватарки - показываем первую букву имени
+                const firstLetter = user.name.charAt(0).toUpperCase();
+                avatarElement.textContent = firstLetter;
+            }
+        }
+
+        function toggleUserDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Закрывать дропдаун при клике вне его
+        document.addEventListener('click', function(event) {
+            const userInfo = document.querySelector('.user-info');
+            const dropdown = document.getElementById('userDropdown');
+            
+            if (!userInfo.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        function logout() {
+            API.logout();
+        }
+
+        // Переключение вкладок
+        function switchTab(tab) {
+            currentTab = tab;
+            currentPage = 1;
+            
+            // Обновляем активную вкладку в UI
+            document.getElementById('activeTab').classList.remove('active');
+            document.getElementById('historyTab').classList.remove('active');
+            document.getElementById(tab + 'Tab').classList.add('active');
+            
+            // Показываем/скрываем соответствующие поисковые интерфейсы
+            const activeSearchControls = document.getElementById('activeSearchControls');
+            const historySearchControls = document.getElementById('historySearchControls');
+            const dateRangeRow = document.getElementById('dateRangeRow');
+            const historyDateRangeRow = document.getElementById('historyDateRangeRow');
+            
+            if (tab === 'history') {
+                // Скрываем интерфейс активных заявок
+                activeSearchControls.style.display = 'none';
+                dateRangeRow.style.display = 'none';
+                
+                // Показываем интерфейс истории
+                historySearchControls.style.display = 'flex';
+                
+                // Скрываем кнопку создания
+                const createButton = document.querySelector('.btn-success[onclick="openCreateOrderModal()"]');
+                createButton.style.display = 'none';
+            } else {
+                // Показываем интерфейс активных заявок
+                activeSearchControls.style.display = 'flex';
+                
+                // Скрываем интерфейс истории
+                historySearchControls.style.display = 'none';
+                historyDateRangeRow.style.display = 'none';
+                
+                // Показываем кнопку создания
+                const createButton = document.querySelector('.btn-success[onclick="openCreateOrderModal()"]');
+                createButton.style.display = 'inline-block';
+            }
+            
+            // Очищаем контейнер таблицы для пересоздания с новым форматом
+            document.getElementById('ordersTableContainer').innerHTML = '';
+            
+            // Перезагружаем заявки для выбранной вкладки
+            loadOrders(1);
+        }
+
+        // Загрузка заявок
+        async function loadOrders(page = 1) {
+            try {
+                currentPage = page;
+                showLoading(true);
+                hideMessages();
+
+                // Используем правильные поля поиска в зависимости от активной вкладки
+                let searchTerm, dateFrom, dateTo;
+                if (currentTab === 'history') {
+                    const historySearchEl = document.getElementById('historySearchInput');
+                    const historyDateFromEl = document.getElementById('historyDateFrom');
+                    const historyDateToEl = document.getElementById('historyDateTo');
+                    
+                    searchTerm = historySearchEl ? historySearchEl.value.trim() : '';
+                    dateFrom = historyDateFromEl ? historyDateFromEl.value : '';
+                    dateTo = historyDateToEl ? historyDateToEl.value : '';
+                } else {
+                    const searchEl = document.getElementById('searchInput');
+                    const dateFromEl = document.getElementById('dateFrom');
+                    const dateToEl = document.getElementById('dateTo');
+                    
+                    searchTerm = searchEl ? searchEl.value.trim() : '';
+                    dateFrom = dateFromEl ? dateFromEl.value : '';
+                    dateTo = dateToEl ? dateToEl.value : '';
+                }
+                
+                const statusFilterEl = document.getElementById('statusFilter');
+                const statusFilter = statusFilterEl ? statusFilterEl.value : '';
+                
+                const params = {
+                    page,
+                    limit: pageSize
+                };
+                
+                // Фильтрация по вкладкам
+                if (currentTab === 'history') {
+                    params.status = 'CLOSED';
+                } else if (currentTab === 'active') {
+                    if (statusFilter && statusFilter !== 'CLOSED') {
+                        params.status = statusFilter;
+                    } else if (!statusFilter) {
+                        // Для активной вкладки исключаем закрытые заявки по умолчанию
+                        params.excludeClosed = 'true';
+                    }
+                }
+
+                if (searchTerm) {
+                    params.search = searchTerm;
+                }
+                
+                if (dateFrom) {
+                    params.dateFrom = dateFrom;
+                    console.log('Adding dateFrom parameter:', dateFrom);
+                }
+                
+                if (dateTo) {
+                    params.dateTo = dateTo;
+                    console.log('Adding dateTo parameter:', dateTo);
+                }
+                
+                console.log('Loading orders with params:', params);
+                
+                // Дополнительная отладка дат
+                if (dateFrom) {
+                    console.log('dateFrom input value:', dateFrom);
+                    console.log('dateFrom as Date:', new Date(dateFrom));
+                }
+                if (dateTo) {
+                    console.log('dateTo input value:', dateTo);
+                    console.log('dateTo as Date:', new Date(dateTo));
+                }
+
+                const response = await API.getOrders(params);
+                console.log('API response received:', response);
+                
+                // Добавляем itemsCount к каждой заявке
+                const ordersWithCount = response.orders.map(order => ({
+                    ...order,
+                    itemsCount: order._count?.items || order.items?.length || 0
+                }));
+
+                displayOrders(ordersWithCount);
+                updatePagination(response.pagination);
+                updateStats();
+
+            } catch (error) {
+                console.error('Error loading orders:', error);
+                showMessage(APIHelpers.formatError(error), true);
+                APIHelpers.showError(document.getElementById('ordersTableContainer'), 'Ошибка загрузки заявок');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Отображение заявок
+        function displayOrders(orders) {
+            const container = document.getElementById('ordersTableContainer');
+            let tableBody = document.getElementById('ordersTableBody');
+            
+            if (orders.length === 0) {
+                const searchTerm = document.getElementById('searchInput').value.trim();
+                const message = searchTerm ? 'По вашему запросу ничего не найдено' : 'Пока нет созданных заявок';
+                APIHelpers.showEmpty(container, message);
+                document.getElementById('pagination').innerHTML = '';
+                return;
+            }
+
+            // Восстанавливаем таблицу если она была удалена
+            if (!tableBody) {
+                const isHistoryTab = currentTab === 'history';
+                const closeDateColumn = isHistoryTab ? '<th>Дата закрытия</th>' : '';
+                const actionsColumn = isHistoryTab ? '' : '<th>Действия</th>';
+                
+                container.innerHTML = `
+                    <table class="orders-table" id="ordersTable">
+                        <thead>
+                            <tr>
+                                <th>№ Заявки</th>
+                                <th>Клиент</th>
+                                <th>Дата создания</th>
+                                <th>Сумма</th>
+                                <th>Товаров</th>
+                                ${closeDateColumn}
+                                ${actionsColumn}
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTableBody">
+                        </tbody>
+                    </table>
+                `;
+                tableBody = document.getElementById('ordersTableBody');
+            }
+
+            const isHistoryTab = currentTab === 'history';
+            
+            tableBody.innerHTML = orders.map(order => {
+                const rowClass = isHistoryTab ? 'history-row' : '';
+                
+                const closeDateColumn = isHistoryTab ? `<td>${APIHelpers.formatDate(order.updatedAt)}</td>` : '';
+                const actionsColumn = isHistoryTab ? '' : `
+                    <td onclick="event.stopPropagation()">
+                        <div class="actions">
+                            <button class="btn btn-edit" onclick="editOrder('${order.id}')" title="Редактировать">✏️</button>
+                            <button class="btn btn-success" onclick="changeOrderStatusWithDirection('${order.id}', 'next')" title="Следующий статус">⏭️</button>
+                            <button class="btn btn-danger" onclick="deleteOrder('${order.id}', '${order.number}')" title="Удалить">🗑️</button>
+                        </div>
+                    </td>
+                `;
+                
+                const redFlag = order.status === 'FOR_SHIPMENT_UNPAID' ? '🚩 ' : '';
+                
+                return `
+                    <tr class="${rowClass}" onclick="viewOrder('${order.id}')" style="cursor: pointer;">
+                        <td>
+                            <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                                <strong>${redFlag}${order.number}</strong>
+                                <span class="status-badge status-${order.status?.toLowerCase() || 'unknown'}">${getStatusText(order.status)}</span>
+                            </div>
+                        </td>
+                        <td>${order.client.name}</td>
+                        <td>${APIHelpers.formatDateTime(order.createdAt)}</td>
+                        <td>${APIHelpers.formatCurrency(order.totalAmount)}</td>
+                        <td>${order.itemsCount} поз.</td>
+                        ${closeDateColumn}
+                        ${actionsColumn}
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'CREATED': 'Создана',
+                'CALCULATION': 'Просчет',
+                'PROPOSAL_SENT': 'КП отправлено',
+                'PROPOSAL_ACCEPTED': 'КП принято',
+                'PROPOSAL_REJECTED': 'КП отклонено',
+                'PAID': 'Оплачена',
+                'FOR_SHIPMENT_UNPAID': 'В отгрузку без оплаты',
+                'PICKING': 'Комплектация',
+                'SHIPPED': 'Отгружена',
+                'CLOSED': 'Закрыта'
+            };
+            return statusMap[status] || status;
+        }
+
+
+        // Загрузка клиентов для выбора
+        async function loadClients() {
+            try {
+                const response = await API.getClients({ limit: 1000 });
+                const clientSelect = document.getElementById('orderClient');
+                
+                clientSelect.innerHTML = '<option value="">Выберите клиента</option>' +
+                    response.clients.map(client => 
+                        `<option value="${client.id}">${client.name}</option>`
+                    ).join('');
+                    
+            } catch (error) {
+                console.error('Error loading clients:', error);
+            }
+        }
+
+        // Загрузка менеджеров для выбора
+        async function loadManagers() {
+            try {
+                const response = await API.getManagers();
+                const managerSelect = document.getElementById('orderManager');
+                const currentUser = APIHelpers.getCurrentUser();
+                
+                managerSelect.innerHTML = '<option value="">Выберите менеджера</option>' +
+                    response.managers.map(manager => 
+                        `<option value="${manager.name}">${manager.name}</option>`
+                    ).join('');
+                
+                // Установить текущего пользователя по умолчанию
+                if (currentUser && currentUser.name) {
+                    // Ищем менеджера с именем текущего пользователя
+                    const userOption = Array.from(managerSelect.options).find(option => 
+                        option.textContent.toLowerCase().includes(currentUser.name.toLowerCase()) ||
+                        currentUser.name.toLowerCase().includes(option.textContent.toLowerCase())
+                    );
+                    if (userOption) {
+                        managerSelect.value = userOption.value;
+                    } else {
+                        // Если не найден, устанавливаем первого менеджера по умолчанию
+                        if (response.managers.length > 0) {
+                            managerSelect.value = response.managers[0].name;
+                        }
+                    }
+                }
+                    
+            } catch (error) {
+                console.error('Error loading managers:', error);
+                // В случае ошибки создаем базовый список менеджеров
+                const managerSelect = document.getElementById('orderManager');
+                managerSelect.innerHTML = `
+                    <option value="">Выберите менеджера</option>
+                    <option value="Менеджер 1">Менеджер 1</option>
+                    <option value="Менеджер 2">Менеджер 2</option>
+                `;
+                // Устанавливаем первого менеджера по умолчанию
+                managerSelect.value = "Менеджер 1";
+            }
+        }
+
+        // Создание заявки
+        function openCreateOrderModal() {
+            currentEditingOrder = null;
+            document.getElementById('orderModalTitle').textContent = 'Создать заявку';
+            document.getElementById('saveOrderBtn').textContent = '💾 Создать заявку';
+            document.getElementById('orderForm').reset();
+            document.getElementById('orderModalErrorMessage').style.display = 'none';
+            
+            // Очистить список товаров
+            orderItems = [];
+            updateOrderItemsList();
+            
+            // Установить текущую дату
+            document.getElementById('orderDate').value = new Date().toISOString().split('T')[0];
+            
+            // Восстановить выбор менеджера по умолчанию
+            loadManagers();
+            
+            document.getElementById('orderModal').style.display = 'block';
+        }
+
+        function closeOrderModal() {
+            document.getElementById('orderModal').style.display = 'none';
+            orderItems = [];
+        }
+
+        // Выбор товаров
+        async function openProductSelector() {
+            document.getElementById('productSelectorModal').style.display = 'block';
+            await loadAvailableProducts();
+        }
+
+        function closeProductSelector() {
+            document.getElementById('productSelectorModal').style.display = 'none';
+            selectedProducts = [];
+            // Убрать все выделения
+            document.querySelectorAll('.product-option.selected').forEach(el => el.classList.remove('selected'));
+        }
+
+        async function loadAvailableProducts() {
+            try {
+                const response = await API.getWarehouseItems({ limit: 1000 });
+                const productList = document.getElementById('productList');
+                
+                if (response.items.length === 0) {
+                    productList.innerHTML = '<div class="empty-state">Нет товаров на складе</div>';
+                    return;
+                }
+
+                productList.innerHTML = response.items
+                    .filter(item => item.quantity > 0) // Только товары в наличии
+                    .map(item => `
+                        <div class="product-option" onclick="selectProduct('${item.id}', '${item.name}', ${item.quantity}, ${item.purchasePrice || item.price || 0}, '${item.unit || 'шт'}')">
+                            <strong>${item.name}</strong><br>
+                            <small>В наличии: ${item.quantity} ${item.unit || 'шт'} | Цена: ${APIHelpers.formatCurrency(item.purchasePrice || item.price || 0)}</small>
+                        </div>
+                    `).join('');
+                    
+            } catch (error) {
+                console.error('Error loading products:', error);
+                document.getElementById('productList').innerHTML = '<div class="error-message">Ошибка загрузки товаров</div>';
+            }
+        }
+
+        let selectedProducts = [];
+
+        function selectProduct(id, name, availableQty, defaultPrice, unit) {
+            const productElement = event.target.closest('.product-option');
+            
+            // Проверить, выбран ли уже товар
+            const productIndex = selectedProducts.findIndex(p => p.id === id);
+            
+            if (productIndex > -1) {
+                // Убрать товар из выбранных
+                selectedProducts.splice(productIndex, 1);
+                productElement.classList.remove('selected');
+            } else {
+                // Добавить товар в выбранные
+                selectedProducts.push({
+                    id,
+                    name,
+                    availableQty,
+                    defaultPrice,
+                    unit
+                });
+                productElement.classList.add('selected');
+            }
+            
+            // Обновить кнопку добавления
+            updateAddSelectedButton();
+        }
+
+        function updateAddSelectedButton() {
+            const addButton = document.getElementById('addSelectedProductsBtn');
+            if (addButton) {
+                addButton.textContent = selectedProducts.length > 0 
+                    ? `Добавить выбранные товары (${selectedProducts.length})` 
+                    : 'Добавить выбранные товары';
+                addButton.disabled = selectedProducts.length === 0;
+            }
+        }
+
+        function addSelectedProduct() {
+            if (selectedProducts.length === 0) {
+                alert('Пожалуйста, выберите товары');
+                return;
+            }
+
+            // Добавить все выбранные товары
+            selectedProducts.forEach(selectedProduct => {
+                // Проверить, не добавлен ли уже этот товар
+                if (!orderItems.find(item => item.id === selectedProduct.id)) {
+                    orderItems.push({
+                        id: selectedProduct.id,
+                        name: selectedProduct.name,
+                        availableQty: selectedProduct.availableQty,
+                        unit: selectedProduct.unit,
+                        quantity: 1,
+                        price: selectedProduct.defaultPrice
+                    });
+                }
+            });
+
+            updateOrderItemsList();
+            closeProductSelector();
+        }
+
+        function updateOrderItemsList() {
+            const container = document.getElementById('orderItemsList');
+            const totalSection = document.getElementById('orderTotal');
+
+            if (orderItems.length === 0) {
+                container.innerHTML = '<div class="empty-state">Товары не добавлены</div>';
+                totalSection.style.display = 'none';
+                return;
+            }
+
+            container.innerHTML = orderItems.map((item, index) => `
+                <div class="order-item">
+                    <div class="order-item-info">
+                        <strong>${item.name}</strong><br>
+                        <small>Доступно: ${item.availableQty} ${item.unit || 'шт'}</small>
+                    </div>
+                    <div class="order-item-actions">
+                        <label>Кол-во:</label>
+                        <input type="number" class="quantity-input" min="1" max="${item.availableQty}" 
+                               value="${item.quantity}" onchange="updateItemQuantity(${index}, this.value)">
+                        
+                        <label>Цена:</label>
+                        <input type="number" class="price-input" min="0" step="0.01" 
+                               value="${item.price}" onchange="updateItemPrice(${index}, this.value)">
+                        
+                        <button type="button" class="btn btn-danger" onclick="removeOrderItem(${index})">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+
+            updateOrderTotals();
+            totalSection.style.display = 'block';
+        }
+
+        function updateItemQuantity(index, quantity) {
+            const qty = parseInt(quantity) || 1;
+            orderItems[index].quantity = Math.min(qty, orderItems[index].availableQty);
+            updateOrderTotals();
+        }
+
+        function updateItemPrice(index, price) {
+            orderItems[index].price = parseFloat(price) || 0;
+            updateOrderTotals();
+        }
+
+        function removeOrderItem(index) {
+            orderItems.splice(index, 1);
+            updateOrderItemsList();
+        }
+
+        function updateOrderTotals() {
+            const totalItems = orderItems.length;
+            const totalQuantity = orderItems.reduce((sum, item) => sum + item.quantity, 0);
+            const totalAmount = orderItems.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+
+            document.getElementById('totalItems').textContent = totalItems;
+            document.getElementById('totalQuantity').textContent = totalQuantity;
+            document.getElementById('totalAmount').textContent = APIHelpers.formatCurrency(totalAmount);
+        }
+
+        // Поиск товаров
+        function searchProducts() {
+            const query = document.getElementById('productSearch').value.toLowerCase();
+            const options = document.querySelectorAll('.product-option');
+            
+            options.forEach(option => {
+                const text = option.textContent.toLowerCase();
+                option.style.display = text.includes(query) ? 'block' : 'none';
+            });
+        }
+
+        // Обработка формы создания заявки
+        document.getElementById('orderForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const orderData = {
+                clientId: document.getElementById('orderClient').value,
+                orderDate: document.getElementById('orderDate').value,
+                manager: document.getElementById('orderManager').value,
+                notes: document.getElementById('orderNotes').value.trim() || null,
+                items: orderItems.map(item => ({
+                    id: item.id,
+                    quantity: item.quantity,
+                    price: item.price
+                }))
+            };
+
+            if (!orderData.clientId) {
+                showOrderModalMessage('Пожалуйста, выберите клиента', true);
+                return;
+            }
+
+            if (!orderData.manager) {
+                showOrderModalMessage('Пожалуйста, выберите менеджера', true);
+                return;
+            }
+
+            if (orderItems.length === 0) {
+                showOrderModalMessage('Пожалуйста, добавьте товары в заявку', true);
+                return;
+            }
+
+            try {
+                const saveBtn = document.getElementById('saveOrderBtn');
+                const originalText = saveBtn.textContent;
+                saveBtn.innerHTML = '<div class="loading"></div>' + (currentEditingOrder ? 'Сохранение...' : 'Создание...');
+                saveBtn.disabled = true;
+
+                let response;
+                if (currentEditingOrder) {
+                    response = await API.updateOrder(currentEditingOrder, orderData);
+                    showMessage(`Заявка ${response.number || response.order?.number || 'неизвестна'} успешно обновлена!`);
+                } else {
+                    response = await API.createOrder(orderData);
+                    showMessage(`Заявка ${response.number || response.order?.number || 'неизвестна'} успешно создана!`);
+                }
+
+                closeOrderModal();
+                loadOrders(currentPage);
+
+            } catch (error) {
+                console.error('Error saving order:', error);
+                showOrderModalMessage(APIHelpers.formatError(error), true);
+            } finally {
+                const saveBtn = document.getElementById('saveOrderBtn');
+                saveBtn.textContent = currentEditingOrder ? '💾 Сохранить изменения' : '💾 Создать заявку';
+                saveBtn.disabled = false;
+            }
+        });
+
+        function showOrderModalMessage(message, isError = false) {
+            const errorEl = document.getElementById('orderModalErrorMessage');
+            if (isError) {
+                errorEl.textContent = message;
+                errorEl.style.display = 'block';
+                setTimeout(() => {
+                    errorEl.style.display = 'none';
+                }, 5000);
+            } else {
+                errorEl.style.display = 'none';
+            }
+        }
+
+        // Функции управления заявками
+        async function viewOrder(id) {
+            try {
+                const order = await API.getOrder(id);
+                
+                // Try to fetch calculation if order has one
+                if (order.calculationId) {
+                    try {
+                        const calculationResponse = await fetch(`/api/orders/${id}/calculation`, {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': 'Bearer ' + localStorage.getItem('token')
+                            }
+                        });
+                        
+                        if (calculationResponse.ok) {
+                            const calculationData = await calculationResponse.json();
+                            order.calculation = calculationData.calculation;
+                        }
+                    } catch (calcError) {
+                        console.log('No calculation found for order:', calcError);
+                    }
+                }
+                
+                displayOrderDetails(order);
+                document.getElementById('viewOrderModal').style.display = 'block';
+            } catch (error) {
+                console.error('Error loading order:', error);
+                showMessage(APIHelpers.formatError(error), true);
+            }
+        }
+
+        function populateOrderForm(order) {
+            // Populate client field
+            const clientSelect = document.getElementById('orderClient');
+            if (clientSelect) {
+                clientSelect.value = order.clientId || '';
+            }
+            
+            // Populate date field
+            const dateInput = document.getElementById('orderDate');
+            if (dateInput && order.orderDate) {
+                const date = new Date(order.orderDate);
+                dateInput.value = date.toISOString().split('T')[0];
+            }
+            
+            // Populate manager field
+            const managerSelect = document.getElementById('orderManager');
+            if (managerSelect) {
+                managerSelect.value = order.manager || '';
+            }
+            
+            // Populate notes field
+            const notesTextarea = document.getElementById('orderNotes');
+            if (notesTextarea) {
+                notesTextarea.value = order.notes || '';
+            }
+            
+            // Populate order items
+            if (order.items && order.items.length > 0) {
+                currentOrderItems = [...order.items];
+                updateOrderItemsDisplay();
+                updateOrderTotal();
+            } else {
+                currentOrderItems = [];
+                updateOrderItemsDisplay();
+                updateOrderTotal();
+            }
+        }
+
+        async function editOrder(id) {
+            console.log('editOrder called with id:', id);
+            try {
+                const order = await API.getOrder(id);
+                console.log('Order loaded for editing:', order);
+                populateOrderForm(order);
+                currentEditingOrder = id;
+                document.getElementById('orderModalTitle').textContent = `Редактировать заявку ${order.number}`;
+                document.getElementById('saveOrderBtn').textContent = '💾 Сохранить изменения';
+                document.getElementById('orderModal').style.display = 'block';
+            } catch (error) {
+                console.error('Error loading order:', error);
+                showMessage(APIHelpers.formatError(error), true);
+            }
+        }
+
+        // Direct status change function (for workflow buttons)
+        async function changeOrderStatus(id, newStatus) {
+            try {
+                const statusNames = {
+                    'CREATED': 'Создана',
+                    'CALCULATION': 'Просчет',
+                    'PROPOSAL_SENT': 'КП отправлено',
+                    'PROPOSAL_ACCEPTED': 'КП принято',
+                    'PROPOSAL_REJECTED': 'КП отклонено',
+                    'PAID': 'Оплачена',
+                    'FOR_SHIPMENT_UNPAID': 'В отгрузку без оплаты',
+                    'PICKING': 'Комплектация',
+                    'SHIPPED': 'Отгружена',
+                    'CLOSED': 'Закрыта'
+                };
+
+                // Особая проверка для перевода в статус "Закрыта"
+                if (newStatus === 'CLOSED') {
+                    const order = await API.getOrder(id);
+                    
+                    // Если заявка была отгружена без оплаты, требуем подтверждение
+                    if (order.status === 'SHIPPED') {
+                        const confirmPayment = confirm(
+                            `ВНИМАНИЕ!\n\n` +
+                            `Вы переводите заявку №${order.number} в статус "Закрыта".\n\n` +
+                            `Пожалуйста, убедитесь что:\n` +
+                            `✓ Клиент произвел оплату\n` +
+                            `✓ Платеж поступил на счет компании\n` +
+                            `✓ Все обязательства выполнены\n\n` +
+                            `Подтверждаете, что заявка ОПЛАЧЕНА и может быть закрыта?`
+                        );
+                        
+                        if (!confirmPayment) {
+                            showMessage('Перевод в статус "Закрыта" отменен. Дождитесь подтверждения оплаты.', false);
+                            return;
+                        }
+                    }
+                } else if (confirm(`Изменить статус заявки на "${statusNames[newStatus]}"?`)) {
+                    // Обычное подтверждение для других статусов
+                } else {
+                    return; // Отмена изменения статуса
+                }
+
+                await API.updateOrderStatus(id, newStatus);
+                showMessage(`Статус заявки изменен на "${statusNames[newStatus]}"`);
+                loadOrders(currentPage);
+                closeViewOrderModal();
+                
+            } catch (error) {
+                console.error('Error changing order status:', error);
+                showMessage(APIHelpers.formatError(error), true);
+            }
+        }
+
+        async function changeOrderStatusWithDirection(id, direction) {
+            console.log('changeOrderStatusWithDirection called with:', id, direction);
+            try {
+                const order = await API.getOrder(id);
+                console.log('Order data:', order);
+                
+                let newStatus;
+                
+                if (direction === 'next') {
+                    // Определяем следующий статус на основе текущего
+                    if (order.status === 'CREATED') {
+                        // Показываем кастомное модальное окно для выбора
+                        showStatusSelectionModal(id, order.number);
+                        return;
+                    } else if (order.status === 'PROPOSAL_ACCEPTED') {
+                        showStatusSelectionModal(id, order.number);
+                        return;
+                    } else if (order.status === 'PAID' || order.status === 'FOR_SHIPMENT_UNPAID') {
+                        newStatus = 'PICKING'; // Переход в комплектацию
+                    } else if (order.status === 'PICKING') {
+                        newStatus = 'SHIPPED'; // Отгрузка происходит только из комплектации
+                    } else if (order.status === 'SHIPPED') {
+                        // Для отгруженных заявок требуем подтверждение оплаты
+                        const confirmPayment = confirm(
+                            `ВНИМАНИЕ!\n\n` +
+                            `Вы переводите заявку №${order.number} в статус "Закрыта".\n\n` +
+                            `Пожалуйста, убедитесь что:\n` +
+                            `✓ Клиент произвел оплату\n` +
+                            `✓ Платеж поступил на счет компании\n` +
+                            `✓ Все обязательства выполнены\n\n` +
+                            `Подтверждаете, что заявка ОПЛАЧЕНА и может быть закрыта?`
+                        );
+                        
+                        if (!confirmPayment) {
+                            showMessage('Перевод в статус "Закрыта" отменен. Дождитесь подтверждения оплаты.', false);
+                            return;
+                        }
+                        
+                        newStatus = 'CLOSED';
+                    } else {
+                        return; // Уже закрыта или другой статус
+                    }
+                } else if (direction === 'prev') {
+                    // Возврат к предыдущему статусу
+                    if (order.status === 'PAID' || order.status === 'FOR_SHIPMENT_UNPAID') {
+                        newStatus = 'PROPOSAL_ACCEPTED';
+                    } else if (order.status === 'PICKING') {
+                        newStatus = 'PAID';
+                    } else if (order.status === 'SHIPPED') {
+                        newStatus = 'PICKING';
+                    } else if (order.status === 'CLOSED') {
+                        newStatus = 'SHIPPED';
+                    } else {
+                        return; // Уже в начальном статусе
+                    }
+                } else {
+                    return;
+                }
+
+                const statusNames = {
+                    'CREATED': 'Создана',
+                    'CALCULATION': 'Просчет',
+                    'PROPOSAL_SENT': 'КП отправлено',
+                    'PROPOSAL_ACCEPTED': 'КП принято',
+                    'PROPOSAL_REJECTED': 'КП отклонено',
+                    'PAID': 'Оплачена',
+                    'FOR_SHIPMENT_UNPAID': 'В отгрузку без оплаты',
+                    'PICKING': 'Комплектация',
+                    'SHIPPED': 'Отгружена',
+                    'CLOSED': 'Закрыта'
+                };
+
+                if (confirm(`Изменить статус заявки ${order.number} на "${statusNames[newStatus]}"?`)) {
+                    await API.updateOrderStatus(id, newStatus);
+                    showMessage(`Статус заявки изменен на "${statusNames[newStatus]}"`);
+                    loadOrders(currentPage);
+                }
+            } catch (error) {
+                console.error('Error changing order status:', error);
+                showMessage(APIHelpers.formatError(error), true);
+            }
+        }
+
+        // Test function for debugging
+        window.testStatusButton = function() {
+            console.log('Test function called');
+            changeOrderStatusWithDirection('1', 'next');
+        };
+        
+        window.testEditButton = function() {
+            console.log('Test edit function called');
+            editOrder('1');
+        };
+
+        // Функции для кастомного модального окна выбора статуса
+        function showStatusSelectionModal(orderId, orderNumber) {
+            console.log('showStatusSelectionModal called with:', orderId, orderNumber);
+            pendingStatusChange = { orderId, orderNumber };
+            document.getElementById('statusSelectionTitle').textContent = `Изменение статуса заявки ${orderNumber}`;
+            document.getElementById('statusSelectionModal').style.display = 'block';
+            console.log('Modal should be visible now');
+        }
+
+        async function selectOrderStatus(status) {
+            if (!pendingStatusChange) return;
+            
+            try {
+                const statusNames = {
+                    'PAID': 'Оплачена',
+                    'FOR_SHIPMENT_UNPAID': 'В отгрузку без оплаты'
+                };
+                
+                await API.updateOrderStatus(pendingStatusChange.orderId, status);
+                showMessage(`Статус заявки изменен на "${statusNames[status]}"`);
+                loadOrders(currentPage);
+                closeStatusSelectionModal();
+            } catch (error) {
+                console.error('Error changing order status:', error);
+                showMessage(APIHelpers.formatError(error), true);
+            }
+        }
+
+        function closeStatusSelectionModal() {
+            document.getElementById('statusSelectionModal').style.display = 'none';
+            pendingStatusChange = null;
+        }
+
+        // Создание договора из заявки
+        async function createContractFromOrder(orderId) {
+            try {
+                if (!confirm('Создать договор на основе этой заявки?')) {
+                    return;
+                }
+
+                showMessage('Создание договора...', false);
+                
+                // Получаем информацию о заявке
+                const order = await API.getOrder(orderId);
+                
+                // Создаем договор с базовыми данными
+                const contractData = {
+                    contractType: 'SUPPLY', // По умолчанию договор поставки
+                    validFrom: new Date().toISOString().split('T')[0],
+                    description: `Договор по заявке ${order.number}`,
+                    terms: 'Стандартные условия поставки',
+                    conditions: 'Согласно спецификации'
+                };
+
+                const response = await fetch('/api/contracts/from-order/' + orderId, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    },
+                    body: JSON.stringify({ contractData })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                
+                showMessage(`Договор ${result.contract.contractNumber} успешно создан!`, false);
+                
+                // Предложить перейти к просмотру договоров
+                if (confirm('Договор создан. Перейти к управлению договорами?')) {
+                    window.location.href = 'contracts.html';
+                }
+
+            } catch (error) {
+                console.error('Error creating contract from order:', error);
+                showMessage('Ошибка создания договора: ' + (error.message || 'Неизвестная ошибка'), true);
+            }
+        }
+
+        async function deleteOrder(id, number) {
+            if (confirm(`Удалить заявку ${number}? Это действие нельзя отменить.`)) {
+                try {
+                    await API.deleteOrder(id);
+                    showMessage(`Заявка ${number} успешно удалена`);
+                    loadOrders(currentPage);
+                } catch (error) {
+                    console.error('Error deleting order:', error);
+                    showMessage(APIHelpers.formatError(error), true);
+                }
+            }
+        }
+
+        function getCylinderInfoForItem(order, item) {
+            // Показываем номера баллонов только для отгруженных заявок
+            if (order.status !== 'SHIPPED' || !order.shipment || !order.shipment.cylinderNumbers) {
+                return '';
+            }
+            
+            // Найдем номера баллонов для этого товара
+            const cylindersForProduct = order.shipment.cylinderNumbers.filter(cyl => cyl.productId === item.id);
+            
+            if (cylindersForProduct.length === 0) {
+                return '';
+            }
+            
+            const cylinderNumbers = cylindersForProduct.map(cyl => cyl.cylinderNumber).join(', ');
+            return `<br><small style="color: #28a745; font-weight: 500;">🏷️ Номера баллонов: ${cylinderNumbers}</small>`;
+        }
+
+        function displayOrderDetails(order) {
+            const content = document.getElementById('viewOrderContent');
+            const statusNames = {
+                'CREATED': 'Создана',
+                'CALCULATION': 'Просчет',
+                'PROPOSAL_SENT': 'КП отправлено',
+                'PROPOSAL_ACCEPTED': 'КП принято',
+                'PROPOSAL_REJECTED': 'КП отклонено',
+                'PAID': 'Оплачена',
+                'FOR_SHIPMENT_UNPAID': 'В отгрузку без оплаты',
+                'PICKING': 'Комплектация',
+                'SHIPPED': 'Отгружена',
+                'CLOSED': 'Закрыта'
+            };
+
+            content.innerHTML = `
+                <div class="enhanced-progress">
+                    <div class="progress-step ${getProgressStepClass(order.status, 'CREATED')}">Создана</div>
+                    <div class="progress-step ${getProgressStepClass(order.status, 'CALCULATION')}">Просчет</div>
+                    <div class="progress-step ${getProgressStepClass(order.status, 'PROPOSAL_SENT')}">КП отправлено</div>
+                    <div class="progress-step ${getProgressStepClass(order.status, 'PROPOSAL_ACCEPTED')}">КП принято</div>
+                    <div class="progress-step ${getProgressStepClass(order.status, 'PAID')}">Оплата</div>
+                    <div class="progress-step ${getProgressStepClass(order.status, 'PICKING')}">Комплектация</div>
+                    <div class="progress-step ${getProgressStepClass(order.status, 'SHIPPED')}">Отгрузка</div>
+                    <div class="progress-step ${getProgressStepClass(order.status, 'CLOSED')}">Закрыта</div>
+                </div>
+
+                ${generateWorkflowButtons(order)}
+
+                <div class="section">
+                    <h3>Информация о заявке</h3>
+                    <p><strong>Номер:</strong> ${order.number}</p>
+                    <p><strong>Клиент:</strong> ${order.client?.name || 'Не указан'}</p>
+                    <p><strong>Дата:</strong> ${APIHelpers.formatDate(order.orderDate)}</p>
+                    <p><strong>Статус:</strong> <span class="status-badge status-${order.status?.toLowerCase() || 'unknown'}">${statusNames[order.status] || 'Неизвестный статус'}</span></p>
+                    <p><strong>Сумма:</strong> ${APIHelpers.formatCurrency(order.totalAmount)}</p>
+                    ${order.notes ? `<p><strong>Примечания:</strong> ${order.notes}</p>` : ''}
+                </div>
+
+                ${generateCalculationSection(order)}
+
+                <div class="section">
+                    <h3>Товары в заявке</h3>
+                    <div class="order-items">
+                        ${order.items?.map(item => {
+                            const cylinderInfo = getCylinderInfoForItem(order, item);
+                            return `
+                                <div class="order-item">
+                                    <div class="order-item-info">
+                                        <strong>${item.product?.name || 'Товар не указан'}</strong><br>
+                                        <small>Количество: ${item.quantity} ${item.product?.unit || 'шт'} × ${APIHelpers.formatCurrency(item.price)} сум = ${APIHelpers.formatCurrency(item.total || (item.quantity * item.price))} сум</small>
+                                        ${cylinderInfo}
+                                    </div>
+                                </div>
+                            `;
+                        }).join('') || '<p>Товары не добавлены</p>'}
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>Прикрепленные файлы</h3>
+                    <div class="file-upload-area">
+                        <input type="file" id="orderFileInput" multiple style="display: none;" onchange="uploadOrderFiles('${order.id}')">
+                        <button class="btn btn-outline" onclick="document.getElementById('orderFileInput').click()">
+                            📎 Прикрепить файл
+                        </button>
+                    </div>
+                    <div id="orderFilesList" class="files-list">
+                        ${order.files && order.files.length > 0 ? order.files.map(file => `
+                            <div class="file-item">
+                                <div class="file-info">
+                                    <strong>${file.originalName}</strong>
+                                    <small>${formatFileSize(file.size)} • ${APIHelpers.formatDateTime(file.createdAt)}</small>
+                                </div>
+                                <button class="btn btn-sm" onclick="downloadOrderFile('${file.id}')" title="Скачать">
+                                    ⬇️
+                                </button>
+                            </div>
+                        `).join('') : '<p class="no-files">Файлы не прикреплены</p>'}
+                    </div>
+                </div>
+
+                <div style="text-align: right; margin-top: 20px;">
+                    <button class="btn btn-success" onclick="createContractFromOrder('${order.id}'); closeViewOrderModal();">📋 Создать договор</button>
+                    <button class="btn btn-primary" onclick="editOrder('${order.id}'); closeViewOrderModal();">Редактировать</button>
+                    <button class="btn btn-secondary" onclick="closeViewOrderModal()">Закрыть</button>
+                </div>
+            `;
+            
+            document.getElementById('viewOrderTitle').textContent = `Заявка ${order.number}`;
+        }
+
+        function getStatusOrder(status) {
+            // Возвращаем порядковый номер для прогресс-бара
+            const statusOrder = {
+                'CREATED': 0,
+                'PAID': 1,
+                'FOR_SHIPMENT_UNPAID': 1, // Альтернативный путь на том же уровне
+                'PICKING': 2,
+                'SHIPPED': 3,
+                'CLOSED': 4
+            };
+            return statusOrder[status] || 0;
+        }
+
+        function populateOrderForm(order) {
+            document.getElementById('orderClient').value = order.clientId;
+            document.getElementById('orderDate').value = order.orderDate.split('T')[0];
+            document.getElementById('orderManager').value = order.manager || '';
+            document.getElementById('orderNotes').value = order.notes || '';
+            
+            // Заполняем товары
+            orderItems = order.items.map(item => ({
+                id: item.productId,
+                name: item.product.name,
+                availableQty: item.product.warehouseItems?.[0]?.quantity || 0,
+                unit: item.product.unit,
+                quantity: item.quantity,
+                price: item.price
+            }));
+            
+            updateOrderItemsList();
+        }
+
+        function closeViewOrderModal() {
+            document.getElementById('viewOrderModal').style.display = 'none';
+        }
+
+        // Функции для работы с файлами
+        async function uploadOrderFiles(orderId) {
+            const fileInput = document.getElementById('orderFileInput');
+            const files = fileInput.files;
+            
+            if (files.length === 0) return;
+
+            try {
+                showMessage('Загружается файл...', false);
+                await API.uploadFiles(files, orderId, 'ORDER');
+                
+                // Перезагрузить детали заявки чтобы отобразить новые файлы
+                const order = await API.getOrder(orderId);
+                displayOrderDetails(order);
+                
+                showMessage(`${files.length} файл(ов) успешно прикреплены к заявке`);
+                fileInput.value = ''; // Очистить input
+            } catch (error) {
+                console.error('Error uploading files:', error);
+                showMessage(APIHelpers.formatError(error), true);
+            }
+        }
+
+        async function downloadOrderFile(fileId) {
+            try {
+                await API.downloadFile(fileId);
+            } catch (error) {
+                console.error('Error downloading file:', error);
+                showMessage(APIHelpers.formatError(error), true);
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Б';
+            
+            const k = 1024;
+            const sizes = ['Б', 'КБ', 'МБ', 'ГБ'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Поиск с задержкой
+        function handleSearch() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                currentPage = 1;
+                loadOrders(1);
+            }, 500);
+        }
+
+        // Поиск в истории заявок
+        function handleHistorySearch() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                currentPage = 1;
+                loadOrders(1);
+            }, 500);
+        }
+
+        // Обработка изменения фильтра по датам
+        function handleDateFilterChange() {
+            const dateFilter = document.getElementById('dateFilter').value;
+            const dateRangeRow = document.getElementById('dateRangeRow');
+            
+            if (dateFilter === 'custom') {
+                dateRangeRow.style.display = 'flex';
+                // Очистить предустановленные даты
+                document.getElementById('dateFrom').value = '';
+                document.getElementById('dateTo').value = '';
+            } else {
+                dateRangeRow.style.display = 'none';
+                // Установить предустановленные даты
+                setPresetDates(dateFilter);
+            }
+            
+            handleSearch();
+        }
+
+        // Обработка изменения фильтра по датам для истории
+        function handleHistoryDateFilterChange() {
+            const dateFilter = document.getElementById('historyDateFilter').value;
+            const dateRangeRow = document.getElementById('historyDateRangeRow');
+            
+            if (dateFilter === 'custom') {
+                dateRangeRow.style.display = 'flex';
+                // Очистить предустановленные даты
+                document.getElementById('historyDateFrom').value = '';
+                document.getElementById('historyDateTo').value = '';
+            } else {
+                dateRangeRow.style.display = 'none';
+                // Установить предустановленные даты для истории
+                setHistoryPresetDates(dateFilter);
+            }
+            
+            handleHistorySearch();
+        }
+
+        // Установка предустановленных дат
+        function setPresetDates(preset) {
+            const today = new Date();
+            const dateFrom = document.getElementById('dateFrom');
+            const dateTo = document.getElementById('dateTo');
+            const indicator = document.getElementById('dateFilterIndicator');
+            
+            // Форматирование даты для input[type="date"]
+            const formatDate = (date) => date.toISOString().split('T')[0];
+            const formatDisplayDate = (date) => date.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' });
+            
+            switch (preset) {
+                case 'today':
+                    dateFrom.value = formatDate(today);
+                    dateTo.value = formatDate(today);
+                    indicator.textContent = `📅 ${formatDisplayDate(today)}`;
+                    indicator.style.display = 'inline';
+                    console.log('Setting today filter:', formatDate(today));
+                    break;
+                
+                case 'yesterday':
+                    const yesterday = new Date(today);
+                    yesterday.setDate(today.getDate() - 1);
+                    dateFrom.value = formatDate(yesterday);
+                    dateTo.value = formatDate(yesterday);
+                    indicator.textContent = `📅 ${formatDisplayDate(yesterday)}`;
+                    indicator.style.display = 'inline';
+                    console.log('Setting yesterday filter:', formatDate(yesterday));
+                    break;
+                
+                case 'this_week':
+                    const startOfWeek = new Date(today);
+                    startOfWeek.setDate(today.getDate() - today.getDay() + 1); // Понедельник
+                    dateFrom.value = formatDate(startOfWeek);
+                    dateTo.value = formatDate(today);
+                    indicator.textContent = `📅 ${formatDisplayDate(startOfWeek)} - ${formatDisplayDate(today)}`;
+                    indicator.style.display = 'inline';
+                    console.log('Setting this week filter:', formatDate(startOfWeek), 'to', formatDate(today));
+                    break;
+                
+                case 'this_month':
+                    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+                    dateFrom.value = formatDate(startOfMonth);
+                    dateTo.value = formatDate(today);
+                    indicator.textContent = `📅 ${formatDisplayDate(startOfMonth)} - ${formatDisplayDate(today)}`;
+                    indicator.style.display = 'inline';
+                    console.log('Setting this month filter:', formatDate(startOfMonth), 'to', formatDate(today));
+                    break;
+                
+                default:
+                    dateFrom.value = '';
+                    dateTo.value = '';
+                    indicator.style.display = 'none';
+                    console.log('Clearing date filters');
+            }
+        }
+
+        // Установка предустановленных дат для истории
+        function setHistoryPresetDates(preset) {
+            const today = new Date();
+            const dateFrom = document.getElementById('historyDateFrom');
+            const dateTo = document.getElementById('historyDateTo');
+            const indicator = document.getElementById('historyDateFilterIndicator');
+            
+            // Форматирование даты для input[type="date"]
+            const formatDate = (date) => date.toISOString().split('T')[0];
+            const formatDisplayDate = (date) => date.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' });
+            
+            switch (preset) {
+                case 'today':
+                    dateFrom.value = formatDate(today);
+                    dateTo.value = formatDate(today);
+                    indicator.textContent = `📅 ${formatDisplayDate(today)}`;
+                    indicator.style.display = 'inline';
+                    break;
+                
+                case 'yesterday':
+                    const yesterday = new Date(today);
+                    yesterday.setDate(today.getDate() - 1);
+                    dateFrom.value = formatDate(yesterday);
+                    dateTo.value = formatDate(yesterday);
+                    indicator.textContent = `📅 ${formatDisplayDate(yesterday)}`;
+                    indicator.style.display = 'inline';
+                    break;
+                
+                case 'this_week':
+                    const startOfWeek = new Date(today);
+                    startOfWeek.setDate(today.getDate() - today.getDay() + 1); // Понедельник
+                    dateFrom.value = formatDate(startOfWeek);
+                    dateTo.value = formatDate(today);
+                    indicator.textContent = `📅 ${formatDisplayDate(startOfWeek)} - ${formatDisplayDate(today)}`;
+                    indicator.style.display = 'inline';
+                    break;
+                
+                case 'this_month':
+                    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+                    dateFrom.value = formatDate(startOfMonth);
+                    dateTo.value = formatDate(today);
+                    indicator.textContent = `📅 ${formatDisplayDate(startOfMonth)} - ${formatDisplayDate(today)}`;
+                    indicator.style.display = 'inline';
+                    break;
+                
+                default:
+                    dateFrom.value = '';
+                    dateTo.value = '';
+                    indicator.style.display = 'none';
+            }
+        }
+
+        // Очистка всех фильтров
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('dateFilter').value = '';
+            document.getElementById('dateFrom').value = '';
+            document.getElementById('dateTo').value = '';
+            document.getElementById('dateRangeRow').style.display = 'none';
+            document.getElementById('dateFilterIndicator').style.display = 'none';
+            
+            currentPage = 1;
+            loadOrders(1);
+        }
+
+        // Очистка фильтров истории
+        function clearHistoryFilters() {
+            document.getElementById('historySearchInput').value = '';
+            document.getElementById('historyDateFilter').value = '';
+            document.getElementById('historyDateFrom').value = '';
+            document.getElementById('historyDateTo').value = '';
+            document.getElementById('historyDateRangeRow').style.display = 'none';
+            document.getElementById('historyDateFilterIndicator').style.display = 'none';
+            
+            currentPage = 1;
+            loadOrders(1);
+        }
+
+        // Вспомогательные функции
+        function showLoading(show = true) {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) {
+                overlay.style.display = show ? 'flex' : 'none';
+            }
+        }
+
+        function showMessage(message, isError = false) {
+            const errorEl = document.getElementById('errorMessage');
+            const successEl = document.getElementById('successMessage');
+            
+            if (isError) {
+                errorEl.textContent = message;
+                errorEl.style.display = 'block';
+                successEl.style.display = 'none';
+            } else {
+                successEl.textContent = message;
+                successEl.style.display = 'block';
+                errorEl.style.display = 'none';
+            }
+
+            setTimeout(() => {
+                if (errorEl) errorEl.style.display = 'none';
+                if (successEl) successEl.style.display = 'none';
+            }, 5000);
+        }
+
+        function hideMessages() {
+            const errorEl = document.getElementById('errorMessage');
+            const successEl = document.getElementById('successMessage');
+            if (errorEl) errorEl.style.display = 'none';
+            if (successEl) successEl.style.display = 'none';
+        }
+
+        function updatePagination(pagination) {
+            const paginationEl = document.getElementById('pagination');
+            
+            if (pagination.pages <= 1) {
+                paginationEl.innerHTML = '';
+                return;
+            }
+
+            let paginationHTML = '';
+            
+            paginationHTML += `
+                <button onclick="loadOrders(${pagination.page - 1})" ${pagination.page <= 1 ? 'disabled' : ''}>
+                    ← Предыдущая
+                </button>
+            `;
+
+            for (let i = 1; i <= pagination.pages; i++) {
+                if (i === pagination.page) {
+                    paginationHTML += `<button class="active">${i}</button>`;
+                } else if (Math.abs(i - pagination.page) <= 2 || i === 1 || i === pagination.pages) {
+                    paginationHTML += `<button onclick="loadOrders(${i})">${i}</button>`;
+                } else if (Math.abs(i - pagination.page) === 3) {
+                    paginationHTML += '<span>...</span>';
+                }
+            }
+
+            paginationHTML += `
+                <button onclick="loadOrders(${pagination.page + 1})" ${pagination.page >= pagination.pages ? 'disabled' : ''}>
+                    Следующая →
+                </button>
+            `;
+
+            paginationEl.innerHTML = paginationHTML;
+        }
+
+        async function updateStats() {
+            try {
+                const stats = await API.getOrderStats();
+                
+                document.getElementById('totalOrders').textContent = stats.totalOrders;
+                document.getElementById('activeOrders').textContent = stats.activeOrders;
+                document.getElementById('totalRevenue').textContent = APIHelpers.formatCurrency(stats.totalRevenue);
+                document.getElementById('completedOrders').textContent = stats.completedOrders;
+                
+            } catch (error) {
+                console.error('Error updating stats:', error);
+                // Показываем прочерки при ошибке
+                document.getElementById('totalOrders').textContent = '-';
+                document.getElementById('activeOrders').textContent = '-';
+                document.getElementById('totalRevenue').textContent = '-';
+                document.getElementById('completedOrders').textContent = '-';
+            }
+        }
+
+        // Helper functions for the enhanced workflow
+
+        function getProgressStepClass(currentStatus, stepStatus) {
+            const statusOrder = {
+                'CREATED': 0,
+                'CALCULATION': 1,
+                'PROPOSAL_SENT': 2,
+                'PROPOSAL_ACCEPTED': 3,
+                'PROPOSAL_REJECTED': 3, // Same level as accepted
+                'PAID': 4,
+                'FOR_SHIPMENT_UNPAID': 4, // Same level as paid
+                'PICKING': 5,
+                'SHIPPED': 6,
+                'CLOSED': 7
+            };
+
+            const currentOrder = statusOrder[currentStatus] || 0;
+            const stepOrder = statusOrder[stepStatus] || 0;
+
+            if (currentStatus === stepStatus) {
+                return 'current';
+            } else if (currentOrder > stepOrder) {
+                return 'completed';
+            } else if (stepOrder === currentOrder + 1) {
+                return 'available';
+            } else {
+                return 'unavailable';
+            }
+        }
+
+        function generateWorkflowButtons(order) {
+            let buttons = '<div class="workflow-buttons">';
+
+            switch (order.status) {
+                case 'CREATED':
+                    buttons += `<button class="btn-workflow calculation" onclick="openCalculationModal('${order.id}')">
+                        🧮 Создать расчет
+                    </button>`;
+                    break;
+                
+                case 'CALCULATION':
+                    buttons += `<button class="btn-workflow proposal" onclick="sendProposal('${order.id}')">
+                        📧 Отправить КП
+                    </button>`;
+                    buttons += `<button class="btn-workflow duplicate" onclick="duplicateCalculation('${order.id}')">
+                        📋 Дублировать расчет
+                    </button>`;
+                    break;
+                
+                case 'PROPOSAL_SENT':
+                    buttons += `<button class="btn-workflow accept" onclick="openProposalResponseModal('${order.id}', 'ACCEPTED')">
+                        ✅ КП принято
+                    </button>`;
+                    buttons += `<button class="btn-workflow reject" onclick="openProposalResponseModal('${order.id}', 'REJECTED')">
+                        ❌ КП отклонено
+                    </button>`;
+                    break;
+                
+                case 'PROPOSAL_ACCEPTED':
+                    buttons += `<button class="btn-workflow proposal" onclick="changeOrderStatus('${order.id}', 'PAID')">
+                        💰 Заявка оплачена
+                    </button>`;
+                    buttons += `<button class="btn-workflow reject" onclick="changeOrderStatus('${order.id}', 'FOR_SHIPMENT_UNPAID')">
+                        📦 В отгрузку без оплаты
+                    </button>`;
+                    break;
+            }
+
+            buttons += '</div>';
+            return buttons;
+        }
+
+        function generateCalculationSection(order) {
+            if (!order.calculation && order.status === 'CREATED') {
+                return `
+                    <div class="calculation-section">
+                        <h3>Расчет стоимости</h3>
+                        <p style="text-align: center; color: #666; font-style: italic;">
+                            Расчет еще не создан для данной заявки
+                        </p>
+                        <div class="workflow-buttons">
+                            <button class="btn-workflow calculation" onclick="openCalculationModal('${order.id}')">
+                                🧮 Создать расчет
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (!order.calculation) {
+                return '';
+            }
+
+            const calc = order.calculation;
+            return `
+                <div class="calculation-section">
+                    <h3>Расчет стоимости: ${calc.name}</h3>
+                    <div class="calculation-summary">
+                        <div>
+                            <div class="calculation-field">
+                                <label>Себестоимость:</label>
+                                <span>${APIHelpers.formatCurrency(calc.totalCostBreakdown || 0)}</span>
+                            </div>
+                            <div class="calculation-field">
+                                <label>Цена за штуку:</label>
+                                <span>${APIHelpers.formatCurrency(calc.pricePerUnit || 0)}</span>
+                            </div>
+                            <div class="calculation-field">
+                                <label>Количество:</label>
+                                <span>${calc.quantity || 0} шт</span>
+                            </div>
+                            <div class="calculation-field">
+                                <label>Сумма сделки:</label>
+                                <span>${APIHelpers.formatCurrency(calc.totalSaleAmount || 0)}</span>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="calculation-field">
+                                <label>Валовая прибыль:</label>
+                                <span>${APIHelpers.formatCurrency(calc.grossProfit || 0)}</span>
+                            </div>
+                            <div class="calculation-field">
+                                <label>НДС:</label>
+                                <span>${APIHelpers.formatCurrency(calc.vatAmount || 0)}</span>
+                            </div>
+                            <div class="calculation-field">
+                                <label>Подоходный налог:</label>
+                                <span>${APIHelpers.formatCurrency(calc.incomeTaxAmount || 0)}</span>
+                            </div>
+                            <div class="calculation-field">
+                                <label>Чистая прибыль:</label>
+                                <span style="color: ${(calc.netProfit || 0) >= 0 ? '#28a745' : '#dc3545'}">
+                                    ${APIHelpers.formatCurrency(calc.netProfit || 0)}
+                                </span>
+                            </div>
+                            <div class="calculation-field">
+                                <label>Рентабельность:</label>
+                                <span style="color: ${(calc.profitabilityPercent || 0) >= 0 ? '#28a745' : '#dc3545'}">
+                                    ${(calc.profitabilityPercent || 0).toFixed(1)}%
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    ${calc.status === 'КП_ОТПРАВЛЕНО' ? `
+                        <p style="margin-top: 15px; padding: 10px; background: #e8f5e8; border-radius: 5px; color: #2e7d32;">
+                            📧 КП отправлено ${APIHelpers.formatDate(calc.sentDate)}
+                            ${calc.reminderActive ? ' • Напоминания активны' : ''}
+                        </p>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        // Calculation modal functions
+        function openCalculationModal(orderId) {
+            currentOrderForCalculation = orderId;
+            document.getElementById('calculationForm').reset();
+            document.getElementById('calculationModalErrorMessage').style.display = 'none';
+            
+            // Set default values
+            document.getElementById('vatPercent').value = 12;
+            document.getElementById('incomeTaxPercent').value = 20;
+            
+            document.getElementById('calculationModal').style.display = 'block';
+        }
+
+        function closeCalculationModal() {
+            document.getElementById('calculationModal').style.display = 'none';
+            currentOrderForCalculation = null;
+        }
+
+        // Handle calculation form submission
+        document.getElementById('calculationForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!currentOrderForCalculation) {
+                showCalculationModalMessage('Ошибка: заявка не выбрана', true);
+                return;
+            }
+
+            const calculationData = {
+                name: document.getElementById('calculationName').value,
+                gasCost: parseFloat(document.getElementById('gasCost').value) || 0,
+                cylinderCost: parseFloat(document.getElementById('cylinderCost').value) || 0,
+                preparationCost: parseFloat(document.getElementById('preparationCost').value) || 0,
+                logisticsCost: parseFloat(document.getElementById('logisticsCost').value) || 0,
+                workersCost: parseFloat(document.getElementById('workersCost').value) || 0,
+                kickbacksCost: parseFloat(document.getElementById('kickbacksCost').value) || 0,
+                pricePerUnit: parseFloat(document.getElementById('pricePerUnit').value) || 0,
+                quantity: parseFloat(document.getElementById('quantity').value) || 0,
+                productName: document.getElementById('productName').value || '',
+                sellingCompany: document.getElementById('sellingCompany').value || '',
+                organizationINN: document.getElementById('organizationINN').value || '',
+                organizationName: document.getElementById('organizationName').value || '',
+                responsibleManager: document.getElementById('responsibleManager').value || '',
+                vatPercent: parseFloat(document.getElementById('vatPercent').value) || 12,
+                incomeTaxPercent: parseFloat(document.getElementById('incomeTaxPercent').value) || 20
+            };
+
+            try {
+                const saveBtn = document.getElementById('saveCalculationBtn');
+                const originalText = saveBtn.textContent;
+                saveBtn.innerHTML = '<div class="loading"></div>Создание...';
+                saveBtn.disabled = true;
+
+                const response = await fetch(`/api/orders/${currentOrderForCalculation}/create-calculation`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    },
+                    body: JSON.stringify(calculationData)
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Ошибка создания расчета');
+                }
+
+                const result = await response.json();
+                showMessage(`Расчет "${result.calculation.name}" успешно создан для заявки!`);
+                closeCalculationModal();
+                loadOrders(currentPage);
+
+            } catch (error) {
+                console.error('Error creating calculation:', error);
+                showCalculationModalMessage(error.message || 'Ошибка создания расчета', true);
+            } finally {
+                const saveBtn = document.getElementById('saveCalculationBtn');
+                saveBtn.textContent = '💾 Создать расчет';
+                saveBtn.disabled = false;
+            }
+        });
+
+        function showCalculationModalMessage(message, isError = false) {
+            const errorEl = document.getElementById('calculationModalErrorMessage');
+            if (isError) {
+                errorEl.textContent = message;
+                errorEl.style.display = 'block';
+                setTimeout(() => {
+                    errorEl.style.display = 'none';
+                }, 5000);
+            } else {
+                errorEl.style.display = 'none';
+            }
+        }
+
+        // Send proposal function
+        async function sendProposal(orderId) {
+            if (!confirm('Отправить КП клиенту? После отправки будут активированы автоматические напоминания.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/orders/${orderId}/send-proposal`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Ошибка отправки КП');
+                }
+
+                const result = await response.json();
+                showMessage(result.message);
+                loadOrders(currentPage);
+                closeViewOrderModal();
+
+            } catch (error) {
+                console.error('Error sending proposal:', error);
+                showMessage(error.message || 'Ошибка отправки КП', true);
+            }
+        }
+
+        // Duplicate calculation function
+        async function duplicateCalculation(orderId) {
+            if (!confirm('Создать копию расчета для данной заявки?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/orders/${orderId}/duplicate-calculation`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Ошибка создания копии расчета');
+                }
+
+                const result = await response.json();
+                showMessage(result.message);
+                
+            } catch (error) {
+                console.error('Error duplicating calculation:', error);
+                showMessage(error.message || 'Ошибка создания копии расчета', true);
+            }
+        }
+
+        // Proposal response modal functions
+        function openProposalResponseModal(orderId, responseType) {
+            currentOrderForProposal = { orderId, responseType };
+            document.getElementById('responseNotes').value = '';
+            document.getElementById('proposalResponseErrorMessage').style.display = 'none';
+            
+            const responseText = responseType === 'ACCEPTED' ? 'принять' : 'отклонить';
+            document.getElementById('proposalResponseText').textContent = 
+                `Подтвердите, что клиент решил ${responseText} коммерческое предложение:`;
+            
+            document.getElementById('proposalResponseModal').style.display = 'block';
+        }
+
+        function closeProposalResponseModal() {
+            document.getElementById('proposalResponseModal').style.display = 'none';
+            currentOrderForProposal = null;
+        }
+
+        async function submitProposalResponse(response) {
+            if (!currentOrderForProposal) {
+                showProposalResponseModalMessage('Ошибка: заявка не выбрана', true);
+                return;
+            }
+
+            const notes = document.getElementById('responseNotes').value.trim();
+
+            try {
+                const result = await fetch(`/api/orders/${currentOrderForProposal.orderId}/proposal-response`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    },
+                    body: JSON.stringify({ response, notes })
+                });
+
+                if (!result.ok) {
+                    const error = await result.json();
+                    throw new Error(error.error || 'Ошибка обработки ответа на КП');
+                }
+
+                const data = await result.json();
+                showMessage(data.message);
+                closeProposalResponseModal();
+                loadOrders(currentPage);
+                closeViewOrderModal();
+
+            } catch (error) {
+                console.error('Error submitting proposal response:', error);
+                showProposalResponseModalMessage(error.message || 'Ошибка обработки ответа на КП', true);
+            }
+        }
+
+        function showProposalResponseModalMessage(message, isError = false) {
+            const errorEl = document.getElementById('proposalResponseErrorMessage');
+            if (isError) {
+                errorEl.textContent = message;
+                errorEl.style.display = 'block';
+                setTimeout(() => {
+                    errorEl.style.display = 'none';
+                }, 5000);
+            } else {
+                errorEl.style.display = 'none';
+            }
+        }
+
+        // Закрытие модальных окон при клике вне их
+        window.onclick = function(event) {
+            const modals = ['orderModal', 'productSelectorModal', 'viewOrderModal', 'statusSelectionModal', 'calculationModal', 'proposalResponseModal'];
+            modals.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                    if (modalId === 'orderModal') {
+                        orderItems = [];
+                    }
+                    if (modalId === 'productSelectorModal') {
+                        selectedProduct = null;
+                    }
+                    if (modalId === 'statusSelectionModal') {
+                        pendingStatusChange = null;
+                    }
+                    if (modalId === 'calculationModal') {
+                        currentOrderForCalculation = null;
+                    }
+                    if (modalId === 'proposalResponseModal') {
+                        currentOrderForProposal = null;
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

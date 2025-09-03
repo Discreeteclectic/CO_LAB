@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test CORS - Port 5002</title>
+    <style>
+        body { font-family: monospace; margin: 20px; }
+        button { padding: 10px 20px; margin: 10px; cursor: pointer; }
+        .result { margin: 20px 0; padding: 10px; background: #f0f0f0; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>Test CORS on Port 5002</h1>
+    
+    <button onclick="testHealth()">Test Health Endpoint</button>
+    <button onclick="testLogin()">Test Login</button>
+    
+    <div id="result"></div>
+
+    <script>
+        const API_BASE = 'http://localhost:5002';
+        
+        function showResult(message, isSuccess) {
+            const div = document.getElementById('result');
+            div.className = 'result ' + (isSuccess ? 'success' : 'error');
+            div.innerHTML = `<pre>${message}</pre>`;
+        }
+        
+        async function testHealth() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                showResult('✅ Health check successful:\n' + JSON.stringify(data, null, 2), true);
+            } catch (error) {
+                showResult('❌ Health check failed:\n' + error.message, false);
+            }
+        }
+        
+        async function testLogin() {
+            try {
+                const response = await fetch(`${API_BASE}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        email: 'test@test.com',
+                        password: 'password123'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('✅ Login successful:\n' + JSON.stringify(data, null, 2), true);
+                } else {
+                    showResult('❌ Login failed:\n' + JSON.stringify(data, null, 2), false);
+                }
+            } catch (error) {
+                showResult('❌ Request failed:\n' + error.message, false);
+            }
+        }
+    </script>
+</body>
+</html>
